@@ -1,0 +1,1519 @@
+"use client";
+import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  baseCommentRoutes,
+  followAccount as followAccountEp,
+  myAccountImages as myAccountImagesEp,
+  myFollowedUsers as myFollowedUsersEp,
+  myNotifications as myNotificationsEp,
+  myFollowers as myFollowersEp,
+  basePostRoutes,
+  baseUserRoutes,
+  commentById,
+  commentLikesById,
+  followedUserPost,
+  loginRoute,
+  myAccount as myAccountEp,
+  myChats as myChatsEp,
+  myPosts as myPostsEp,
+  postById,
+  postCommentsByPostId,
+  postImageByPostAndImageId,
+  postImagesByPostId,
+  postLikesByPostId,
+  userById,
+  userFollowedUsersById,
+  userFollowersById,
+  searchRoute,
+  logoutRoute,
+  userPost,
+  userIsFollowed,
+  followedAccountById,
+  postIsLiked,
+} from "./endpoints";
+import { useRouter } from "next/navigation";
+import { useAuthSession } from "@/stores/auth-store";
+import axios, { AxiosRequestConfig } from "axios";
+import { keys } from "./queryKey";
+import { getFormData } from "./getFormData";
+import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import {
+  UserAccount,
+  UserAccountPublic,
+  UserFollowerResponse,
+  UserFollowingResponse,
+} from "@/types/user";
+import { PostExtended, PostLikeResponse } from "@/types/post";
+import { Comment, CommentLikeResponse } from "@/types/comment";
+import { Chat } from "@/types/chat";
+import { useMemo } from "react";
+
+// TODO ADD PAGING OBJECT IN KEY
+
+type NotificationType = "post" | "comment" | "follow" | "like";
+
+interface LoginData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface RegisterAccountData {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+interface UpdateUserDataOptions {
+  username?: string;
+  description?: string;
+}
+
+interface CreateNotificationData {
+  title: string;
+  content: string;
+  type: NotificationType;
+  url?: string;
+}
+
+interface CreatePostData {
+  title?: string;
+  content: string;
+  images?: File[];
+}
+
+interface UpdatePostDataOptions {
+  title?: string;
+  content?: string;
+  images?: File[];
+}
+
+interface CreateCommentData {
+  image?: File;
+  comment: string;
+  postId: number;
+  parentId?: number | null;
+}
+
+interface CreateChatData {
+  recipientId: number;
+  message: string;
+  image?: File;
+}
+
+type OffsetPaging = { limit?: number; offset?: number } | undefined;
+
+export type SearchOptions = OffsetPaging & {
+  q?: string;
+  type: "user" | "post" | "all";
+};
+
+type OffsetPagingwithOrder =
+  | (OffsetPaging & {
+      order_by?: ("latest" | "oldest" | "highest" | "lowest")[];
+    })
+  | undefined;
+
+export const useGetMyInfo = (config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+  const { data: myInfo, ...rest } = useQuery<JsendSuccess<UserAccount>>({
+    queryFn: () =>
+      request
+        .get(myAccountEp, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    queryKey: keys.myInfo,
+  });
+
+  return { myInfo, ...rest };
+};
+
+export const useLogin = () => {
+  const { setSession } = useAuthSession();
+  const request = useAxiosInterceptor();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { mutate: login, ...rest } = useMutation({
+    mutationFn: (data: LoginData) =>
+      request
+        .post(loginRoute, data)
+        .then(
+          (res) =>
+            res.data as JsendSuccess<{
+              access_token: string;
+              token_type: string;
+              expires_in: number;
+            }>
+        )
+        .catch((err) => Promise.reject(err.response.data)),
+    onSuccess: (data, v, ctx) => {
+      const res = data?.data;
+      alert("Success login!");
+      console.log(res);
+      if (res?.access_token) {
+        router.push("/");
+        setSession({
+          ...JSON.parse(window.atob(res?.access_token.split(".")[1])),
+          accessToken: res?.access_token,
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: keys.meAccount() });
+    },
+  });
+
+  return { login, ...rest };
+};
+
+export const useLogout = () => {
+  const { setSession } = useAuthSession();
+  const request = useAxiosInterceptor();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { mutate: logout, ...rest } = useMutation({
+    mutationFn: () =>
+      request
+        .post(logoutRoute)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err.response.data)),
+    onSuccess: (data, v, ctx) => {
+      setSession(null);
+      router.push("/login");
+      queryClient.invalidateQueries({ queryKey: keys.meAccount() });
+    },
+  });
+
+  return { logout, ...rest };
+};
+
+export const useGetUsers = (
+  options?: OffsetPaging,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: usersData, ...rest } = useQuery<UserAccount[]>({
+    queryKey: keys.users,
+    queryFn: () =>
+      request
+        .get(baseUserRoutes(options), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { usersData, ...rest };
+};
+
+export const useGetUserById = (userId: number, config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+
+  const { data: userData, ...rest } = useQuery<UserAccountPublic>({
+    queryKey: keys.userById(userId),
+    queryFn: () =>
+      request
+        .get(userById(userId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { userData, ...rest };
+};
+
+export const useUpdateUser = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: updateUser,
+    mutateAsync: updateUserAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      userId: number;
+      data?: UpdateUserDataOptions;
+      config?: AxiosRequestConfig;
+    }) =>
+      request
+        .patch(userById(v.userId.toString()), v?.data, v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
+    },
+  });
+
+  return { updateUser, updateUserAsync, ...rest };
+};
+
+export const useDeleteUser = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteUser,
+    mutateAsync: deleteUserAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
+      request
+        .delete(userById(v.userId.toString()), v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
+    },
+  });
+
+  return { deleteUser, deleteUserAsync, ...rest };
+};
+
+export const useGetUserFollowers = (
+  userId: number,
+  config?: AxiosRequestConfig
+) => {
+  const {
+    data: userFollowersData,
+    error,
+    ...rest
+  } = useQuery<JsendSuccess<UserFollowerResponse>>({
+    queryKey: keys.userFollowers(userId),
+    queryFn: () =>
+      axios
+        .get(userFollowersById(userId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { userFollowersData, ...rest };
+};
+
+export const useGetUserIsFollowed = (
+  userId: number,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: isFollowed, ...rest } = useQuery<JsendSuccess<boolean>>({
+    queryKey: keys.isFollowing(userId),
+    queryFn: () =>
+      request
+        .get(userIsFollowed(userId), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { isFollowed, ...rest };
+};
+
+export const useGetUserFollowedUsers = (
+  userId: number,
+  config?: AxiosRequestConfig
+) => {
+  const { data: userFollowedUsersData, ...rest } = useQuery<
+    JsendSuccess<UserFollowingResponse>
+  >({
+    queryKey: keys.userFollowedUsers(userId),
+    queryFn: () =>
+      axios
+        .get(userFollowedUsersById(userId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { userFollowedUsersData, ...rest };
+};
+
+export const useGetPosts = (
+  options?: OffsetPaging,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+    queryKey: keys.posts,
+    queryFn: () =>
+      request
+        .get(basePostRoutes(options), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { posts, ...rest };
+};
+
+export const useGetPostByUserId = (
+  userId: number,
+  query?: { limit?: number; offset?: number },
+  config?: AxiosRequestConfig
+) => {
+  const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+    queryKey: [...keys.posts, userId, query, "users"],
+    queryFn: () =>
+      axios
+        .get(userPost(userId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { posts, ...rest };
+};
+
+export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+
+  const { data: post, ...rest } = useQuery<JsendSuccess<PostExtended>>({
+    queryKey: keys.postById(postId),
+    queryFn: () =>
+      request
+        .get(postById(postId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { post, ...rest };
+};
+
+export const useGetPostFromFollowedUsers = (
+  options?: OffsetPaging,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: followedUsersPost, ...rest } = useQuery<
+    JsendWithPaging<PostExtended[]>
+  >({
+    queryKey: keys.posts,
+    queryFn: () =>
+      request
+        .get(followedUserPost(options), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { followedUsersPost, ...rest };
+};
+
+export const useGetCommentByPostId = (
+  postId: number,
+  options?: OffsetPagingwithOrder,
+  config?: AxiosRequestConfig
+) => {
+  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<Comment[]>>({
+    getNextPageParam: (res) => res?.pagination?.next,
+    getPreviousPageParam: (res) => res?.pagination?.previous,
+    queryKey: keys.postComments(postId),
+    queryFn: ({ pageParam }) =>
+      pageParam === null
+        ? Promise.resolve(undefined)
+        : axios
+            .get(
+              pageParam
+                ? pageParam
+                : postCommentsByPostId(postId.toString(), options),
+              config
+            )
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  const postComments = useMemo(
+    () => ({
+      ...data?.pages?.[0],
+      data: data?.pages
+        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
+        .flat(),
+    }),
+    [data]
+  );
+
+  return { postComments, data, ...rest };
+};
+
+export const useGetPostLikeByPostId = (
+  postId: number,
+  config?: AxiosRequestConfig
+) => {
+  const { data: postLikes, ...rest } = useQuery<JsendSuccess<PostLikeResponse>>(
+    {
+      queryKey: keys.postLikes(postId),
+      queryFn: () =>
+        axios
+          .get(postLikesByPostId(postId.toString()), config)
+          .then((res) => res.data)
+          .catch((err) => Promise.reject(err?.response?.data)),
+    }
+  );
+
+  return { postLikes, ...rest };
+};
+
+export const useCreatePost = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: createPost,
+    mutateAsync: createPostAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { data: CreatePostData; config?: AxiosRequestConfig }) => {
+      const formData = new FormData();
+      if (v?.data?.title) formData.append("title", v?.data?.title);
+      formData.append("content", v?.data?.content);
+      if (v?.data?.images && v?.data?.images?.length > 0) {
+        v?.data.images.forEach((image) => formData.append("images", image));
+      }
+      return request
+        .post(basePostRoutes(), formData, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.posts });
+    },
+  });
+
+  return { createPost, createPostAsync, ...rest };
+};
+
+export const useUpdatePost = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: updatePost,
+    mutateAsync: updatePostAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      postId: number;
+      data: UpdatePostDataOptions;
+      config?: AxiosRequestConfig;
+    }) => {
+      const formData = getFormData(v.data);
+      return request
+        .patch(postById(v.postId.toString()), formData, v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.postById(v.postId) });
+    },
+  });
+
+  return { updatePost, updatePostAsync, ...rest };
+};
+
+export const useDeletePost = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deletePost,
+    mutateAsync: deletePostAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .delete(postById(v.postId.toString()), v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.postById(v.postId) });
+    },
+  });
+
+  return { deletePost, deletePostAsync, ...rest };
+};
+
+export const useLikePost = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: likePost,
+    mutateAsync: likePostAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .post(postLikesByPostId(v.postId.toString()), undefined, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onMutate: async (v) => {
+      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
+      await queryClient.cancelQueries({ queryKey: keys.posts });
+
+      const post = queryClient.getQueryData(keys.postById(v.postId));
+      const posts = queryClient.getQueryData(keys.posts);
+      console.log(posts);
+      console.log(post);
+
+      queryClient.setQueryData(keys.posts, (old: any) =>
+        (old?.data ?? []).map((item: any) => {
+          if (item.id === v.postId) {
+            return { ...item, total_likes: item?.total_likes ?? 0 + 1 };
+          }
+          return item;
+        })
+      );
+
+      queryClient.setQueryData(
+        keys.postById(v.postId),
+        (old: { total_likes: number } | undefined) => ({
+          ...old,
+          total_likes: old?.total_likes ?? 0 + 1,
+        })
+      );
+
+      return { post, postId: v.postId, posts };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(
+        keys.postById(context?.postId ?? -1),
+        context?.post
+      );
+
+      queryClient.setQueryData(keys.posts, context?.posts);
+    },
+    onSettled: (d, e, v) => {
+      queryClient.invalidateQueries(keys.postById(v.postId));
+      queryClient.invalidateQueries(keys.posts);
+    },
+  });
+
+  return { likePost, likePostAsync, ...rest };
+};
+
+export const useUnlikePost = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: unlikePost,
+    mutateAsync: unlikePostAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .delete(postLikesByPostId(v.postId.toString()), v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onMutate: async (v) => {
+      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
+      await queryClient.cancelQueries({ queryKey: keys.posts });
+
+      const post = queryClient.getQueryData(keys.postById(v.postId));
+      const posts = queryClient.getQueryData(keys.posts);
+
+      queryClient.setQueryData(keys.posts, (old: any) =>
+        (old?.data ?? [])?.map((item: any) => {
+          if (item.id === v.postId) {
+            return {
+              ...item,
+              total_likes:
+                item?.total_likes ?? 0 - 1 === -1
+                  ? 0
+                  : item?.total_likes ?? 0 - 1,
+            };
+          }
+          return item;
+        })
+      );
+
+      queryClient.setQueryData(
+        keys.postById(v.postId),
+        (old: { total_likes: number } | undefined) => ({
+          ...old,
+          total_likes:
+            old?.total_likes ?? 0 - 1 === -1 ? 0 : old?.total_likes ?? 0 - 1,
+        })
+      );
+
+      return { post, postId: v.postId, posts };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(
+        keys.postById(context?.postId ?? -1),
+        context?.post
+      );
+
+      queryClient.setQueryData(keys.posts, context?.posts);
+    },
+    onSettled: (d, e, v) => {
+      queryClient.invalidateQueries(keys.postById(v.postId));
+      queryClient.invalidateQueries(keys.posts);
+    },
+  });
+
+  return { unlikePost, unlikePostAsync, ...rest };
+};
+
+export const useDeletepostImages = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteAllPostImages,
+    mutateAsync: deleteAllPostImagesAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .delete(postImagesByPostId(v.postId.toString()), v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.postById(v.postId) });
+    },
+  });
+
+  return { deleteAllPostImages, deleteAllPostImagesAsync, ...rest };
+};
+
+export const useDeletePostImage = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deletePostImage,
+    mutateAsync: deletePostImageAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      postId: number;
+      imageId: number;
+      config?: AxiosRequestConfig;
+    }) => {
+      return request
+        .delete(
+          postImageByPostAndImageId(v.postId.toString(), v.imageId.toString()),
+          v?.config
+        )
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.postById(v.postId) });
+    },
+  });
+
+  return { deletePostImage, deletePostImageAsync, ...rest };
+};
+
+export const useCreateComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: createComment,
+    mutateAsync: createCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      data: CreateCommentData;
+      config?: AxiosRequestConfig;
+    }) => {
+      const formData = new FormData();
+
+      if (v.data?.image) formData.append("image", v.data.image);
+      if (v.data?.parentId)
+        formData.append("parentId", v.data.parentId.toString());
+      formData.append("comment", v.data.comment);
+      formData.append("postId", v.data.postId.toString());
+      return request
+        .post(baseCommentRoutes, formData, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.posts });
+      queryClient.invalidateQueries({ queryKey: keys.postById(v.data.postId) });
+      queryClient.invalidateQueries({
+        queryKey: keys.postComments(v.data.postId),
+      });
+    },
+  });
+
+  return { createComment, createCommentAsync, ...rest };
+};
+
+export const useCreateReplyComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: createReplyComment,
+    mutateAsync: createReplyCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      commentId: number;
+      comment: string;
+      image?: File;
+      config?: AxiosRequestConfig;
+    }) => {
+      const formData = new FormData();
+      formData.append("commentId", v.commentId.toString());
+      formData.append("comment", v.comment);
+      if (v?.image) formData.append("image", v.image);
+      return request
+        .post(commentById(v.commentId.toString()), formData, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.commentById(v.commentId),
+      });
+    },
+  });
+
+  return { createReplyComment, createReplyCommentAsync, ...rest };
+};
+
+export const useGetComment = (
+  commentId: number,
+  config?: AxiosRequestConfig
+) => {
+  const { data: comment, ...rest } = useQuery<JsendSuccess<Comment>>({
+    queryKey: keys.commentById(commentId),
+    queryFn: () =>
+      axios
+        .get(commentById(commentId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { comment, ...rest };
+};
+
+export const useGetCommentLikes = (
+  commentId: number,
+  config?: AxiosRequestConfig
+) => {
+  const { data: commentLikes, ...rest } = useQuery<
+    JsendSuccess<CommentLikeResponse>
+  >({
+    queryKey: keys.commentById(commentId),
+    queryFn: () =>
+      axios
+        .get(commentLikesById(commentId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { commentLikes, ...rest };
+};
+
+export const useDeleteComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteComment,
+    mutateAsync: deleteCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { commentId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .delete(commentById(v.commentId.toString()), v?.config)
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.commentById(v.commentId),
+      });
+    },
+  });
+
+  return { deleteComment, deleteCommentAsync, ...rest };
+};
+
+export const useLikeComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+  const {
+    mutate: likeComment,
+    mutateAsync: likeCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { commentId: number; config?: AxiosRequestConfig }) =>
+      request
+        .post(commentLikesById(v.commentId.toString()), undefined, v?.config)
+        .then((res) => res.data)
+        .catch((err) => err?.response?.data),
+    onMutate: async (v) => {
+      // await queryClient.cancelQueries(keys.commentLikes(v.commentId));
+      await queryClient.cancelQueries(keys.commentIsLiked(v.commentId));
+      await queryClient.cancelQueries(keys.commentById(v.commentId));
+
+      const comment = queryClient.getQueryData(keys.commentById(v.commentId));
+      const commentIsLiked = queryClient.getQueryData(
+        keys.commentIsLiked(v.commentId)
+      );
+
+      queryClient.setQueryData(
+        keys.commentIsLiked(v.commentId),
+        (old: any) => ({
+          ...old,
+          data: true,
+        })
+      );
+
+      queryClient.setQueryData(keys.commentById(v.commentId), (old: any) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          total_likes: old?.data?.total_likes ?? 0 + 1,
+        },
+      }));
+      // queryClient.setQueryData(keys.commentLikes(v.commentId), (old:any) => ({
+      //   ...old,data:{
+      //     ...old?.data,
+      //     likedBy:[...old?.data?.likedBy, {id:v.commentId}],
+      //     total:old?.data?.total ?? 0 + 1
+      //   }
+      // }))
+
+      return { comment, commentIsLiked };
+    },
+    onError: (e, v, ctx) => {
+      queryClient.setQueryData(
+        keys.commentIsLiked(v.commentId),
+        ctx?.commentIsLiked
+      );
+      queryClient.setQueryData(keys.commentById(v.commentId), ctx?.comment);
+    },
+    onSuccess: (d, v, ctx) => {
+      queryClient.invalidateQueries(["comment", "isliked"]);
+      queryClient.invalidateQueries(keys.commentLikes(v.commentId));
+    },
+    onSettled: (d, v, ctx) => {
+      queryClient.invalidateQueries(keys.commentIsLiked(ctx.commentId));
+    },
+  });
+
+  return { likeComment, likeCommentAsync, ...rest };
+};
+
+// likeComment(commentId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).post(
+//     commentLikesById(commentId.toString()),
+//     config
+//   );
+// }
+
+export const useUnlikeComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+  const {
+    mutate: likeComment,
+    mutateAsync: likeCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { commentId: number; config?: AxiosRequestConfig }) =>
+      request
+        .delete(commentLikesById(v.commentId.toString()), v?.config)
+        .then((res) => res.data)
+        .catch((err) => err?.response?.data),
+    onMutate: async (v) => {
+      // await queryClient.cancelQueries(keys.commentLikes(v.commentId));
+      await queryClient.cancelQueries(keys.commentIsLiked(v.commentId));
+      await queryClient.cancelQueries(keys.commentById(v.commentId));
+
+      const comment = queryClient.getQueryData(keys.commentById(v.commentId));
+      const commentIsLiked = queryClient.getQueryData(
+        keys.commentIsLiked(v.commentId)
+      );
+
+      queryClient.setQueryData(
+        keys.commentIsLiked(v.commentId),
+        (old: any) => ({
+          ...old,
+          data: false,
+        })
+      );
+
+      queryClient.setQueryData(keys.commentById(v.commentId), (old: any) => ({
+        ...old,
+        data: {
+          ...old?.data,
+          total_likes: old?.data?.total_likes ?? (0 - 1 || 0),
+        },
+      }));
+      // queryClient.setQueryData(keys.commentLikes(v.commentId), (old:any) => ({
+      //   ...old,data:{
+      //     ...old?.data,
+      //     likedBy:[...old?.data?.likedBy, {id:v.commentId}],
+      //     total:old?.data?.total ?? 0 + 1
+      //   }
+      // }))
+
+      return { comment, commentIsLiked };
+    },
+    onError: (e, v, ctx) => {
+      queryClient.setQueryData(
+        keys.commentIsLiked(v.commentId),
+        ctx?.commentIsLiked
+      );
+      queryClient.setQueryData(keys.commentById(v.commentId), ctx?.comment);
+    },
+    onSuccess: (d, v, ctx) => {
+      queryClient.invalidateQueries(["comment", "isliked"]);
+      queryClient.invalidateQueries(keys.commentLikes(v.commentId));
+    },
+    onSettled: (d, v, ctx) => {
+      queryClient.invalidateQueries(keys.commentIsLiked(ctx.commentId));
+    },
+  });
+
+  return { likeComment, likeCommentAsync, ...rest };
+};
+
+// unlikeComment(commentId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).delete(
+//     commentLikesById(commentId.toString()),
+//     config
+//   );
+// }
+
+export const useUpdateComment = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: updateComment,
+    mutateAsync: updateCommentAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      commentId: number;
+      comment: string;
+      config?: AxiosRequestConfig;
+    }) => {
+      return request
+        .patch(
+          commentById(v.commentId.toString()),
+          { comment: v?.comment },
+          v?.config
+        )
+        .then((res) => res.data as JsendSuccess<null>)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.commentById(v.commentId),
+      });
+    },
+  });
+
+  return { updateComment, updateCommentAsync, ...rest };
+};
+
+export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myAccountInfo, ...rest } = useQuery<JsendSuccess<UserAccount>>({
+    queryKey: keys.meAccount(),
+    queryFn: () =>
+      request
+        .get(myAccountEp, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myAccountInfo, ...rest };
+};
+
+export const useGetMyChats = (
+  query?: OffsetPaging,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myChats, ...rest } = useQuery<JsendWithPaging<Chat[]>>({
+    queryKey: keys.meChats(),
+    queryFn: () =>
+      request
+        .get(myChatsEp(query), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myChats, ...rest };
+};
+
+export const useGetMyPosts = (
+  query?: OffsetPaging,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myPosts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+    queryKey: keys.mePosts(),
+    queryFn: () =>
+      request
+        .get(myPostsEp(query), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myPosts, ...rest };
+};
+
+export const useGetMyFollowers = (config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myFollowers, ...rest } = useQuery<
+    JsendSuccess<{ followerIds: number[]; total: number }>
+  >({
+    queryKey: keys.meFollowers(),
+    queryFn: () =>
+      request
+        .get(myFollowersEp, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myFollowers, ...rest };
+};
+
+export const useGetMyFollowedUsers = (config?: AxiosRequestConfig) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myFollowedUsers, ...rest } = useQuery<
+    JsendSuccess<{ followedUserIds: number[]; total: number }>
+  >({
+    queryKey: keys.meFollowing(),
+    queryFn: () =>
+      request
+        .get(myFollowedUsersEp, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myFollowedUsers, ...rest };
+};
+
+export const useGetMyNotifications = (
+  query?: OffsetPaging & { order_by?: ("latest" | "oldest")[] },
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: myNotifications, ...rest } = useQuery({
+    queryKey: keys.meNotifications(),
+    queryFn: () =>
+      request
+        .get(myNotificationsEp(query), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { myNotifications, ...rest };
+};
+
+export const useUpdateMyAccountInfo = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: updateAccount,
+    mutateAsync: updateAccountAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      data: UpdateUserDataOptions;
+      config?: AxiosRequestConfig;
+    }) => {
+      return request
+        .patch(myAccountEp, v.data, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.meAccount(),
+      });
+    },
+  });
+
+  return { updateAccount, updateAccountAsync, ...rest };
+};
+
+export const useUpdateMyAccountImage = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: updateAccountImage,
+    mutateAsync: updateAccountImageAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { image: File; config?: AxiosRequestConfig }) => {
+      const formData = new FormData();
+      formData.append("image", v.image);
+
+      return request
+        .patch(myAccountImagesEp, formData, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.meAccount(),
+      });
+    },
+  });
+
+  return { updateAccountImage, updateAccountImageAsync, ...rest };
+};
+
+export const useDeleteMyAccountImage = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteAccountImage,
+    mutateAsync: deleteAccountImageAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { config?: AxiosRequestConfig }) => {
+      return request
+        .delete(myAccountImagesEp, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.meAccount(),
+      });
+    },
+  });
+
+  return { deleteAccountImage, deleteAccountImageAsync, ...rest };
+};
+
+export const useDeleteMyAccount = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: deleteMyAccount,
+    mutateAsync: deleteMyAccountAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { config?: AxiosRequestConfig }) => {
+      return request
+        .delete(myAccountEp, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.meAccount(),
+      });
+    },
+  });
+
+  return { deleteMyAccount, deleteMyAccountAsync, ...rest };
+};
+
+export const useFollowAccount = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: followAccount,
+    mutateAsync: followAccountAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .post(followAccountEp, { userId: v.userId }, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onMutate: async (v) => {
+      await queryClient.cancelQueries(keys.users);
+      await queryClient.cancelQueries(keys.userById(v.userId));
+
+      const users = queryClient.getQueryData(keys.users);
+      const user = queryClient.getQueryData(keys.userById(v.userId));
+
+      queryClient.setQueryData(keys.users, (old: any) =>
+        (old ?? []).map((user: any) => ({
+          ...user,
+          followedBy: {
+            ...user?.followedBy,
+            followerIds: [...user?.followedBy?.followerIds, v.userId],
+            total: user?.followedBy?.total ?? 0 + 1,
+          },
+        }))
+      );
+      queryClient.setQueryData(keys.userById(v.userId), (old: any) => ({
+        ...old,
+        followedBy: {
+          ...old?.followedBy,
+          followerIds: [...old?.followedBy?.followerIds, v.userId],
+          total: old?.followedBy?.total ?? 0 + 1,
+        },
+      }));
+
+      return { users, user };
+    },
+    onError: (e, v, ctx) => {
+      queryClient.setQueryData(keys.users, ctx?.users ?? []);
+      queryClient.setQueryData(keys.userById(v.userId), ctx?.user ?? undefined);
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.isFollowing(v.userId) });
+    },
+    onSettled: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.users,
+      });
+      queryClient.invalidateQueries({ queryKey: keys.userById(d.userId) });
+    },
+  });
+
+  return { followAccount, followAccountAsync, ...rest };
+};
+
+// followAccount(userId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).post(
+//     followAccount,
+//     {
+//       userId,
+//     },
+//     config
+//   );
+// }
+
+export const useUnfollowAccount = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: unfollowAccount,
+    mutateAsync: unfollowAccountAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) => {
+      return request
+        .delete(followedAccountById(v.userId.toString()), v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onMutate: async (v) => {
+      await queryClient.cancelQueries(keys.users);
+      await queryClient.cancelQueries(keys.userById(v.userId));
+
+      const users = queryClient.getQueryData(keys.users);
+      const user = queryClient.getQueryData(keys.userById(v.userId));
+
+      queryClient.setQueryData(keys.users, (old: any) =>
+        (old ?? []).map((user: any) => ({
+          ...user,
+          followedBy: {
+            ...user?.followedBy,
+            followerIds: user?.followedBy?.followerIds.filter(
+              (u: any) => u !== v.userId
+            ),
+            total:
+              user?.followedBy?.total ?? 0 - 1 === -1
+                ? 0
+                : old?.followedBy?.total ?? 0 - 1,
+          },
+        }))
+      );
+      queryClient.setQueryData(keys.userById(v.userId), (old: any) => ({
+        ...old,
+        followedBy: {
+          ...old?.followedBy,
+          followerIds: old?.followedBy?.followerIds.filter(
+            (u: any) => u !== v.userId
+          ),
+          total:
+            old?.followedBy?.total ?? 0 - 1 === -1
+              ? 0
+              : old?.followedBy?.total ?? 0 - 1,
+        },
+      }));
+
+      return { users, user };
+    },
+    onError: (e, v, ctx) => {
+      queryClient.setQueryData(keys.users, ctx?.users ?? []);
+      queryClient.setQueryData(keys.userById(v.userId), ctx?.user ?? undefined);
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.isFollowing(v.userId) });
+    },
+    onSettled: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.users,
+      });
+      queryClient.invalidateQueries({ queryKey: keys.userById(d.userId) });
+    },
+  });
+
+  return { unfollowAccount, unfollowAccountAsync, ...rest };
+};
+
+// unfollowAccount(userId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).delete(
+//     followedAccountById(userId.toString()),
+//     config
+//   );
+// }
+
+export const useCreateNotification = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: createNotification,
+    mutateAsync: createNotificationAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: {
+      data: CreateNotificationData;
+      config?: AxiosRequestConfig;
+    }) => {
+      return request
+        .post(myNotificationsEp(), v.data, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data));
+    },
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.meNotifications(),
+      });
+    },
+  });
+
+  return { createNotification, createNotificationAsync, ...rest };
+};
+
+export const useClearNotifications = () => {};
+
+// clearMyNotifications(config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).delete(
+//     myNotifications(),
+//     config
+//   );
+// }
+
+export const useGetSearchResult = (
+  options: SearchOptions,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: searchResult, ...rest } = useQuery<
+    JsendWithPaging<UserAccountPublic[] | PostExtended[]>
+  >({
+    queryKey: keys.search(options),
+    queryFn: () =>
+      request
+        .get(searchRoute(options), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { searchResult, ...rest };
+};
+
+// search(options: SearchOptions, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).get(
+//     searchRoute(options),
+//     config
+//   );
+// }
+
+export const useCreateChat = () => {};
+
+// createChat(data: CreateChatData, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).post(
+//     baseChatRoutes,
+//     data,
+//     config
+//   );
+// }
+// deleteChat(chatId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).delete(
+//     chatById(chatId.toString()),
+//     config
+//   );
+// }
+// getChatByRecipientId(recipientId: number, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).get(
+//     chatsByRecipientId(recipientId.toString()),
+//     config
+//   );
+// }
+// updateChat(chatId: number, message: string, config?: AxiosRequestConfig) {
+//   return axiosWithAccessToken(this.accessToken).patch(
+//     chatById(chatId.toString()),
+//     { message },
+//     config
+//   );
+// }
+
+// login(data: LoginData, config?: AxiosRequestConfig) {
+//   return axios.post(loginRoute, data, { withCredentials: true, ...config });
+// }
+
+// registerAccount(data: RegisterAccountData, config?: AxiosRequestConfig) {
+//   return axios.post(signUpRoute, data, { withCredentials: true, ...config });
+// }
+
+// // NEED FIX
+// logout(config?: AxiosRequestConfig) {
+//   return axios.post(logoutRoute, null, { withCredentials: true, ...config });
+// }
+
+// refreshAccessToken(config?: AxiosRequestConfig) {
+//   return axios.post(
+//     refreshTokenRoute,
+//     {},
+//     {
+//       ...config,
+//       withCredentials: true,
+//     }
+//   );
+// }
+
+export const useGetPostIsLiked = (
+  postId: number,
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data: isLiked, ...rest } = useQuery<JsendSuccess<boolean>>({
+    queryKey: [...keys.posts, "likes", postId],
+    queryFn: () =>
+      request
+        .get(postIsLiked(postId.toString()), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return { isLiked, ...rest };
+};

@@ -1,0 +1,23 @@
+"use client";
+
+import React from "react";
+import { TypographyMuted } from "./ui/typography";
+import moment from "moment";
+
+export default function Timestamp({
+  date,
+  className,
+  customDate,
+}: {
+  date?: Date;
+  className?: string;
+  customDate?: Date;
+}) {
+  const style = `text-[14px] ${className}`;
+
+  return (
+    <TypographyMuted className={style}>
+      {customDate ? moment(customDate).format("LT") : moment(date).fromNow()}
+    </TypographyMuted>
+  );
+}

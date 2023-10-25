@@ -1,0 +1,38 @@
+"use client";
+import { useGetUserFollowers } from "@/lib/api/users/query";
+import { useParams } from "next/navigation";
+import React, { useMemo } from "react";
+import UsersGridLayout from "../layout/users-grid-layout";
+import { TypographyH3 } from "../ui/typography";
+import UserCard from "../user/user-card";
+import UserCardSkeleton from "../user/user-card-skeleton";
+
+export default function FollowersPage() {
+  const params = useParams();
+  const { userFollowersData, isSuccess, isLoading, isError } =
+    useGetUserFollowers(Number(params.userId));
+
+  const total = useMemo(
+    () => userFollowersData?.data?.total ?? 0,
+    [userFollowersData]
+  );
+  return (
+    <UsersGridLayout className="pt-8 px-2 pb-16">
+      <TypographyH3 className="px-3 !text-base">
+        {total} {total < 2 ? " follower" : " followers"}
+      </TypographyH3>
+      {isLoading
+        ? [1, 2, 3, 4, 5].map((item) => (
+            <UserCardSkeleton key={item} className="rounded-none shadow-none" />
+          ))
+        : isSuccess &&
+          userFollowersData?.data?.followers?.map((user) => (
+            <UserCard
+              key={user?.id}
+              user={user}
+              className="rounded-none shadow-none"
+            />
+          ))}
+    </UsersGridLayout>
+  );
+}

@@ -1,0 +1,76 @@
+"use client";
+import React from "react";
+import MenuLayout from "../layout";
+import { useHideUserMenu, useUserMenuIsOpen } from "@/stores/user-menu-store";
+import { BiBlock, BiHeart } from "react-icons/bi";
+import { GoReport } from "react-icons/go";
+import { BsChat } from "react-icons/bs";
+import {
+  useFollowAccount,
+  useUnfollowAccount,
+} from "@/lib/api/follow/mutation";
+import { useGetUserIsFollowed } from "@/lib/api/users/query";
+import { useParams, useRouter } from "next/navigation";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+
+export default function UserMenu() {
+  const isOpen = useUserMenuIsOpen();
+  const onClose = useHideUserMenu();
+  const router = useRouter();
+  const params = useParams();
+  const { followAccountAsync } = useFollowAccount();
+  const { unfollowAccountAsync } = useUnfollowAccount();
+  const { isFollowed } = useGetUserIsFollowed(Number(params.userId ?? -1));
+
+  return (
+    <MenuLayout
+      isOpen={isOpen}
+      onClose={onClose}
+      items={[
+        {
+          key: "follow",
+          label: isFollowed?.data ? "Unfollow user" : "Follow user",
+          icon: isFollowed?.data ? (
+            <AiFillHeart className="text-danger" />
+          ) : (
+            <AiOutlineHeart />
+          ),
+        },
+        {
+          key: "message",
+          label: "Message user",
+          icon: <BsChat />,
+        },
+        {
+          key: "block-delete",
+          label: "Block user",
+          icon: <BiBlock />,
+        },
+        {
+          key: "report-delete",
+          label: "Report user",
+          icon: <GoReport />,
+        },
+      ]}
+      onAction={async (key) => {
+        try {
+          if (key === "follow") {
+            if (isFollowed?.data) {
+              return await unfollowAccountAsync({
+                userId: Number(params.userId ?? -1),
+              });
+            }
+            return await followAccountAsync({
+              userId: Number(params.userId ?? -1),
+            });
+          } else if (key === "message") {
+            router.push(`/chats/${params.userId ?? -1}`);
+          }
+        } catch (err) {
+        } finally {
+          onClose();
+        }
+      }}
+    />
+  );
+}

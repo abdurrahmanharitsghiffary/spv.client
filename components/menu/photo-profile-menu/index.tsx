@@ -1,0 +1,108 @@
+"use client";
+import {
+  useHidePhotoProfileMenu,
+  usePhotoProfileMenuIsOpen,
+} from "@/stores/photo-profile-store";
+import React, { useRef, useState } from "react";
+import MenuLayout from "../layout";
+import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
+import {
+  useDeleteMyAccountImage,
+  useUpdateMyAccountImage,
+  useUpdateMyCoverImage,
+} from "@/lib/api/account/mutation";
+import { useCreatePost } from "@/lib/api/posts/mutation";
+import { useSession } from "@/stores/auth-store";
+import { useConfirm } from "@/stores/confirm-store";
+
+export default function PhotoProfileMenu() {
+  const isOpen = usePhotoProfileMenuIsOpen();
+  const onClose = useHidePhotoProfileMenu();
+  const { updateAccountImageAsync } = useUpdateMyAccountImage();
+  const { deleteAccountImageAsync } = useDeleteMyAccountImage();
+  const { createPostAsync } = useCreatePost();
+  const confirm = useConfirm();
+  const session = useSession();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fullName = `${session?.firstName ?? ""} ${session?.lastName ?? ""}`;
+
+  return (
+    <MenuLayout
+      isOpen={isOpen}
+      onClose={onClose}
+      onAction={async (key) => {
+        if (key === "edit") {
+          fileInputRef.current?.click();
+        } else if (key === "delete") {
+          try {
+            await confirm({
+              title: "Delete picture",
+              body: "Delete your profile picture?",
+              confirmColor: "danger",
+              confirmLabel: "Delete",
+              closeLabel: "Cancel",
+            });
+            await deleteAccountImageAsync({});
+          } catch (err) {
+          } finally {
+            onClose();
+          }
+        }
+      }}
+      items={[
+        {
+          key: "edit",
+          label: "Upload photo profile",
+          action: (
+            <form className="absolute w-0 h-0" encType="multipart/form-data">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/png,image/jpg,image/jpeg"
+                onChange={async (e) => {
+                  if (!e?.target?.files?.[0]) return null;
+                  try {
+                    await confirm({
+                      title: "Change profile picture",
+                      body: "Save with this picture?",
+                      imgSrc: URL.createObjectURL(e?.target?.files?.[0] ?? ""),
+                      imageClassName:
+                        "w-150 h-150 object-cover rounded-full aspect-square border-2 border-divider",
+                      size: "full",
+                      modalClassNames: {
+                        body: "items-center gap-5",
+                      },
+                      modalWrapperClassNames: {
+                        base: "!h-full !w-full",
+                      },
+                    });
+                    await updateAccountImageAsync({
+                      image: e?.target?.files?.[0],
+                    });
+                    await createPostAsync({
+                      data: {
+                        content: `${fullName} updated their profile picture`,
+                        images: [e?.target?.files?.[0]],
+                      },
+                    });
+                  } catch (err) {
+                  } finally {
+                    e.target.value = "";
+                    onClose();
+                  }
+                }}
+                className="absolute w-0 h-0"
+              />
+            </form>
+          ),
+          icon: <AiOutlineUpload />,
+        },
+        {
+          key: "delete",
+          label: "Delete photo profile",
+          icon: <AiOutlineDelete />,
+        },
+      ]}
+    />
+  );
+}
