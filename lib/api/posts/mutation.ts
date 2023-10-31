@@ -1,5 +1,5 @@
 "use client";
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   basePostRoutes,
   mySavedPost,

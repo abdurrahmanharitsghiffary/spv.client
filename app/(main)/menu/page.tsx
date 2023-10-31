@@ -3,7 +3,7 @@ import { Listbox, ListboxItem, ListboxSection } from "@nextui-org/listbox";
 import { Avatar } from "@nextui-org/avatar";
 import React from "react";
 import { BsBookmark, BsChat, BsPostcard } from "react-icons/bs";
-import { FiLogOut, FiMoon, FiSettings, FiUser } from "react-icons/fi";
+import { FiLogOut, FiMoon, FiSettings, FiUser, FiUserX } from "react-icons/fi";
 import { useGetMyAccountInfo } from "@/lib/api/account/query";
 import { TypographyMuted } from "@/components/ui/typography";
 import Link from "next/link";
@@ -15,11 +15,12 @@ import { useLogout } from "@/lib/api/auth";
 import { useConfirm } from "@/stores/confirm-store";
 import SendVerifyButton from "@/components/button/send-verify-button";
 import { useRouter } from "next/navigation";
-import { useShowEditProfile } from "@/hooks/useEditProfile";
-import { useShowChangePasswordModal } from "@/hooks/useChangePasswordModal";
+import { useShowEditProfile } from "@/hooks/use-edit-profile";
+import { useShowChangePasswordModal } from "@/hooks/use-change-password-modal";
 import { useIsSSR } from "@react-aria/ssr";
 import { AiOutlineDelete } from "react-icons/ai";
-import { useShowDeleteAccountModal } from "@/hooks/useShowDeleteAccount";
+import { useShowDeleteAccountModal } from "@/hooks/use-delete-account";
+import { IoLanguage } from "react-icons/io5";
 
 type ListboxItem = {
   label: string;
@@ -118,12 +119,12 @@ export default function MenuPage() {
       section: {
         title: "Posts",
         items: [
-          {
-            key: "posts",
-            label: "My Posts",
-            url: "/menu/posts",
-            icon: <BsPostcard />,
-          },
+          // {
+          //   key: "posts",
+          //   label: "My Posts",
+          //   url: "/menu/posts",
+          //   icon: <BsPostcard />,
+          // },
           {
             key: "saved-posts",
             label: "Saved posts",
@@ -144,6 +145,8 @@ export default function MenuPage() {
             url: "/settings",
             icon: <FiSettings />,
           },
+          { key: "language", label: "Language", icon: <IoLanguage /> },
+          { key: "blocked-users", label: "Blocked users", icon: <FiUserX /> },
           {
             key: "dark-mode",
             label: "Dark mode",

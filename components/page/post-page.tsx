@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import PostCard from "./post-card";
+import PostCard from "../post/post-card";
 import { Divider } from "@nextui-org/divider";
 import Comment from "../comment";
 import { useGetPostById } from "@/lib/api/posts/query";
 import { useGetCommentByPostId } from "@/lib/apiv2";
 import CommentSkeleton from "../comment/skeleton";
-import PostCardSkeleton from "./skeleton";
-import useFetchNextPageObserver from "@/hooks/useFetchNextPageObserver";
+import PostCardSkeleton from "../post/skeleton";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 
 export default function PostPage({ postId }: { postId: string }) {

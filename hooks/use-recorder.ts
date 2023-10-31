@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import useSpeech from "./useSpeech";
+import useSpeech from "./use-speech";
 
 export default function useRecorder() {
   const [isSupported, setIsSupported] = useState<boolean>(false);

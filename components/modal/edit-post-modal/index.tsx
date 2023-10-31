@@ -4,7 +4,7 @@ import ModalLayout from "../layout";
 import {
   useGetSelectedPostId,
   useShowEditPostDisclosure,
-} from "@/hooks/useEditPost";
+} from "@/hooks/use-edit-post";
 import { Input, Textarea } from "@nextui-org/input";
 import { z } from "zod";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/lib/createPostSchema";

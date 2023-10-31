@@ -1,5 +1,5 @@
 "use client";
-import { useShowPreviewImage } from "@/hooks/usePreviewImage";
+import { useShowPreviewImage } from "@/hooks/use-preview-image";
 import { Image, ImageProps } from "@nextui-org/image";
 import React, { useState } from "react";
 import { MdBrokenImage } from "react-icons/md";

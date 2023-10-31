@@ -1,4 +1,4 @@
-import ChangePasswordModal from "@/components/modal/changepassword-modal";
+import ChangePasswordModal from "@/components/modal/change-password-modal";
 import DeleteAccountModal from "@/components/modal/delete-account-modal";
 import ChangePasswordProvider from "@/context/changepassword-context";
 import DeleteAccountProvider from "@/context/delete-account-modal-context";

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import SingleComment from "@/components/comment/single-comment";
 import { CommentReply } from "@/components/comment";
-import { useBodyOverflowHidden } from "@/hooks/useBodyOverflowHidden";
+import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useGetComment } from "@/lib/api/comments/query";
 
 export default function CommentModal({

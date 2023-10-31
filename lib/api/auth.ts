@@ -1,5 +1,5 @@
 "use client";
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { useAuthSession } from "@/stores/auth-store";
 import { JsendSuccess } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

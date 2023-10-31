@@ -7,12 +7,12 @@ import {
   SearchContext,
   SearchContextManager,
 } from "@giphy/react-components";
-import { useShowModalGif } from "@/hooks/useModalGif";
+import { useShowModalGif } from "@/hooks/use-modal-gif";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { IGif } from "@giphy/js-types";
 import { TypographyH4 } from "../ui/typography";
 import { useTheme } from "next-themes";
-import { useIsMd } from "@/hooks/useMediaQuery";
+import { useIsMd } from "@/hooks/use-media-query";
 
 const minusWidth = 22;
 const gridClass = "w-full hide-scrollbar mx-auto pt-2";

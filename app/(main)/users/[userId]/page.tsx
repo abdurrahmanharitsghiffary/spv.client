@@ -8,7 +8,7 @@ import ProfileInfo from "@/components/profile/profile-info";
 import ProfileSkeleton from "@/components/profile/profile-skeleton";
 import { TypographyH3, TypographyMuted } from "@/components/ui/typography";
 import UserActionButton from "@/components/user/user-action-button";
-import useFetchNextPageObserver from "@/hooks/useFetchNextPageObserver";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { useGetPostByUserId } from "@/lib/api/posts/query";
 import { useGetUserById } from "@/lib/api/users/query";
 import { PostExtended } from "@/types/post";

@@ -1,11 +1,9 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   basePostRoutes,
   followedUserPost,
-  myPosts as myPostsEp,
-  mySavedPost,
   mySavedPostsRoute,
   postById,
   postIsLiked,
@@ -18,7 +16,7 @@ import { OffsetPaging } from "@/types";
 import { PostExtended, PostLikeResponse } from "@/types/post";
 import { JsendSuccess, JsendWithPaging } from "@/types/response";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
 
 export const useGetPosts = (
@@ -62,18 +60,19 @@ export const useGetPostByUserId = (
   // const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
   //   queryKey: [...keys.posts, userId, query, "users"],
   //   queryFn: () =>
-  //     axios
+  //    request
   //       .get(userPost(userId.toString()), config)
   //       .then((res) => res.data)
   //       .catch((err) => Promise.reject(err?.response?.data)),
   // });
+  const request = useAxiosInterceptor();
 
   const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
     queryKey: [...keys.posts, userId, query, "users"],
     queryFn: ({ pageParam }) =>
       pageParam === null
         ? Promise.resolve(undefined)
-        : axios
+        : request
             .get(pageParam ? pageParam : userPost(userId.toString()), config)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err?.response?.data)),
@@ -117,11 +116,13 @@ export const useGetPostLikeByPostId = (
   postId: number,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
+
   const { data: postLikes, ...rest } = useQuery<JsendSuccess<PostLikeResponse>>(
     {
       queryKey: keys.postLikes(postId),
       queryFn: () =>
-        axios
+        request
           .get(postLikesByPostId(postId.toString()), config)
           .then((res) => res.data)
           .catch((err) => Promise.reject(err?.response?.data)),

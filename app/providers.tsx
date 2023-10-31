@@ -15,7 +15,16 @@ export interface ProvidersProps {
   themeProps?: ThemeProviderProps;
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry(failureCount, error) {
+        console.log(error, " lolololol");
+        return failureCount !== 3;
+      },
+    },
+  },
+});
 
 export function Providers({ children, themeProps }: ProvidersProps) {
   return (

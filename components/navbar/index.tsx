@@ -1,17 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Navbar as NavbarTemplate,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
-} from "@nextui-org/react";
-import Link from "next/link";
+import { Navbar as NavbarTemplate } from "@nextui-org/react";
 import { usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
-import ChatButton from "../button/chat-button";
 
 const navItem: string[] = [];
 // ["Home", "Login", "SignUp"];
@@ -26,8 +17,6 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
-
-  if (["login", "signup"].some((item) => pathname.includes(item))) return null;
 
   return (
     <NavbarTemplate

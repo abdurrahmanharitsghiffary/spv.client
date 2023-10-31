@@ -15,7 +15,7 @@ import {
   passwordValidationSchema,
 } from "@/lib/schema";
 
-export default function PasswordChangeForm({ token }: { token: string }) {
+export default function ChangePasswordForm({ token }: { token: string }) {
   const {
     handleSubmit,
     register,

@@ -1,5 +1,5 @@
 "use client";
-import { useShowPreviewImage } from "@/hooks/usePreviewImage";
+import { useShowPreviewImage } from "@/hooks/use-preview-image";
 import clsx from "clsx";
 import React from "react";
 

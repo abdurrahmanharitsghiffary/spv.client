@@ -1,6 +1,6 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { SearchAllData, SearchOptions } from "@/types";
 import { PostExtended } from "@/types/post";
 import { JsendWithPaging } from "@/types/response";

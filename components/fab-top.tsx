@@ -3,7 +3,7 @@ import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";
 import React from "react";
 import { BiChevronUp } from "react-icons/bi";
-import { useScrollWindowValue } from "@/hooks/useScrollValue";
+import { useScrollWindowValue } from "@/hooks/use-scroll-value";
 
 export default function FabTop({ className, radius, color }: ButtonProps) {
   const { x, y } = useScrollWindowValue();

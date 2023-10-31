@@ -5,7 +5,7 @@ import ImageWithPreview from "@/components/image/image-with-preview";
 import {
   useGetGalleryImages,
   useImageGalleryControls,
-} from "@/hooks/useImageGallery";
+} from "@/hooks/use-image-gallery";
 
 export default function ImageGallery() {
   const { onClose, isOpen } = useImageGalleryControls();

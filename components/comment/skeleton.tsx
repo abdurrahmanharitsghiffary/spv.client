@@ -54,9 +54,10 @@ export default function CommentSkeleton({
           </div>
         </CardHeader>
         <CardBody className="text-sm p-0 my-3 w-full flex flex-col gap-2 ml-[0.8rem] shadow-[0_0_7px_-1px_rgba(0,0,0,0)]">
-          {[1, 2, 3].map((item) => (
+          {[1, 2, 3].map((item, i) => (
             <Skeleton
-              className="h-2 w-[20%] rounded-medium max-w-full min-w-[50px]"
+              className="h-2 rounded-medium max-w-full min-w-[50px]"
+              style={{ width: i === 0 ? "20%" : i === 1 ? "18%" : "19%" }}
               key={item}
             />
           ))}

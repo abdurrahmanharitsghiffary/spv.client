@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import ModalLayout from "../layout";
 import { Image } from "@nextui-org/image";
 import { motion } from "framer-motion";
-import usePreviewImage from "@/hooks/usePreviewImage";
+import usePreviewImage from "@/hooks/use-preview-image";
 import AnimationControl from "./animation-control";
-import { useBodyOverflowHidden } from "@/hooks/useBodyOverflowHidden";
+import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { MdBrokenImage } from "react-icons/md";
 
 export default function ImagePreview() {

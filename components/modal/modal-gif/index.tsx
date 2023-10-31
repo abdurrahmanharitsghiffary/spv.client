@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
 import ModalLayout from "../layout";
-import { useGetGif, useGifModalControls } from "@/hooks/useModalGif";
+import { useGetGif, useGifModalControls } from "@/hooks/use-modal-gif";
 import { Gif } from "@giphy/react-components";
 import { Button } from "@nextui-org/button";
-import { useGifMenuClose } from "@/hooks/useGifMenu";
-import { useGetReplyId, useSetReplyId } from "@/hooks/useReply";
+import { useGifMenuClose } from "@/hooks/use-gif-menu";
+import { useGetReplyId, useSetReplyId } from "@/hooks/use-reply";
 import {
   useCreateComment,
   useCreateReplyComment,

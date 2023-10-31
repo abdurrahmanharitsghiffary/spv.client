@@ -37,19 +37,19 @@ export default function PostCardSkeleton(props: CardProps) {
       <CardBody className="gap-2">
         <div className="flex flex-col gap-2">
           <Skeleton className="h-3 w-[60%] rounded-medium"></Skeleton>
-          <Skeleton className="h-3 w-[60%] rounded-medium"></Skeleton>
-          <Skeleton className="h-3 w-[60%] rounded-medium"></Skeleton>
-          <Skeleton className="h-3 w-[60%] rounded-medium"></Skeleton>
+          <Skeleton className="h-3 w-[50%] rounded-medium"></Skeleton>
+          <Skeleton className="h-3 w-[40%] rounded-medium"></Skeleton>
+          <Skeleton className="h-3 w-[45%] rounded-medium"></Skeleton>
         </div>
       </CardBody>
       <Divider />
       <CardFooter className="py-2">
         <ButtonGroup fullWidth variant="light">
           <Button>
-            <FiThumbsUp /> 0
+            <FiThumbsUp />
           </Button>
           <Button>
-            <BiComment /> 0
+            <BiComment />
           </Button>
           <Button>
             <PiPaperPlaneTilt />

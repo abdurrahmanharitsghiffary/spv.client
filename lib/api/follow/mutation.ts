@@ -1,6 +1,6 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import {

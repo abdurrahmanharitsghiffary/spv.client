@@ -23,7 +23,7 @@ import {
   useUnlikePost,
 } from "@/lib/api/posts/mutation";
 import { useConfirm } from "@/stores/confirm-store";
-import { useShowEditPost } from "@/hooks/useEditPost";
+import { useShowEditPost } from "@/hooks/use-edit-post";
 import { useGetPostIsLiked, useGetPostIsSaved } from "@/lib/api/posts/query";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 

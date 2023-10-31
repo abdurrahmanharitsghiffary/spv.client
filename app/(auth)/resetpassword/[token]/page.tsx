@@ -1,4 +1,4 @@
-import PasswordChangeForm from "@/components/form/passwordchange-form";
+import ChangePasswordForm from "@/components/form/change-password-form";
 import React from "react";
 
 export default function ResetPasswordTokenPage({
@@ -6,5 +6,5 @@ export default function ResetPasswordTokenPage({
 }: {
   params: { token: string };
 }) {
-  return <PasswordChangeForm token={params.token} />;
+  return <ChangePasswordForm token={params.token} />;
 }

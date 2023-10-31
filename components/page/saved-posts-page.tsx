@@ -1,5 +1,5 @@
 "use client";
-import useFetchNextPageObserver from "@/hooks/useFetchNextPageObserver";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { useGetMySavedPosts } from "@/lib/api/posts/query";
 import React from "react";
 import PostsGridLayout from "../layout/posts-grid-layout";

@@ -11,7 +11,7 @@ export default function Layout({
 }) {
   const cn = `${
     className ?? ""
-  } flex w-full flex-col items-center justify-center gap-4`;
+  } flex w-full flex-col h-full items-center justify-center gap-4`;
 
   return (
     <section className={cn} style={style}>

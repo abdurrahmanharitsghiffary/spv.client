@@ -3,6 +3,9 @@ import React from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
+import { useIsMd } from "@/hooks/use-media-query";
+import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
+import IconButton from "../button/icon-button";
 
 function IconWrapper({
   children,
@@ -36,34 +39,62 @@ export default function MenuLayout({
   onClose: () => void;
   isOpen: boolean;
 }) {
+  const isMd = useIsMd();
+
   return (
     <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            drag="y"
+            drag={isMd ? "x" : "y"}
             dragElastic={0}
-            dragConstraints={{ top: 0, bottom: 200 }}
+            dragConstraints={
+              isMd ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
+            }
             onDragEnd={() => onClose()}
             key="menu-layout"
-            initial={{
-              y: 200,
-            }}
-            animate={{
-              y: 0,
-            }}
+            initial={
+              isMd
+                ? { x: 200 }
+                : {
+                    y: 200,
+                  }
+            }
+            animate={
+              isMd
+                ? { x: 0 }
+                : {
+                    y: 0,
+                  }
+            }
             transition={{
               duration: 0.2,
-              ease: "easeInOut",
+              ease: "easeIn",
             }}
-            exit={{
-              y: 200,
-            }}
+            exit={
+              isMd
+                ? { x: 200 }
+                : {
+                    y: 200,
+                  }
+            }
             className="w-full
-             shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed"
-            style={{ zIndex: 200, left: "50%", translateX: "-50%" }}
+             shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed md:min-h-screen md:overflow-y-auto md:hide-scrollbar md:rounded-t-none md:max-w-sm"
+            style={
+              isMd
+                ? { zIndex: 200, insetBlock: 0, right: 0 }
+                : { zIndex: 200, left: "50%", translateX: "-50%" }
+            }
           >
-            <div className="w-12 h-1 bg-divider my-2 mx-auto rounded-xl"></div>
+            {isMd ? (
+              <div className="w-full justify-start items-center border-b-1 border-divider h-fit p-3">
+                <IconButton onClick={() => onClose()}>
+                  <BiChevronRight />
+                </IconButton>
+              </div>
+            ) : (
+              <div className="w-12 h-1 bg-divider my-2 mx-auto rounded-xl"></div>
+            )}
             <Listbox
               aria-label="menu"
               items={items}

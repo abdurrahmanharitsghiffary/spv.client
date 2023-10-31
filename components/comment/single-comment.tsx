@@ -7,6 +7,7 @@ import CommentMenuProvider from "../menu/comment-menu/context/comment-menu-conte
 import clsx from "clsx";
 import CommentLikeButton from "../button/comment-like-button";
 import { Comment } from "@/types/comment";
+import ImageWithPreview from "../image/image-with-preview";
 
 export default function SingleComment({
   comment,
@@ -23,7 +24,15 @@ export default function SingleComment({
     <CommentMenuProvider>
       <div className={cl}>
         <User user={comment?.user} createdAt={comment?.createdAt} />
-        <TypographyP>{comment?.comment}</TypographyP>
+        {comment?.image && (
+          <ImageWithPreview
+            removeWrapper
+            src={comment?.image?.src}
+            radius="sm"
+            className="min-w-[150px] mt-4 max-w-[175px] h-auto object-cover"
+          />
+        )}
+        {comment?.comment && <TypographyP>{comment?.comment}</TypographyP>}
         <div className="flex gap-2 justify-between items-center absolute top-[58px] right-4">
           <CommentLikeButton
             total={comment?.total_likes ?? 0}

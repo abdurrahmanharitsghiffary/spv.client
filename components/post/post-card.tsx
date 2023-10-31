@@ -15,6 +15,7 @@ import PostActionButton from "./action-button";
 import { Divider } from "@nextui-org/divider";
 import User from "../user/user";
 import { PostExtended } from "@/types/post";
+import PostMenuTrigger from "../menu/post-menu/trigger";
 
 interface PostCardProps {
   post: PostExtended | undefined;
@@ -41,10 +42,7 @@ export default function PostCard(
           user={post?.author}
           isPreview={props?.isPreview}
         />
-        <PostDropdown
-          postAuthorId={post?.author?.id ?? -1}
-          postId={post?.id ?? -1}
-        />
+        <PostMenuTrigger post={post as PostExtended} />
       </CardHeader>
       <CardBody className="gap-2">
         {props?.isPostPage || props?.isPreview ? (

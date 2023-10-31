@@ -6,13 +6,13 @@ import { TypographyMuted, TypographyP } from "../ui/typography";
 import Timestamp from "../timestamp";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import { useSetReplyId } from "@/hooks/useReply";
+import { useSetReplyId } from "@/hooks/use-reply";
 import { useRouter } from "next/navigation";
 import CommentMenu from "../menu/comment-menu";
 import CommentMenuProvider from "../menu/comment-menu/context/comment-menu-context";
 import CommentMenuTrigger from "../menu/comment-menu/trigger";
 import CommentLikeButton from "../button/comment-like-button";
-import { useBreakpoints } from "@/hooks/useMediaQuery";
+import { useBreakpoints } from "@/hooks/use-media-query";
 import ImageWithPreview from "../image/image-with-preview";
 import {
   Comment as CommentType,
@@ -88,7 +88,6 @@ export default function Comment({
               <div className="flex gap-1 items-center">
                 <Timestamp date={commentData?.createdAt} className="text-xs" />
                 <TypographyMuted className="!text-xs !text-foreground-800">
-                  {isUpdated && "(updated)"}
                 </TypographyMuted>
               </div>
             </NextLink>

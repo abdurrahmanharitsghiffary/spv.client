@@ -1,6 +1,6 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   baseUserRoutes,
   userById,
@@ -18,7 +18,7 @@ import {
   UserFollowingResponse,
 } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 
 export const useGetUsers = (
   options?: OffsetPaging,
@@ -61,6 +61,7 @@ export const useGetUserFollowers = (
   userId: number,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
   const {
     data: userFollowersData,
     error,
@@ -68,7 +69,7 @@ export const useGetUserFollowers = (
   } = useQuery<JsendSuccess<UserFollowerResponse>>({
     queryKey: keys.userFollowers(userId),
     queryFn: () =>
-      axios
+      request
         .get(userFollowersById(userId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
@@ -81,12 +82,14 @@ export const useGetUserFollowedUsers = (
   userId: number,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
+
   const { data: userFollowedUsersData, ...rest } = useQuery<
     JsendSuccess<UserFollowingResponse>
   >({
     queryKey: keys.userFollowedUsers(userId),
     queryFn: () =>
-      axios
+      request
         .get(userFollowedUsersById(userId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),

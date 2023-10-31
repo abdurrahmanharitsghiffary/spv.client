@@ -1,5 +1,5 @@
 "use client";
-import useSpeech from "@/hooks/useSpeech";
+import useSpeech from "@/hooks/use-speech";
 import { Button, ButtonProps } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/tooltip";
 import React, { useCallback, useEffect } from "react";

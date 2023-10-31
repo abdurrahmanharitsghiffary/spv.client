@@ -89,20 +89,20 @@ export default function CommentMenu() {
           } else if (key === "delete-report-comment" && !isAuthored)
             return notifyToast("Cooming soon!");
           if (isAuthored) {
-            if (key === "delete-comment" && commentId) {
-              await deleteCommentAsync(
-                { commentId: Number(commentId) },
-                {
-                  onSuccess: () => {
-                    router.back();
-                  },
-                }
-              );
-            } else if (key === "delete-comment" && comment) {
-              await deleteCommentAsync({ commentId: comment?.id });
-            } else if (key === "edit-comment" && comment) {
-              showCommentEditForm(comment);
-            }
+          }
+          if (key === "delete-comment" && comment) {
+            await deleteCommentAsync({ commentId: comment?.id });
+          } else if (key === "edit-comment" && comment) {
+            showCommentEditForm(comment);
+          } else if (key === "delete-comment" && commentId) {
+            await deleteCommentAsync(
+              { commentId: Number(commentId) },
+              {
+                onSuccess: () => {
+                  router.back();
+                },
+              }
+            );
           }
         } catch (err) {
         } finally {

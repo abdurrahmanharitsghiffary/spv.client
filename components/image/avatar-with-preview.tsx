@@ -1,5 +1,5 @@
 "use client";
-import { useShowPreviewImage } from "@/hooks/usePreviewImage";
+import { useShowPreviewImage } from "@/hooks/use-preview-image";
 import { Avatar, AvatarProps } from "@nextui-org/avatar";
 import React from "react";
 

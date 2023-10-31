@@ -1,5 +1,5 @@
 "use client";
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { JsendSuccess, JsendWithPaging } from "@/types/response";
 import { UserAccount } from "@/types/user";
 import { AxiosRequestConfig } from "axios";

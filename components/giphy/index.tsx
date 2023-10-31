@@ -4,8 +4,8 @@ import GiphyGrid from "./grid";
 import { Card, CardBody } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
 import { BiChevronDown } from "react-icons/bi";
-import { useGifMenuControls } from "@/hooks/useGifMenu";
-import { useBodyOverflowHidden } from "@/hooks/useBodyOverflowHidden";
+import { useGifMenuControls } from "@/hooks/use-gif-menu";
+import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 
 export default function Giphy() {
   const controls = useGifMenuControls();

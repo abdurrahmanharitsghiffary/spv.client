@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useShowDeleteAccountModalControls } from "@/hooks/useShowDeleteAccount";
+import { useShowDeleteAccountModalControls } from "@/hooks/use-delete-account";
 import ModalLayout from "../layout";
 import { password as passwordValidation } from "@/lib/schema";
 import { toast } from "react-toastify";
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
 import { useRouter } from "next/navigation";
 import { useAuthSession } from "@/stores/auth-store";

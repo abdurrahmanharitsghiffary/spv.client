@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import ModalLayoutV2 from "../layoutV2";
-import { useShowChangePasswordModalControls } from "@/hooks/useChangePasswordModal";
+import { useShowChangePasswordModalControls } from "@/hooks/use-change-password-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
@@ -12,7 +12,7 @@ import InputPassword from "@/components/form/input/password";
 import { Button } from "@nextui-org/button";
 import { useConfirm } from "@/stores/confirm-store";
 import { toast } from "react-toastify";
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
 
 export default function ChangePasswordModal() {

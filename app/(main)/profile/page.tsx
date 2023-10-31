@@ -14,11 +14,9 @@ import ProfileInfo from "@/components/profile/profile-info";
 import { useGetMyAccountInfo, useGetMyPosts } from "@/lib/api/account/query";
 import ProfileActionButton from "@/components/profile/profile-action-button";
 import CreatePostForm from "@/components/form/create-post-form";
-import EditProfileProvider from "@/context/edit-profile-context";
-import EditProfileModal from "@/components/modal/edit-profile-modal";
 import ProfileSkeleton from "@/components/profile/profile-skeleton";
 import PostCardSkeleton from "@/components/post/skeleton";
-import useFetchNextPageObserver from "@/hooks/useFetchNextPageObserver";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 
 export default function ProfilePage() {

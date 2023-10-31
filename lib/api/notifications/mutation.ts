@@ -1,6 +1,6 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { myNotifications } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { CreateNotificationData } from "@/types";

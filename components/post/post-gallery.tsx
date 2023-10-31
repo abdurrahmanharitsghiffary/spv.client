@@ -2,7 +2,7 @@
 import React from "react";
 import "./post-card.css";
 import ImageWithPreview from "../image/image-with-preview";
-import { useShowImageGallery } from "@/hooks/useImageGallery";
+import { useShowImageGallery } from "@/hooks/use-image-gallery";
 import { useIsSSR } from "@react-aria/ssr";
 
 const galleryStructures = [

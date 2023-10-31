@@ -1,6 +1,6 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/useAxiosInterceptor";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   commentById,
   commentIsLiked,
@@ -12,17 +12,19 @@ import { OffsetPagingwithOrder } from "@/types";
 import { Comment, CommentLikeResponse } from "@/types/comment";
 import { JsendSuccess, JsendWithPaging } from "@/types/response";
 import { useQuery } from "@tanstack/react-query";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 
 export const useGetCommentByPostId = (
   postId: number,
   options?: OffsetPagingwithOrder,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
+
   const { data: postComments, ...rest } = useQuery<JsendWithPaging<Comment[]>>({
     queryKey: [...keys.postComments(postId), options],
     queryFn: () =>
-      axios
+      request
         .get(postCommentsByPostId(postId.toString(), options), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
@@ -35,10 +37,12 @@ export const useGetComment = (
   commentId: number,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
+
   const { data: comment, ...rest } = useQuery<JsendSuccess<Comment>>({
     queryKey: keys.commentById(commentId),
     queryFn: () =>
-      axios
+      request
         .get(commentById(commentId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
@@ -50,12 +54,14 @@ export const useGetCommentLikes = (
   commentId: number,
   config?: AxiosRequestConfig
 ) => {
+  const request = useAxiosInterceptor();
+
   const { data: commentLikes, ...rest } = useQuery<
     JsendSuccess<CommentLikeResponse>
   >({
     queryKey: keys.commentLikes(commentId),
     queryFn: () =>
-      axios
+      request
         .get(commentLikesById(commentId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),

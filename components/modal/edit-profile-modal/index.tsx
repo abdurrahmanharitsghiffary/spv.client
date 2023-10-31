@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ModalLayout from "../layout";
-import { useEditProfileControls } from "@/hooks/useEditProfile";
+import { useEditProfileControls } from "@/hooks/use-edit-profile";
 import { Input, Textarea } from "@nextui-org/input";
 import { Divider } from "@nextui-org/divider";
 import { Button } from "@nextui-org/button";
@@ -149,7 +149,7 @@ export default function EditProfileModal() {
       //   header={<TypographyH4>Edit profile information</TypographyH4>}
     >
       <form
-        className="p-4 px-0 flex flex-col gap-6"
+        className="p-4 px-0 flex flex-col gap-6 max-w-lg"
         id="edit-profile-form"
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -197,6 +197,7 @@ export default function EditProfileModal() {
               </IconButton>
             </div>
             <CoverImage
+              className="max-w-lg"
               src={
                 coverImage
                   ? URL.createObjectURL(coverImage)

@@ -9,7 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { BiSend } from "react-icons/bi";
 import { z } from "zod";
 import CommentFormImage from "./comment-form-image";
-import { useGetReplyId, useSetReplyId } from "@/hooks/useReply";
+import { useGetReplyId, useSetReplyId } from "@/hooks/use-reply";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
@@ -18,7 +18,7 @@ import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
 import { formatBytes } from "@/lib/formatBytes";
 import Recorder from "../recorder";
 import CommentFormPopover from "./comment-form-popover";
-import { useGifMenuIsOpen, useGifMenuShow } from "@/hooks/useGifMenu";
+import { useGifMenuIsOpen, useGifMenuShow } from "@/hooks/use-gif-menu";
 import {
   useCreateComment,
   useCreateReplyComment,

@@ -1,5 +1,5 @@
 "use client";
-import { useShowEditProfile } from "@/hooks/useEditProfile";
+import { useShowEditProfile } from "@/hooks/use-edit-profile";
 import { Button } from "@nextui-org/button";
 import React from "react";
 
