@@ -18,7 +18,7 @@ function Recorder({
     (result: string | null | undefined) => {
       if (onSpeechSuccess) onSpeechSuccess(result);
     },
-    []
+    [onSpeechSuccess]
   );
 
   useEffect(() => {

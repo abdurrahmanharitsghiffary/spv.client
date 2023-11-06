@@ -7,6 +7,8 @@ export interface UserAccountPublic {
   lastName: string;
   username: string;
   profile: {
+    birthDate: Date | null;
+    gender: $Enums.Gender | null;
     description: string | null;
     image: Image;
     coverImage: Image;

@@ -13,7 +13,7 @@ export default function Timestamp({
   className?: string;
   customDate?: Date;
 }) {
-  const style = `text-[14px] ${className}`;
+  const style = `text-[0.875rem] ${className}`;
 
   return (
     <TypographyMuted className={style}>

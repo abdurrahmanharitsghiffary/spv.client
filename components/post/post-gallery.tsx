@@ -4,6 +4,7 @@ import "./post-card.css";
 import ImageWithPreview from "../image/image-with-preview";
 import { useShowImageGallery } from "@/hooks/use-image-gallery";
 import { useIsSSR } from "@react-aria/ssr";
+import { PostExtended } from "@/types/post";
 
 const galleryStructures = [
   "'a'",
@@ -25,9 +26,15 @@ const getTemplateArea = (items: any[]) => {
   return galleryStructures[items.length - 1];
 };
 
-export default function PostGallery({ images }: { images: { src: string }[] }) {
+export default function PostGallery({
+  images,
+}: {
+  images: PostExtended["images"];
+}) {
   const showGallery = useShowImageGallery();
   const isSSR = useIsSSR();
+  if ((images ?? []).length === 0 || images === null) return null;
+
   return (
     <div
       style={{

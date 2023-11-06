@@ -49,7 +49,9 @@ export default function SearchTabs() {
             {isLoading ? (
               <>
                 <PostTabLoading />
-                <TypographyH3 className="px-4 text-[20px]">Users</TypographyH3>
+                <TypographyH3 className="px-4 text-[1.25rem]">
+                  Users
+                </TypographyH3>
                 <UserTabLoading />
               </>
             ) : (
@@ -63,7 +65,7 @@ export default function SearchTabs() {
                   />
                   {((searchResult?.data as SearchAllData)?.users?.data ?? [])
                     ?.length > 0 && (
-                    <TypographyH3 className="px-4 text-[20px]">
+                    <TypographyH3 className="px-4 text-[1.25rem]">
                       Users
                     </TypographyH3>
                   )}

@@ -1,53 +1,17 @@
 "use client";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
-import { formatBytes } from "@/lib/formatBytes";
 import { Input, Textarea } from "@nextui-org/input";
 import { useIsSSR } from "@react-aria/ssr";
 import { BsCardImage } from "react-icons/bs";
 import { Button } from "@nextui-org/react";
 import { BiSend } from "react-icons/bi";
-import { TypographyMuted } from "../ui/typography";
 import CommentFormImage from "./comment-form-image";
 import clsx from "clsx";
 import Recorder from "../recorder";
-
-const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-const createChatSchema = z
-  .object({
-    chat: z.string().nonempty({ message: "Chat must not be empty" }),
-    image: z
-      .any()
-      .refine(
-        (file: File) =>
-          file instanceof File || file === null || file === undefined,
-        "Image must be a file"
-      )
-      .refine(
-        (file: File) =>
-          file?.size < MAX_FILE_SIZE || file === null || file === undefined,
-        `Max image size is ${formatBytes(MAX_FILE_SIZE, "kb")}`
-      )
-      .refine(
-        (file: File) =>
-          ACCEPTED_TYPES.includes(file?.type) ||
-          file === null ||
-          file === undefined,
-        "Accepted .jpg, .jpeg, .png, .webp"
-      )
-      .optional(),
-  })
-  .refine((arg) => {
-    if (!arg.image) return true;
-    if (!arg.chat) return false;
-    return true;
-  });
-
-type CreateChatSchema = z.infer<typeof createChatSchema>;
+import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 
 export default function ChatForm() {
   const {
@@ -121,7 +85,7 @@ export default function ChatForm() {
                   variant="light"
                   radius="full"
                   isIconOnly
-                  className="absolute top-[6px] right-0"
+                  className="absolute top-[6px] right-0 z-[102]"
                   color="primary"
                 >
                   <BiSend size={18} />
@@ -131,7 +95,7 @@ export default function ChatForm() {
           )}
           <Recorder
             radius="md"
-            className="text-[18px]"
+            className="text-[1.125rem]"
             onSpeechSuccess={handleResultChange}
           />
           <Button className="relative" radius="md" isIconOnly>
@@ -143,7 +107,7 @@ export default function ChatForm() {
                 <input
                   type="file"
                   multiple={false}
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  accept={ACCEPTED_IMAGE_TYPES.join(",")}
                   className="absolute inset-0 opacity-0"
                   onChange={(e) => {
                     onChange(e?.target?.files?.[0] ?? null);

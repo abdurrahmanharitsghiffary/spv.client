@@ -1,12 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import ModalLayout from "../layout";
+import React, { useEffect } from "react";
 import { useEditProfileControls } from "@/hooks/use-edit-profile";
 import { Input, Textarea } from "@nextui-org/input";
-import { Divider } from "@nextui-org/divider";
 import { Button } from "@nextui-org/button";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetMyAccountInfo } from "@/lib/api/account/query";
 import {
@@ -16,40 +13,20 @@ import {
 } from "@/lib/api/account/mutation";
 import { toast } from "react-toastify";
 import IconButton from "@/components/button/icon-button";
-import { BiChevronLeft } from "react-icons/bi";
 import { Avatar } from "@nextui-org/avatar";
 import CoverImage from "@/components/image/cover-image";
 import { TypographyH4 } from "@/components/ui/typography";
 import { AiOutlineEdit } from "react-icons/ai";
-
-const editProfileValidationSchema = z.object({
-  username: z
-    .string()
-    .min(4, {
-      message: "Username is must at least 4 character",
-    })
-    .max(100, {
-      message: "Username is must at least below 100 characters",
-    })
-    .optional(),
-  firstName: z
-    .string()
-    .min(2, "Firstname is must at least 4 character")
-    .max(125, "Lastname is must at least below 125 characters")
-    .optional(),
-  lastName: z
-    .string()
-    .min(2, "Lastname is must at least 4 character")
-    .max(125, "Lastname is must at least below 125 characters")
-    .optional(),
-  bio: z.string().optional(),
-});
-
-type EditProfileValidationSchema = z.infer<typeof editProfileValidationSchema>;
+import ModalLayoutV2 from "../layoutV2";
+import {
+  EditProfileValidationSchema,
+  editProfileValidationSchema,
+} from "@/lib/zod-schema/user";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import ValidationErrorText from "@/components/validation-error-text";
+import { Select, SelectItem } from "@nextui-org/select";
 
 export default function EditProfileModal() {
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { updateAccountAsync } = useUpdateMyAccountInfo();
@@ -58,9 +35,19 @@ export default function EditProfileModal() {
     handleSubmit,
     register,
     reset,
+    watch,
+    control,
     formState: {
       isSubmitSuccessful,
-      errors: { bio, lastName, firstName, username },
+      errors: {
+        bio,
+        lastName,
+        firstName,
+        gender,
+        username,
+        profileImage: pIErr,
+        coverImage: cIErr,
+      },
     },
   } = useForm<EditProfileValidationSchema>({
     resolver: zodResolver(editProfileValidationSchema),
@@ -69,8 +56,13 @@ export default function EditProfileModal() {
       lastName: myAccountInfo?.data?.lastName,
       username: myAccountInfo?.data?.username,
       bio: myAccountInfo?.data?.profile?.description ?? "",
+      gender: myAccountInfo?.data?.profile?.gender ?? "not_say",
     },
   });
+
+  const profileImage = watch("profileImage");
+  const coverImage = watch("coverImage");
+
   const disclosure = useEditProfileControls();
   const onSubmit: SubmitHandler<EditProfileValidationSchema> = async (data) => {
     await toast.promise(
@@ -97,47 +89,28 @@ export default function EditProfileModal() {
       }
     );
 
-    if (profileImage) {
-      await updateAccountImageAsync({ image: profileImage });
+    if (data?.profileImage) {
+      await updateAccountImageAsync({ image: data.profileImage });
     }
-    if (coverImage) {
-      await updateCoverImageAsync({ image: coverImage });
+    if (data?.coverImage) {
+      await updateCoverImageAsync({ image: data.coverImage });
     }
   };
 
   useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
-
       disclosure.onClose();
     }
   }, [isSubmitSuccessful]);
 
   return (
-    <ModalLayout
-      scrollBehavior="inside"
+    <ModalLayoutV2
+      isOpen={disclosure.isOpen}
       onClose={() => {
         disclosure.onClose();
         reset();
       }}
-      header={<Divider className="w-full" />}
-      classNames={{
-        wrapper: "min-h-screen",
-        header: "p-0 h-[100px] items-end ",
-        footer: "p-4",
-      }}
-      wrapperClassNames={{
-        wrapper: "z-[100]",
-        closeButton: "left-2 top-[12px]",
-      }}
-      closeButton={
-        <IconButton>
-          <BiChevronLeft />
-        </IconButton>
-      }
-      isOpen={disclosure.isOpen}
-      placement="center"
-      size="full"
       footer={
         <div className="flex gap-2 justify-center items-center">
           <Button onClick={() => reset()}>Cancel</Button>
@@ -146,7 +119,6 @@ export default function EditProfileModal() {
           </Button>
         </div>
       }
-      //   header={<TypographyH4>Edit profile information</TypographyH4>}
     >
       <form
         className="p-4 px-0 flex flex-col gap-6 max-w-lg"
@@ -159,13 +131,19 @@ export default function EditProfileModal() {
               <TypographyH4>Profile picture</TypographyH4>
               <IconButton className="relative">
                 <AiOutlineEdit />
-                <input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png"
-                  onChange={(e) => {
-                    setProfileImage((c) => e.target?.files?.[0] ?? null);
-                  }}
-                  className="absolute inset-0 opacity-0"
+                <Controller
+                  name="profileImage"
+                  control={control}
+                  render={({ field: { onChange } }) => (
+                    <input
+                      type="file"
+                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                      onChange={(e) => {
+                        onChange(e.target.files?.[0]);
+                      }}
+                      className="absolute inset-0 opacity-0"
+                    />
+                  )}
                 />
               </IconButton>
             </div>
@@ -179,6 +157,11 @@ export default function EditProfileModal() {
               }
               className="w-32 h-32"
             />
+            {pIErr?.message && (
+              <ValidationErrorText>
+                {pIErr?.message.toString()}
+              </ValidationErrorText>
+            )}
           </div>
 
           <div className="w-full flex flex-col gap-2">
@@ -186,13 +169,19 @@ export default function EditProfileModal() {
               <TypographyH4>Cover image</TypographyH4>
               <IconButton className="relative">
                 <AiOutlineEdit />
-                <input
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png"
-                  onChange={(e) => {
-                    setCoverImage((c) => e.target?.files?.[0] ?? null);
-                  }}
-                  className="absolute inset-0 opacity-0"
+                <Controller
+                  name="coverImage"
+                  control={control}
+                  render={({ field: { onChange } }) => (
+                    <input
+                      type="file"
+                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                      onChange={(e) => {
+                        onChange(e.target.files?.[0]);
+                      }}
+                      className="absolute inset-0 opacity-0"
+                    />
+                  )}
                 />
               </IconButton>
             </div>
@@ -204,11 +193,17 @@ export default function EditProfileModal() {
                   : myAccountInfo?.data?.profile?.coverImage?.src ?? ""
               }
             />
+            {cIErr?.message && (
+              <ValidationErrorText>
+                {cIErr?.message.toString()}
+              </ValidationErrorText>
+            )}
           </div>
         </div>
         <Input
           label="Username"
           type="text"
+          variant="bordered"
           isInvalid={username?.message !== undefined}
           errorMessage={username?.message}
           color={username?.message ? "danger" : "default"}
@@ -216,6 +211,7 @@ export default function EditProfileModal() {
           placeholder="Enter your new username"
         />
         <Input
+          variant="bordered"
           label="Firstname"
           type="text"
           isInvalid={firstName?.message !== undefined}
@@ -225,6 +221,7 @@ export default function EditProfileModal() {
           placeholder="Enter your new firstname"
         />
         <Input
+          variant="bordered"
           label="Lastname"
           type="text"
           isInvalid={lastName?.message !== undefined}
@@ -233,7 +230,33 @@ export default function EditProfileModal() {
           {...register("lastName")}
           placeholder="Enter your new lastname"
         />
+        <Controller
+          control={control}
+          name="gender"
+          render={({ field: { onChange, value } }) => (
+            <Select
+              variant="bordered"
+              color={gender?.message ? "danger" : "default"}
+              isInvalid={gender?.message ? true : false}
+              errorMessage={gender?.message}
+              label="Gender"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            >
+              <SelectItem key="male" value="male">
+                Male
+              </SelectItem>
+              <SelectItem key="female" value="female">
+                Female
+              </SelectItem>
+              <SelectItem key="not_say" value="not_say">
+                Rather not say
+              </SelectItem>
+            </Select>
+          )}
+        />
         <Textarea
+          variant="bordered"
           maxRows={4}
           minRows={2}
           label="Bio"
@@ -244,6 +267,137 @@ export default function EditProfileModal() {
           placeholder="Enter your new bio"
         />
       </form>
-    </ModalLayout>
+    </ModalLayoutV2>
   );
 }
+// <ModalLayout
+//       scrollBehavior="inside"
+//       onClose={() => {
+//         disclosure.onClose();
+//         reset();
+//       }}
+//       header={<Divider className="w-full" />}
+//       classNames={{
+//         wrapper: "min-h-screen",
+//         header: "p-0 h-[100px] items-end ",
+//         footer: "p-4",
+//       }}
+//       wrapperClassNames={{
+//         wrapper: "z-[100]",
+//         closeButton: "left-2 top-[12px]",
+//       }}
+//       closeButton={
+//         <IconButton>
+//           <BiChevronLeft />
+//         </IconButton>
+//       }
+//       isOpen={disclosure.isOpen}
+//       placement="center"
+//       size="full"
+//       footer={
+//         <div className="flex gap-2 justify-center items-center">
+//           <Button onClick={() => reset()}>Cancel</Button>
+//           <Button color="primary" form="edit-profile-form" type="submit">
+//             Save changes
+//           </Button>
+//         </div>
+//       }
+//       //   header={<TypographyH4>Edit profile information</TypographyH4>}
+//     >
+//       <form
+//         className="p-4 px-0 flex flex-col gap-6 max-w-lg"
+//         id="edit-profile-form"
+//         onSubmit={handleSubmit(onSubmit)}
+//       >
+//         <div className="w-full flex flex-col gap-4">
+//           <div className="flex flex-col gap-2">
+//             <div className="w-full flex gap-2 items-center">
+//               <TypographyH4>Profile picture</TypographyH4>
+//               <IconButton className="relative">
+//                 <AiOutlineEdit />
+//                 <input
+//                   type="file"
+//                   accept="image/jpeg,image/jpg,image/png"
+//                   onChange={(e) => {
+//                     setProfileImage((c) => e.target?.files?.[0] ?? null);
+//                   }}
+//                   className="absolute inset-0 opacity-0"
+//                 />
+//               </IconButton>
+//             </div>
+
+//             <Avatar
+//               name={myAccountInfo?.data?.username}
+//               src={
+//                 profileImage
+//                   ? URL.createObjectURL(profileImage)
+//                   : myAccountInfo?.data?.profile?.image?.src
+//               }
+//               className="w-32 h-32"
+//             />
+//           </div>
+
+//           <div className="w-full flex flex-col gap-2">
+//             <div className="w-full flex gap-2 items-center">
+//               <TypographyH4>Cover image</TypographyH4>
+//               <IconButton className="relative">
+//                 <AiOutlineEdit />
+//                 <input
+//                   type="file"
+//                   accept="image/jpeg,image/jpg,image/png"
+//                   onChange={(e) => {
+//                     setCoverImage((c) => e.target?.files?.[0] ?? null);
+//                   }}
+//                   className="absolute inset-0 opacity-0"
+//                 />
+//               </IconButton>
+//             </div>
+//             <CoverImage
+//               className="max-w-lg"
+//               src={
+//                 coverImage
+//                   ? URL.createObjectURL(coverImage)
+//                   : myAccountInfo?.data?.profile?.coverImage?.src ?? ""
+//               }
+//             />
+//           </div>
+//         </div>
+//         <Input
+//           label="Username"
+//           type="text"
+//           isInvalid={username?.message !== undefined}
+//           errorMessage={username?.message}
+//           color={username?.message ? "danger" : "default"}
+//           {...register("username")}
+//           placeholder="Enter your new username"
+//         />
+//         <Input
+//           label="Firstname"
+//           type="text"
+//           isInvalid={firstName?.message !== undefined}
+//           errorMessage={firstName?.message}
+//           color={firstName?.message ? "danger" : "default"}
+//           {...register("firstName")}
+//           placeholder="Enter your new firstname"
+//         />
+//         <Input
+//           label="Lastname"
+//           type="text"
+//           isInvalid={lastName?.message !== undefined}
+//           errorMessage={lastName?.message}
+//           color={lastName?.message ? "danger" : "default"}
+//           {...register("lastName")}
+//           placeholder="Enter your new lastname"
+//         />
+//         <Textarea
+//           maxRows={4}
+//           minRows={2}
+//           label="Bio"
+//           isInvalid={bio?.message !== undefined}
+//           errorMessage={bio?.message}
+//           color={bio?.message ? "danger" : "default"}
+//           {...register("bio")}
+//           placeholder="Enter your new bio"
+//         />
+//       </form>
+//     </ModalLayout>

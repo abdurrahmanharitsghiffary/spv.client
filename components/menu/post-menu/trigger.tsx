@@ -1,6 +1,6 @@
 import IconButton from "@/components/button/icon-button";
 import { useShowPostMenu } from "@/stores/post-menu-store";
-import { PostExtended } from "@/types/post";
+import { PostId } from "@/types/post";
 import { ButtonProps } from "@nextui-org/button";
 import React from "react";
 import { FiMoreVertical } from "react-icons/fi";
@@ -9,7 +9,7 @@ export default function PostMenuTrigger({
   post,
   onClick,
   ...rest
-}: { post: PostExtended } & ButtonProps) {
+}: { post: PostId } & ButtonProps) {
   const onOpen = useShowPostMenu();
 
   return (

@@ -30,7 +30,8 @@ export default function ProfilePage() {
     fetchNextPage,
     isFetchingNextPage,
   } = useGetMyPosts();
-  const isDisabled = (data?.pageParams ?? []).some((params) => params === null);
+  const isDisabled =
+    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
     isDisabled,

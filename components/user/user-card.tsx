@@ -1,7 +1,6 @@
+import React from "react";
 import { Card, CardBody } from "@nextui-org/card";
 import { Avatar } from "@nextui-org/avatar";
-
-import React from "react";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import clsx from "clsx";
 import Link from "next/link";

@@ -12,8 +12,11 @@ import {
 import { useGetUserIsFollowed } from "@/lib/api/users/query";
 import { useParams, useRouter } from "next/navigation";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { useConfirm } from "@/stores/confirm-store";
+import { useBlockUser } from "@/lib/api/users/mutation";
 
 export default function UserMenu() {
+  const confirm = useConfirm();
   const isOpen = useUserMenuIsOpen();
   const onClose = useHideUserMenu();
   const router = useRouter();
@@ -21,6 +24,7 @@ export default function UserMenu() {
   const { followAccountAsync } = useFollowAccount();
   const { unfollowAccountAsync } = useUnfollowAccount();
   const { isFollowed } = useGetUserIsFollowed(Number(params.userId ?? -1));
+  const { blockUserAsync } = useBlockUser();
 
   return (
     <MenuLayout
@@ -65,6 +69,14 @@ export default function UserMenu() {
             });
           } else if (key === "message") {
             router.push(`/chats/${params.userId ?? -1}`);
+          } else if (key === "block-delete") {
+            await confirm({
+              body: "Are you sure want to block this user?",
+              title: "Block",
+              confirmLabel: "Block",
+              confirmColor: "danger",
+            });
+            await blockUserAsync({ userId: Number(params.userId ?? -1) });
           }
         } catch (err) {
         } finally {

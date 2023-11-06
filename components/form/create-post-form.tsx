@@ -10,12 +10,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CreatePostValidationSchema,
   createPostValidationSchema,
-} from "@/lib/createPostSchema";
+} from "@/lib/zod-schema/post";
 import CreatePostImageChip from "./create-post-image-chip";
 import { PostExtended } from "@/types/post";
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 
 export default function CreatePostForm({
   withPreview = true,
@@ -137,7 +138,7 @@ export default function CreatePostForm({
                       onChange={(e) => {
                         onChange(Array.from(e?.target?.files ?? []));
                       }}
-                      accept="image/png,image/jpg,image/jpeg"
+                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
                       multiple={true}
                     />
                   )}
@@ -201,27 +202,3 @@ export default function CreatePostForm({
     </>
   );
 }
-
-// onChange={(e) => {
-//   const formData = new FormData();
-//   formData.append("title", "Yahahaa");
-//   formData.append("content", "Yahahaaysyuusyuusyu");
-//   Array.from(e.target.files ?? []).forEach((file) =>
-//     formData.append("images", file)
-//   );
-//   // formData.append(
-//   //   "images",
-//   //   JSON.stringify([...Array.from(e.target.files ?? [])])
-//   // );
-//   fetch("http://localhost:5000/api/posts", {
-//     method: "POST",
-//     headers: {
-//       // "Content-type": "application/json",
-//       Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJoYWZmYWUxMjRAZ21haWwuY29tIiwidXNlcm5hbWUiOiJiZWR1bCIsImlhdCI6MTY5NTU0NTExOCwiZXhwIjoxNjk1NTQ4NzE4fQ.57QXnV4lOKGmd56WP62bgGswC8lPwm5XwaylESpxgyk`,
-//     },
-//     body: formData,
-//   })
-//     .then((res) => res.json())
-//     .then((json) => console.log(json))
-//     .catch((err) => console.error("error ", err));
-// }}

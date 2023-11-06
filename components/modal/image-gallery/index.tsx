@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 import ModalLayout from "../layout";
 import ImageWithPreview from "@/components/image/image-with-preview";
 import {
@@ -7,7 +7,7 @@ import {
   useImageGalleryControls,
 } from "@/hooks/use-image-gallery";
 
-export default function ImageGallery() {
+function ImageGallery() {
   const { onClose, isOpen } = useImageGalleryControls();
   const images = useGetGalleryImages();
 
@@ -39,3 +39,5 @@ export default function ImageGallery() {
     </ModalLayout>
   );
 }
+
+export default ImageGallery;

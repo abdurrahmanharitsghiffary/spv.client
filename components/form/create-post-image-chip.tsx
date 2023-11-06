@@ -3,7 +3,7 @@ import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import Image from "next/image";
 import { Chip } from "@nextui-org/chip";
 import { Tooltip } from "@nextui-org/tooltip";
-import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
+import { MAX_FILE_SIZE } from "@/lib/zod-schema/image";
 import { formatBytes } from "@/lib/formatBytes";
 import clsx from "clsx";
 
@@ -118,7 +118,7 @@ export default function CreatePostImageChip({
                 {image.size > MAX_FILE_SIZE && (
                   <TypographyMuted className="text-danger">
                     File size is too large, max file size is{" "}
-                    {formatBytes(MAX_FILE_SIZE, "mb")}Mb
+                    {formatBytes(MAX_FILE_SIZE, "kb")}kb
                   </TypographyMuted>
                 )}
               </div>

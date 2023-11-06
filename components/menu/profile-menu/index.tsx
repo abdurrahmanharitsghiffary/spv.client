@@ -16,6 +16,7 @@ import {
 } from "@/stores/profile-menu-store";
 import { useLogout } from "@/lib/api/auth";
 import { FiLogOut } from "react-icons/fi";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 
 export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
@@ -39,8 +40,8 @@ export default function ProfileMenu() {
         } else if (key === "delete") {
           try {
             await confirm({
-              title: "Delete image",
-              body: "Delete your cover image?",
+              title: "Delete",
+              body: "Are you sure delete your cover image?",
               confirmColor: "danger",
               confirmLabel: "Delete",
               closeLabel: "Cancel",
@@ -74,7 +75,7 @@ export default function ProfileMenu() {
               <input
                 type="file"
                 ref={fileInputRef}
-                accept="image/png,image/jpg,image/jpeg"
+                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 onChange={async (e) => {
                   if (!e?.target?.files?.[0]) return null;
                   try {

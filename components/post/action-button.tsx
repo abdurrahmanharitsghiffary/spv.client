@@ -13,22 +13,25 @@ import { PiPaperPlaneTilt } from "react-icons/pi";
 export default function PostActionButton({
   isPostPage,
   isPreview,
-  post,
+  postId,
+  totalComments,
 }: {
   isPostPage?: boolean;
-  post: PostExtended | undefined;
+  postId: number;
+  totalComments: number;
   isPreview?: boolean;
 }) {
   const { likePost } = useLikePost();
   const { unlikePost } = useUnlikePost();
-  const { isLiked } = useGetPostIsLiked(post?.id ?? -1);
+  const { isLiked } = useGetPostIsLiked(postId);
   return (
     <ButtonGroup fullWidth variant="light">
       <Tooltip content="Like">
         <Button
           onClick={() => {
-            if (isLiked?.data) return unlikePost({ postId: post?.id ?? -1 });
-            return likePost({ postId: post?.id ?? -1 });
+            if (!postId && postId !== 0) return null;
+            if (isLiked?.data) return unlikePost({ postId: postId });
+            return likePost({ postId: postId });
           }}
         >
           {isLiked?.data ? (
@@ -36,21 +39,21 @@ export default function PostActionButton({
           ) : (
             <FiThumbsUp />
           )}
-          {post?.total_likes ?? 0}
+          {totalComments ?? 0}
         </Button>
       </Tooltip>
       <Tooltip content="Comment">
         {isPreview ? (
           <Button>
-            <BiComment /> {post?.comments?.total ?? 0}
+            <BiComment /> {totalComments ?? 0}
           </Button>
         ) : (
           <Button
             as={Link}
-            href={isPostPage ? "#cm9ti2pt" : `/posts/${post?.id}`}
-            replace
+            href={isPostPage ? "#cm9ti2pt" : `/posts/${postId}`}
+            replace={isPostPage ?? false}
           >
-            <BiComment /> {post?.comments?.total ?? 0}
+            <BiComment /> {totalComments ?? 0}
           </Button>
         )}
       </Tooltip>

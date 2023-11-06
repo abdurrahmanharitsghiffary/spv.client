@@ -48,7 +48,7 @@ export default function PostMenu() {
   const showEditForm = useShowEditPost();
   const confirm = useConfirm();
 
-  const isAuthored = session?.id === selectedPost?.author?.id;
+  const isAuthored = session?.id === selectedPost?.authorId;
 
   const baseItems: DropdownProps[] = [
     {
@@ -111,6 +111,12 @@ export default function PostMenu() {
         case "save": {
           if (!selectedPost) return null;
           if (isSaved?.data) {
+            await confirm({
+              title: "Delete",
+              body: "Are you sure want to delete this post from your saved posts?",
+              confirmColor: "danger",
+              confirmLabel: "Delete",
+            });
             return deleteSavedPostAsync({ postId: selectedPost?.id });
           }
           return savePostAsync({ postId: selectedPost?.id });
@@ -120,8 +126,8 @@ export default function PostMenu() {
         case "delete": {
           if (!isAuthored || !selectedPost) return null;
           await confirm({
-            title: "Delete post",
-            body: "Are you sure delete this post?",
+            title: "Delete",
+            body: "Are you sure want to delete this post?",
             confirmColor: "danger",
             confirmLabel: "Delete",
           });

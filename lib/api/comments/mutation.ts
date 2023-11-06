@@ -34,8 +34,14 @@ export const useCreateComment = () => {
         formData.append("parentId", v.data.parentId.toString());
       formData.append("comment", v.data.comment);
       formData.append("postId", v.data.postId.toString());
+
       return request
-        .post(baseCommentRoutes, formData, v?.config)
+        .post(baseCommentRoutes, formData, {
+          ...v?.config,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },
@@ -54,7 +60,6 @@ export const useCreateComment = () => {
 export const useCreateReplyComment = () => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
-
   const {
     mutate: createReplyComment,
     mutateAsync: createReplyCommentAsync,
@@ -73,7 +78,10 @@ export const useCreateReplyComment = () => {
       if (v?.image) formData.append("image", v.image);
       if (v?.imageSrc) formData.append("imageSrc", v?.imageSrc);
       return request
-        .post(commentById(v.commentId.toString()), formData, v?.config)
+        .post(commentById(v.commentId.toString()), formData, {
+          ...v?.config,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },

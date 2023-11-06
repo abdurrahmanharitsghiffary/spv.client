@@ -47,6 +47,7 @@ export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
         .get(postById(postId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    enabled: postId !== -1 && postId !== undefined,
   });
 
   return { post, ...rest };
@@ -57,14 +58,6 @@ export const useGetPostByUserId = (
   query?: { limit?: number; offset?: number },
   config?: AxiosRequestConfig
 ) => {
-  // const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
-  //   queryKey: [...keys.posts, userId, query, "users"],
-  //   queryFn: () =>
-  //    request
-  //       .get(userPost(userId.toString()), config)
-  //       .then((res) => res.data)
-  //       .catch((err) => Promise.reject(err?.response?.data)),
-  // });
   const request = useAxiosInterceptor();
 
   const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
@@ -145,6 +138,7 @@ export const useGetPostIsLiked = (
         .get(postIsLiked(postId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    enabled: postId !== -1 && postId !== undefined,
   });
 
   return { isLiked, ...rest };
@@ -199,6 +193,7 @@ export const useGetPostIsSaved = (
         .get(postIsSaved(postId), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    enabled: postId !== -1 && postId !== undefined,
   });
 
   return { isSaved, ...rest };

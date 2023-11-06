@@ -2,6 +2,7 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter, CardHeader } from "@nextui-org/card";
 import { Skeleton } from "@nextui-org/skeleton";
+import clsx from "clsx";
 import React from "react";
 import { AiOutlineHeart } from "react-icons/ai";
 import { FiMoreVertical } from "react-icons/fi";
@@ -27,10 +28,10 @@ export default function CommentSkeleton({
       )}
 
       <Card className={style}>
-        <CardHeader className="pb-0 pt-0 flex justify-start w-[50%] mt-2">
+        <CardHeader className="pb-0 pt-0 flex justify-between w-full mt-2">
           <div className="flex flex-col w-full gap-2">
-            <Skeleton className="h-2 w-[40%] rounded-medium max-w-full min-w-[45px]" />
-            <Skeleton className="h-2 w-[35%] rounded-medium min-w-[35px]" />
+            <Skeleton className="h-2 w-[40%] rounded-medium min-w-[45px] max-w-[50px]" />
+            <Skeleton className="h-2 w-[35%] rounded-medium min-w-[35px] max-w-[40px]" />
           </div>
           <div className="flex gap-2 items-start justify-end">
             <Button
@@ -56,8 +57,13 @@ export default function CommentSkeleton({
         <CardBody className="text-sm p-0 my-3 w-full flex flex-col gap-2 ml-[0.8rem] shadow-[0_0_7px_-1px_rgba(0,0,0,0)]">
           {[1, 2, 3].map((item, i) => (
             <Skeleton
-              className="h-2 rounded-medium max-w-full min-w-[50px]"
-              style={{ width: i === 0 ? "20%" : i === 1 ? "18%" : "19%" }}
+              className={clsx(
+                "h-2 rounded-medium max-w-full",
+                i === 0 && "min-w-[45px]",
+                i === 1 && "min-w-[40px]",
+                i === 2 && "min-w-[35px]"
+              )}
+              style={{ width: i === 0 ? "20%" : i === 1 ? "17%" : "15%" }}
               key={item}
             />
           ))}

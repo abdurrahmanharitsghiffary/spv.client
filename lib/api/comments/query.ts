@@ -11,8 +11,9 @@ import { keys } from "@/lib/queryKey";
 import { OffsetPagingwithOrder } from "@/types";
 import { Comment, CommentLikeResponse } from "@/types/comment";
 import { JsendSuccess, JsendWithPaging } from "@/types/response";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
+import { useMemo } from "react";
 
 export const useGetCommentByPostId = (
   postId: number,
@@ -20,17 +21,35 @@ export const useGetCommentByPostId = (
   config?: AxiosRequestConfig
 ) => {
   const request = useAxiosInterceptor();
-
-  const { data: postComments, ...rest } = useQuery<JsendWithPaging<Comment[]>>({
-    queryKey: [...keys.postComments(postId), options],
-    queryFn: () =>
-      request
-        .get(postCommentsByPostId(postId.toString(), options), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<Comment[]>>({
+    getNextPageParam: (res) => res?.pagination?.next,
+    getPreviousPageParam: (res) => res?.pagination?.previous,
+    queryKey: keys.postComments(postId),
+    queryFn: ({ pageParam }) =>
+      pageParam === null
+        ? Promise.resolve(undefined)
+        : request
+            .get(
+              pageParam
+                ? pageParam
+                : postCommentsByPostId(postId.toString(), options),
+              config
+            )
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err?.response?.data)),
   });
 
-  return { postComments, ...rest };
+  const postComments = useMemo(
+    () => ({
+      ...data?.pages?.[0],
+      data: data?.pages
+        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
+        .flat(),
+    }),
+    [data]
+  );
+
+  return { postComments, data, ...rest };
 };
 
 export const useGetComment = (
@@ -46,6 +65,7 @@ export const useGetComment = (
         .get(commentById(commentId.toString()), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    enabled: commentId !== -1 && commentId !== undefined,
   });
   return { comment, ...rest };
 };
@@ -83,7 +103,7 @@ export const useGetCommentIsLiked = (
         .get(commentIsLiked((commentId ?? -1).toString()), config)
         .then((res) => res.data)
         .catch((err) => err?.response?.data),
-    enabled: commentId !== undefined,
+    enabled: commentId !== -1 && commentId !== undefined,
   });
 
   return { isLiked, ...rest };

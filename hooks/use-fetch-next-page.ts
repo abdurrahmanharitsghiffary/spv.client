@@ -39,7 +39,7 @@ export default function useFetchNextPageObserver({
 
   useEffect(() => {
     if (isObserving && !isDisabled && !isFetching) fetchNextPage();
-  }, [isDisabled, isObserving, fetchNextPage, isFetching]);
+  }, [isDisabled, isObserving, isFetching]);
 
   return { ref };
 }

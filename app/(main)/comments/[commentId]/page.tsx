@@ -7,15 +7,18 @@ import SingleComment from "@/components/comment/single-comment";
 import { useGetComment } from "@/lib/api/comments/query";
 import SingleCommentSkeleton from "@/components/comment/single-comment-skeleton";
 import CommentSkeleton from "@/components/comment/skeleton";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 
 export default function CommentPage({
   params,
 }: {
   params: { commentId: string };
 }) {
-  const { comment, isLoading, isSuccess } = useGetComment(
+  const { comment, isLoading, isSuccess, isError, error } = useGetComment(
     Number(params.commentId)
   );
+
+  useNotFoundRedirect(error, isError);
 
   return (
     <>

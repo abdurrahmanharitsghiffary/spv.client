@@ -1,27 +1,27 @@
 "use client";
-import React, { useMemo, useState } from "react";
-import { CardFooter, Card, CardBody, CardHeader } from "@nextui-org/card";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Card } from "@nextui-org/card";
 import { Avatar } from "@nextui-org/avatar";
-import { TypographyMuted, TypographyP } from "../ui/typography";
-import Timestamp from "../timestamp";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import { useSetReplyId } from "@/hooks/use-reply";
 import { useRouter } from "next/navigation";
-import CommentMenu from "../menu/comment-menu";
-import CommentMenuProvider from "../menu/comment-menu/context/comment-menu-context";
-import CommentMenuTrigger from "../menu/comment-menu/trigger";
-import CommentLikeButton from "../button/comment-like-button";
-import { useBreakpoints } from "@/hooks/use-media-query";
-import ImageWithPreview from "../image/image-with-preview";
 import {
   Comment as CommentType,
   CommentReply as CommentReplyType,
 } from "@/types/comment";
 import { useGetComment } from "@/lib/api/comments/query";
 import CommentSkeleton from "./skeleton";
+import CommentHeader from "./comment-header";
+import CommentBody from "./comment-body";
+import CommentFooter from "./comment-footer";
 
-export default function Comment({
+function Comment({
   comment,
   className,
   level = 0,
@@ -30,12 +30,9 @@ export default function Comment({
   className?: string;
   level?: number;
 }) {
-  const breakpoints = useBreakpoints();
-  const router = useRouter();
   const [isShow, setIsShow] = useState(false);
-  const setReplyId = useSetReplyId();
-
   const commentData = useMemo(() => comment, [comment]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const style = `${
     level > 0 ? "border-l" : ""
@@ -43,137 +40,182 @@ export default function Comment({
     className ?? ""
   }`;
 
-  const isUpdated = comment?.updateAt !== comment?.createdAt;
-
-  const levelLimit = (() => {
-    if (breakpoints.isXs) return 2;
-    if (breakpoints.isSm) return 3;
-    if (breakpoints.isMd) return 4;
-    return 5;
-  })();
-
-  const childCommentTotal = commentData?.commentReply?.total ?? 0;
-  // const commentReply = useMemo(
-  //   () => (commentData as CommentType)?.commentReply?.comments ?? [],
-  //   [commentData]
-  // );
   const commentIds = useMemo(
     () => (commentData as CommentReplyType)?.commentReply?.commentIds ?? [],
     [commentData]
   );
 
-  return (
-    <CommentMenuProvider>
-      <div className="flex gap-2 relative">
-        <Avatar
-          as={NextLink}
-          href={`/users/${commentData?.user?.id}`}
-          name={commentData?.user?.username}
-          src={commentData?.user?.image?.src}
-          className="absolute"
-        />
-        {level > 1 && (
-          <span className="absolute top-[20px] w-[10%] h-[1px] bg-divider -left-[20px]"></span>
-        )}
+  const handleScrollBottom = useCallback(() => {
+    const element = containerRef.current;
+    if (element) {
+      element.scrollIntoView({
+        behavior: "auto",
+        block: "end",
+        inline: "end",
+      });
+    }
+  }, [containerRef]);
 
-        <Card className={style}>
-          <CardHeader className="pb-0 pt-0 flex justify-start w-full">
-            <NextLink
-              href={`/users/${commentData?.user?.id}`}
-              className="flex flex-col"
-            >
-              <TypographyP className="font-semibold text-sm !leading-[1.50rem]">
-                {commentData?.user?.username}
-              </TypographyP>
-              <div className="flex gap-1 items-center">
-                <Timestamp date={commentData?.createdAt} className="text-xs" />
-                <TypographyMuted className="!text-xs !text-foreground-800">
-                </TypographyMuted>
-              </div>
-            </NextLink>
-            <div className="flex gap-2 items-start justify-end">
-              <CommentLikeButton
-                commentId={commentData?.id}
-                total={commentData?.total_likes}
-              />
-              <CommentMenuTrigger comment={commentData as CommentType} />
-            </div>
-          </CardHeader>
-          <CardBody className="text-sm p-0 my-3 w-fit max-w-full rounded-lg ml-[0.8rem] shadow-[0_0_7px_-1px_rgba(0,0,0,0)] pr-3">
-            {commentData?.image && (
-              <ImageWithPreview
-                removeWrapper
-                src={commentData?.image?.src}
-                radius="sm"
-                className="min-w-[150px] max-w-[175px] h-auto my-1 object-cover"
-              />
-            )}
-            {commentData?.comment}
-          </CardBody>
-          <CardFooter className="gap-3 pt-1">
-            <Link
-              as={level > levelLimit ? NextLink : "button"}
-              href={level > levelLimit ? `/comments/${commentData?.id}` : ""}
-              color="foreground"
-              className="text-xs"
-              size="sm"
-              onClick={() => {
-                if (level > levelLimit) return null;
-                router.replace("#cm9ti2pt");
-                setIsShow(true);
-                setReplyId({
-                  username: commentData?.user?.username ?? "",
-                  id: commentData?.id ?? -1,
-                });
-              }}
-            >
-              Reply
-            </Link>
-            <Link
-              underline="hover"
-              color="foreground"
-              as={level > levelLimit ? NextLink : "button"}
-              href={level > levelLimit ? `/comments/${commentData?.id}` : ""}
-              size="sm"
-              className="text-xs"
-              onClick={() => {
-                if (level > levelLimit) return null;
-                setIsShow((c) => !c);
-              }}
-            >
-              {isShow
-                ? childCommentTotal > 0
-                  ? "Hide"
-                  : ""
-                : childCommentTotal > 0
-                ? `Show ${childCommentTotal} repl${
-                    childCommentTotal > 1 ? "ies" : "y"
-                  }`
-                : null}
-            </Link>
-          </CardFooter>
-          {isShow &&
-            commentIds?.length > 0 &&
-            commentIds.map((id) => (
-              <CommentReply level={level + 1} key={id} commentId={id} />
-            ))}
-        </Card>
-      </div>
-      <CommentMenu />
-    </CommentMenuProvider>
+  const handleScrollTop = useCallback(() => {
+    const element = containerRef.current;
+    if (element) {
+      element.scrollIntoView({
+        behavior: "auto",
+        block: "start",
+        inline: "start",
+      });
+    }
+  }, [containerRef]);
+
+  useEffect(() => {
+    if (isShow) {
+      handleScrollBottom();
+    }
+
+    return () => {
+      if (isShow) handleScrollTop();
+    };
+  }, [isShow, handleScrollBottom, handleScrollTop]);
+
+  const handleReplyClick = (value: React.SetStateAction<boolean>) => {
+    setIsShow(value);
+  };
+
+  // const onSuccessLoad = useCallback((isSuccess: boolean) => {
+  //   console.log(isSuccess, "isSucessAll");
+  // }, []);
+
+  return (
+    <div className="flex gap-2 relative py-2 w-full" ref={containerRef}>
+      <Avatar
+        as={NextLink}
+        href={`/users/${commentData?.user?.id}`}
+        name={commentData?.user?.username}
+        src={commentData?.user?.image?.src}
+        className="absolute"
+      />
+      {level > 1 && (
+        <span className="absolute top-[20px] w-[10%] h-[1px] bg-divider -left-[20px]"></span>
+      )}
+
+      <Card className={style}>
+        <CommentHeader
+          commentId={commentData?.id}
+          createdAt={commentData?.createdAt}
+          totalLikes={commentData?.total_likes}
+          userId={commentData?.user?.id}
+          username={commentData?.user?.username}
+        />
+        <CommentBody
+          comment={commentData?.comment}
+          imageSrc={commentData?.image?.src}
+        />
+        <CommentFooter
+          commentId={commentData?.id}
+          isShow={isShow}
+          level={level}
+          onReplyClick={handleReplyClick}
+          totalReply={commentData?.commentReply?.total}
+          username={commentData?.user?.username}
+        />
+        {isShow && commentIds?.length > 0 && (
+          <CommentReplies
+            // onSuccessLoadReply={onSuccessLoad}
+            level={level}
+            commentIds={commentIds}
+          />
+        )}
+      </Card>
+    </div>
   );
 }
+export default Comment;
 
 export function CommentReply({
   commentId,
   level,
-}: {
+}: // onSuccessLoad,
+{
   commentId: number;
   level?: number;
+  // onSuccessLoad?: (isSuccess: boolean) => void;
 }) {
   const { isLoading, isSuccess, comment } = useGetComment(commentId);
+
+  // useEffect(() => {
+  //   if (onSuccessLoad && isSuccess) onSuccessLoad(isSuccess);
+  // }, [isSuccess]);
+
   if (isLoading) return <CommentSkeleton level={level} />;
   if (isSuccess)
     return <Comment comment={comment?.data ?? null} level={level} />;
   return null;
+}
+
+export function CommentReplies({
+  commentIds = [],
+  level,
+}: // onSuccessLoadReply,
+{
+  commentIds?: number[];
+  level: number;
+  // onSuccessLoadReply?: (isSuccess: boolean) => void;
+}) {
+  const [limit, setLimit] = useState(10);
+  // const [isSuccessAll, setIsSuccessAll] = useState<boolean[]>([]);
+  // console.log(isSuccessAll, "all");
+  // const isSuccess =
+  //   isSuccessAll.every((val) => val === true) && isSuccessAll.length === limit;
+
+  // useEffect(() => {
+  //   if (onSuccessLoadReply) onSuccessLoadReply(isSuccess);
+  // }, [isSuccess]);
+
+  // const onSuccessLoad = useCallback((isSuccess: boolean) => {
+  //   setIsSuccessAll((c) => [...c, isSuccess]);
+  // }, []);
+
+  const isOlderCommentAvailable =
+    commentIds.length > 10 && commentIds.length - limit >= 0;
+
+  const reversedIds = useMemo(() => commentIds.slice().reverse(), [commentIds]);
+
+  const ids = useMemo(() => {
+    if (!isOlderCommentAvailable) return reversedIds;
+    return (reversedIds ?? []).length > 0
+      ? reversedIds.slice(
+          reversedIds.length - limit < 0 ? 0 : reversedIds.length - limit
+        )
+      : [];
+  }, [reversedIds, limit, isOlderCommentAvailable]);
+
+  const handleShowOlderComments = () => {
+    if (limit <= commentIds.length && isOlderCommentAvailable)
+      return setLimit((c) => c + 10);
+  };
+
+  return (
+    <>
+      {isOlderCommentAvailable && (
+        <Link
+          underline="hover"
+          color="foreground"
+          as={"button"}
+          size="sm"
+          className="text-xs mb-4"
+          onClick={handleShowOlderComments}
+        >
+          Show older comments
+        </Link>
+      )}
+      {(ids ?? []).map((id) => (
+        <CommentReply
+          // onSuccessLoad={onSuccessLoad}
+          level={level + 1}
+          commentId={id}
+          key={id}
+        />
+      ))}
+    </>
+  );
 }

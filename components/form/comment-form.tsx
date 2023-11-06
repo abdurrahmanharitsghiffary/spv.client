@@ -7,62 +7,31 @@ import { Divider } from "@nextui-org/divider";
 import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { BiSend } from "react-icons/bi";
-import { z } from "zod";
 import CommentFormImage from "./comment-form-image";
-import { useGetReplyId, useSetReplyId } from "@/hooks/use-reply";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 import { useIsSSR } from "@react-aria/ssr";
-import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
-import { formatBytes } from "@/lib/formatBytes";
 import Recorder from "../recorder";
 import CommentFormPopover from "./comment-form-popover";
-import { useGifMenuIsOpen, useGifMenuShow } from "@/hooks/use-gif-menu";
 import {
   useCreateComment,
   useCreateReplyComment,
 } from "@/lib/api/comments/mutation";
-import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
-
-const allowedFormat = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-const commentValidation = z
-  .object({
-    comment: z.string(),
-    image: z
-      .any()
-      .refine(
-        (file) => file === null || file === undefined || file instanceof File,
-        "Image must be a file"
-      )
-      .refine(
-        (file: File) =>
-          file === null ||
-          file === undefined ||
-          allowedFormat.includes(file?.type),
-        "Invalid image format, allowed format is .jpg, .jpeg, .png, .webp"
-      )
-      .refine(
-        (file: File) =>
-          file === null ||
-          file === undefined ||
-          (file?.size ?? 0) < MAX_FILE_SIZE,
-        "Max file size is " + formatBytes(MAX_FILE_SIZE, "mb") + "Mb"
-      )
-      .optional(),
-  })
-  .refine(
-    (arg) => {
-      if (arg.image) return true;
-      if ((arg.comment ?? "").length === 0) return false;
-      return true;
-    },
-    { message: "Comment must not be empty", path: ["comment"] }
-  );
-
-type CommentValidation = z.infer<typeof commentValidation>;
+import {
+  CreateCommentSchema,
+  createCommentSchema,
+} from "@/lib/zod-schema/comment";
+import {
+  useGetSelectedCommentReplyId,
+  useResetReplyValue,
+  useReplyStore,
+} from "@/stores/comment-reply-store";
+import {
+  useGiphyGridIsOpen,
+  useShowGiphyGrid,
+} from "@/stores/giphy-grid-store";
 
 export default function CommentForm({
   hideSpacer,
@@ -73,6 +42,10 @@ export default function CommentForm({
   hideSpacer?: boolean;
   spacerClassName?: string;
 }) {
+  const replyId = useGetSelectedCommentReplyId();
+  const replyUsername = useReplyStore((state) => state?.username) ?? "";
+  const resetReply = useResetReplyValue();
+
   const { postId, commentId } = useParams();
   const { createCommentAsync } = useCreateComment();
   const { createReplyCommentAsync } = useCreateReplyComment();
@@ -84,30 +57,27 @@ export default function CommentForm({
     reset,
     formState: { errors, isSubmitSuccessful },
     register,
-  } = useForm<CommentValidation>({
-    resolver: zodResolver(commentValidation),
+  } = useForm<CreateCommentSchema>({
+    resolver: zodResolver(createCommentSchema),
     defaultValues: { image: null },
   });
   const isSSR = useIsSSR();
 
-  // const stringFile = JSON.stringify(watch("image") ?? "");
   const file: File | null = watch("image");
 
   useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
-      setReplyId({ id: null, username: "" });
+      resetReply();
     }
-  }, [isSubmitSuccessful, reset]);
+  }, [isSubmitSuccessful]);
 
   const handleImageReset = useCallback(() => {
     setValue("image", null);
   }, []);
 
-  const showGifMenu = useGifMenuShow();
-  const gifMenuIsOpen = useGifMenuIsOpen();
-  const replyId = useGetReplyId();
-  const setReplyId = useSetReplyId();
+  const showGifMenu = useShowGiphyGrid();
+  const gifMenuIsOpen = useGiphyGridIsOpen();
   const currentComment = watch("comment");
   const [formHeight, setFormHeight] = useState(0);
   const formContainerRef = useCallback(
@@ -115,7 +85,7 @@ export default function CommentForm({
       setFormHeight(node?.offsetHeight < 67 ? 67 : node?.offsetHeight ?? 67);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentComment, replyId.id, file, gifMenuIsOpen, errors.image]
+    [currentComment, replyId, file, gifMenuIsOpen, errors.image]
   );
 
   const fieldIsError = errors.comment?.message ? true : false;
@@ -123,14 +93,14 @@ export default function CommentForm({
   const handleGifMenu = () => {
     showGifMenu();
   };
-
-  const onSubmit: SubmitHandler<CommentValidation> = (data) => {
+  console.log(replyId);
+  const onSubmit: SubmitHandler<CreateCommentSchema> = (data) => {
     // toast.promise(
-    replyId.id || commentId
+    replyId || commentId
       ? createReplyCommentAsync({
           comment: data.comment,
           image: data?.image,
-          commentId: replyId.id ?? Number(commentId),
+          commentId: replyId ?? Number(commentId),
         })
       : createCommentAsync({
           data: {
@@ -160,9 +130,9 @@ export default function CommentForm({
 
   return (
     <>
-      {(replyId?.id || file || fieldIsError || formHeight) && !hideSpacer ? (
+      {(replyId || file || fieldIsError || formHeight) && !hideSpacer ? (
         <div
-          className={`w-full dark:bg-content1 ${spacerClassName ?? ""}`}
+          className={`w-full ${spacerClassName ?? ""}`}
           style={{
             height: formHeight,
           }}
@@ -178,12 +148,9 @@ export default function CommentForm({
         />
         <Card className="shadow-none rounded-none ">
           <Divider />
-          {replyId.id && replyId.username ? (
-            <Chip
-              className="m-2 mb-0"
-              onClose={() => setReplyId({ id: null, username: "" })}
-            >
-              Replying to <Link>@{replyId.username}</Link>
+          {replyId && replyUsername ? (
+            <Chip className="m-2 mb-0" onClose={resetReply}>
+              Replying to <Link>@{replyUsername}</Link>
             </Chip>
           ) : (
             ""
@@ -225,7 +192,7 @@ export default function CommentForm({
                       radius="full"
                       color="primary"
                       variant="light"
-                      className="absolute top-[6px] right-0"
+                      className="absolute top-[6px] right-0 z-[102]"
                       isDisabled={gifMenuIsOpen}
                     >
                       <BiSend size={18} />
@@ -237,7 +204,7 @@ export default function CommentForm({
               )}
             </div>
             <Recorder
-              className="text-[18px]"
+              className="text-[1.125rem]"
               onSpeechSuccess={handleSuccessSpeech}
               // color="primary"
               radius="md"

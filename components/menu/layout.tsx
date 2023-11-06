@@ -15,7 +15,7 @@ function IconWrapper({
   children: React.ReactNode;
 }) {
   const cl = clsx(
-    "w-fit text-[22px] h-fit p-2 flex justify-center items-center",
+    "w-fit text-[1.375rem] h-fit p-2 flex justify-center items-center",
     className
   );
 

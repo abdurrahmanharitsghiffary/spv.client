@@ -14,6 +14,7 @@ import {
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 
 export default function PhotoProfileMenu() {
   const isOpen = usePhotoProfileMenuIsOpen();
@@ -36,8 +37,8 @@ export default function PhotoProfileMenu() {
         } else if (key === "delete") {
           try {
             await confirm({
-              title: "Delete picture",
-              body: "Delete your profile picture?",
+              title: "Delete",
+              body: "Are you sure want to delete your profile picture?",
               confirmColor: "danger",
               confirmLabel: "Delete",
               closeLabel: "Cancel",
@@ -58,13 +59,13 @@ export default function PhotoProfileMenu() {
               <input
                 type="file"
                 ref={fileInputRef}
-                accept="image/png,image/jpg,image/jpeg"
+                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 onChange={async (e) => {
                   if (!e?.target?.files?.[0]) return null;
                   try {
                     await confirm({
-                      title: "Change profile picture",
-                      body: "Save with this picture?",
+                      title: "Edit",
+                      body: "Save changes with this picture?",
                       imgSrc: URL.createObjectURL(e?.target?.files?.[0] ?? ""),
                       imageClassName:
                         "w-150 h-150 object-cover rounded-full aspect-square border-2 border-divider",

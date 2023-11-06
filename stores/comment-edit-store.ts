@@ -1,14 +1,15 @@
-import { type Comment as CommentType } from "@/types/comment";
+"use client";
+import { CommentId } from "@/types/comment";
 import { useCallback } from "react";
 import { create } from "zustand";
 
 type State = {
-  comment: CommentType | null;
+  comment: CommentId | null;
   isOpen: boolean;
 };
 
 type Action = {
-  setSelectedComment: (comment: CommentType | null) => void;
+  setSelectedComment: (comment: CommentId | null) => void;
   onClose: () => void;
   onOpen: () => void;
 };
@@ -30,7 +31,7 @@ export const useShowCommentEditForm = () => {
 
   const onOpen = useCommentEditStore((state) => state.onOpen);
 
-  const handleOpen = useCallback((comment: CommentType) => {
+  const handleOpen = useCallback((comment: CommentId) => {
     setSelectedComment(comment);
     onOpen();
   }, []);

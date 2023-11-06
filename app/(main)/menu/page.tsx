@@ -55,7 +55,7 @@ export default function MenuPage() {
           confirmLabel: "Logout",
           confirmColor: "danger",
           body: "Logout from this account?",
-          title: "Logout account",
+          title: "Logout",
         });
         await logoutAsync();
         return null;
@@ -74,14 +74,17 @@ export default function MenuPage() {
         const choice = await confirm({
           confirmLabel: "Confirm",
           confirmColor: "danger",
-          body: "Are you sure delete this account?",
-          title: "Delete account",
+          body: "Are you sure want to delete this account?",
+          title: "Delete",
         });
 
         if (choice) {
           showDeleteModal();
         }
         return null;
+      }
+      case "blocked-users": {
+        return router.push("/users/blocked");
       }
       default:
         alert(key);
@@ -187,7 +190,7 @@ export default function MenuPage() {
             isSuccess && (
               <>
                 <TypographyMuted>{`${myAccountInfo?.data?.firstName} ${myAccountInfo?.data?.lastName}`}</TypographyMuted>
-                <p className="text-[12px] text-default group-hover:text-default-800 dark:text-default-200 transition-all">
+                <p className="text-[0.75rem] text-default group-hover:text-default-800 dark:text-default-200 transition-all">
                   View profile
                 </p>
               </>
@@ -196,7 +199,7 @@ export default function MenuPage() {
         </div>
       </Link>
       <div className="w-full px-2">
-        {!isSSR && !myAccountInfo?.data?.verified ? (
+        {isSuccess && !myAccountInfo?.data?.verified ? (
           <div className="py-2 flex flex-col gap-2">
             <TypographyMuted>
               Account is not verified. pls verify your account
@@ -263,5 +266,5 @@ export default function MenuPage() {
 }
 
 function IconWrapper({ children }: { children: React.ReactNode }) {
-  return <div className="w-fit h-fit text-[18px] mr-1">{children}</div>;
+  return <div className="w-fit h-fit text-[1.125rem] mr-1">{children}</div>;
 }

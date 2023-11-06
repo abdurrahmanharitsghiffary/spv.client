@@ -1,7 +1,7 @@
 "use client";
 
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { userById } from "@/lib/endpoints";
+import { blockUserByIdRoute, blockUserRoute, userById } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { UpdateUserDataOptions } from "@/types";
 import { JsendSuccess } from "@/types/response";
@@ -54,4 +54,50 @@ export const useDeleteUser = () => {
   });
 
   return { deleteUser, deleteUserAsync, ...rest };
+};
+
+export const useBlockUser = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: blockUser,
+    mutateAsync: blockUserAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
+      request
+        .post(blockUserRoute, { userId: v.userId }, v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
+      queryClient.invalidateQueries({ queryKey: keys.blockedUsers() });
+    },
+  });
+
+  return { blockUser, blockUserAsync, ...rest };
+};
+
+export const useUnblockUser = () => {
+  const request = useAxiosInterceptor();
+  const queryClient = useQueryClient();
+
+  const {
+    mutate: unblock,
+    mutateAsync: unblockAsync,
+    ...rest
+  } = useMutation({
+    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
+      request
+        .delete(blockUserByIdRoute(v.userId), v?.config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    onSuccess: (d, v) => {
+      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
+      queryClient.invalidateQueries({ queryKey: keys.blockedUsers() });
+    },
+  });
+
+  return { unblock, unblockAsync, ...rest };
 };

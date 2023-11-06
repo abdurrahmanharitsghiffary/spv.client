@@ -31,7 +31,7 @@ export default function ChatBubble({
           image ? "pb-4" : ""
         )}
       >
-        <TypographyP className="!text-[16px]">{text}</TypographyP>
+        <TypographyP className="!text-[1rem]">{text}</TypographyP>
         {image && (
           <ImageWithPreview
             radius="sm"
@@ -43,7 +43,7 @@ export default function ChatBubble({
       <Timestamp
         className={clsx(
           isRecipient ? "self-start" : "self-end",
-          "!text-[11px]"
+          "!text-[0.688rem]"
         )}
         customDate={new Date(Date.now())}
       />

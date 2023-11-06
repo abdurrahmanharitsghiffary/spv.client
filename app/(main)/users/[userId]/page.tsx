@@ -9,15 +9,18 @@ import ProfileSkeleton from "@/components/profile/profile-skeleton";
 import { TypographyH3, TypographyMuted } from "@/components/ui/typography";
 import UserActionButton from "@/components/user/user-action-button";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { useGetPostByUserId } from "@/lib/api/posts/query";
 import { useGetUserById } from "@/lib/api/users/query";
 import { PostExtended } from "@/types/post";
 import { Divider } from "@nextui-org/divider";
 import { Spinner } from "@nextui-org/spinner";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 
 export default function UserPage({ params }: { params: { userId: string } }) {
-  const { userData, isLoading, isSuccess } = useGetUserById(
+  const router = useRouter();
+  const { userData, isLoading, isSuccess, isError, error } = useGetUserById(
     Number(params.userId)
   );
   const {
@@ -30,8 +33,13 @@ export default function UserPage({ params }: { params: { userId: string } }) {
     isFetchingNextPage,
   } = useGetPostByUserId(Number(params.userId));
 
+  useNotFoundRedirect(error, isError);
+
   const isDisabled =
-    data?.pageParams.some((params) => params === null) ?? false;
+    !isSuccess ||
+    (data?.pageParams.some((params) => params === null) ?? false) ||
+    isError;
+
   const { ref } = useFetchNextPageObserver({
     isDisabled,
     fetchNextPage,

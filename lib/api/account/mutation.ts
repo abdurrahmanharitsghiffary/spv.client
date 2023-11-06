@@ -52,7 +52,10 @@ export const useUpdateMyAccountImage = () => {
       formData.append("image", v.image);
 
       return request
-        .patch(myAccountImages, formData, v?.config)
+        .patch(myAccountImages, formData, {
+          ...v?.config,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },
@@ -131,7 +134,10 @@ export const useUpdateMyCoverImage = () => {
       const url = new URL(myAccountImages);
       url.searchParams.append("type", "cover");
       return request
-        .patch(url.href, formData, v?.config)
+        .patch(url.href, formData, {
+          ...v?.config,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },

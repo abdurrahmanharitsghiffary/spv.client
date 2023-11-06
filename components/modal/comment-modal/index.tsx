@@ -1,0 +1,30 @@
+"use client";
+import React from "react";
+import ModalLayoutV2 from "../layoutV2";
+import { useRouter } from "next/navigation";
+import CommentEditForm from "@/components/form/comment-edit-form";
+import CommentForm from "@/components/form/comment-form";
+
+export default function CommentModal({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
+
+  return (
+    <ModalLayoutV2
+      classNames={{ body: "px-0" }}
+      isOpen
+      onClose={() => router.back()}
+      footer={
+        <div className="w-full">
+          <CommentEditForm />
+          <CommentForm />
+        </div>
+      }
+    >
+      {children}
+    </ModalLayoutV2>
+  );
+}

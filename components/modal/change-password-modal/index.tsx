@@ -7,7 +7,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import {
   ChangePasswordValidationSchema,
   changePasswordValidationSchema,
-} from "@/lib/schema";
+} from "@/lib/zod-schema/auth";
 import InputPassword from "@/components/form/input/password";
 import { Button } from "@nextui-org/button";
 import { useConfirm } from "@/stores/confirm-store";
@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
 
-export default function ChangePasswordModal() {
+function ChangePasswordModal() {
   const {
     register,
     handleSubmit,
@@ -69,7 +69,10 @@ export default function ChangePasswordModal() {
   return (
     <ModalLayoutV2
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => {
+        onClose();
+        reset();
+      }}
       footer={
         <div className="flex gap-2">
           <Button onClick={() => reset()}>Cancel</Button>
@@ -85,6 +88,7 @@ export default function ChangePasswordModal() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <InputPassword
+          variant="bordered"
           {...register("currentPassword")}
           label="Current password"
           placeholder="your current password"
@@ -93,6 +97,7 @@ export default function ChangePasswordModal() {
           color={currentPassword?.message ? "danger" : "default"}
         />
         <InputPassword
+          variant="bordered"
           {...register("password")}
           label="New password"
           placeholder="Enter your new password"
@@ -101,6 +106,7 @@ export default function ChangePasswordModal() {
           color={password?.message ? "danger" : "default"}
         />
         <InputPassword
+          variant="bordered"
           {...register("confirmPassword")}
           label="Confirm"
           placeholder="Enter again your new password"
@@ -112,3 +118,5 @@ export default function ChangePasswordModal() {
     </ModalLayoutV2>
   );
 }
+
+export default ChangePasswordModal;

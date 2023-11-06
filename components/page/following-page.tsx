@@ -1,19 +1,19 @@
 "use client";
-import {
-  useGetUserFollowedUsers,
-  useGetUserFollowers,
-} from "@/lib/api/users/query";
+import { useGetUserFollowedUsers } from "@/lib/api/users/query";
 import { useParams } from "next/navigation";
 import React, { useMemo } from "react";
 import UsersGridLayout from "../layout/users-grid-layout";
 import { TypographyH3 } from "../ui/typography";
 import UserCard from "../user/user-card";
 import UserCardSkeleton from "../user/user-card-skeleton";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 
 export default function FollowingPage() {
   const params = useParams();
-  const { userFollowedUsersData, isSuccess, isLoading, isError } =
+  const { userFollowedUsersData, isSuccess, isLoading, isError, error } =
     useGetUserFollowedUsers(Number(params.userId));
+
+  useNotFoundRedirect(error, isError);
 
   const total = useMemo(
     () => userFollowedUsersData?.data?.total ?? 0,

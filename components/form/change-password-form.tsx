@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import {
   PasswordValidationSchema,
   passwordValidationSchema,
-} from "@/lib/schema";
+} from "@/lib/zod-schema/auth";
 
 export default function ChangePasswordForm({ token }: { token: string }) {
   const {
@@ -61,6 +61,7 @@ export default function ChangePasswordForm({ token }: { token: string }) {
       }
     >
       <InputPassword
+        variant="bordered"
         {...register("password")}
         color={password?.message ? "danger" : "default"}
         isInvalid={password?.message ? true : false}
@@ -69,6 +70,7 @@ export default function ChangePasswordForm({ token }: { token: string }) {
         placeholder="Enter your new password..."
       />
       <InputPassword
+        variant="bordered"
         {...register("confirmPassword")}
         color={confirmPassword?.message ? "danger" : "default"}
         isInvalid={confirmPassword?.message ? true : false}

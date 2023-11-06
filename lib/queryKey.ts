@@ -12,6 +12,7 @@ export const keys = {
   isFollowing: (userId: number) =>
     [...keys.userById(userId), "isFollow"] as const,
   meAccount: () => [...keys.me, "account"] as const,
+  blockedUsers: () => [...keys.users, "blocked"] as const,
   meNotifications: () => [...keys.me, "notifications"] as const,
   meChats: () => [...keys.me, "chats"] as const,
   mePosts: () => [...keys.me, "posts"] as const,

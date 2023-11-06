@@ -18,10 +18,13 @@ export const navActionItems: NavItemsAction[] = [
   {
     key: "back-button",
     keys: [
+      "/comments/:commentId",
+      "/posts/saved",
       "/posts/:postId",
       "/users/:userId/followers",
       "/users/:userId/following",
       "/chats",
+      "/users/blocked",
     ],
     action: (router) => <BackButton router={router} />,
   },

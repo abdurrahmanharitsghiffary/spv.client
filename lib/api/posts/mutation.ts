@@ -33,7 +33,10 @@ export const useCreatePost = () => {
         v?.data.images.forEach((image) => formData.append("images", image));
       }
       return request
-        .post(basePostRoutes(), formData, v?.config)
+        .post(basePostRoutes(), formData, {
+          ...v?.config,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },
@@ -63,7 +66,10 @@ export const useUpdatePost = () => {
     }) => {
       const formData = getFormData(v.data);
       return request
-        .patch(postById(v.postId.toString()), formData, v?.config)
+        .patch(postById(v.postId.toString()), formData, {
+          ...v?.config,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((res) => res.data as JsendSuccess<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },

@@ -4,6 +4,7 @@ import ModalLayout, { ModalLayoutProps } from "./layout";
 import IconButton from "../button/icon-button";
 import { BiChevronLeft } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
+import clsx from "clsx";
 
 const ModalLayoutV2 = forwardRef(
   (
@@ -25,18 +26,26 @@ const ModalLayoutV2 = forwardRef(
         ref={ref}
         header={<Divider className="w-full" />}
         classNames={{
-          wrapper: "h-full",
-          header: "p-0 h-[64px] items-end ",
-          footer: "p-4",
+          wrapper: clsx("h-full max-h-none", classNames?.wrapper),
+          header: clsx("p-0 h-[64px] items-end", classNames?.header),
+          footer: clsx("p-4", classNames?.footer),
+          body: classNames?.body,
+          content: classNames?.content,
+          modalBtn: classNames?.modalBtn,
         }}
         wrapperClassNames={{
-          closeButton: "left-2 top-[12px]",
+          closeButton: clsx(
+            "left-2 top-[12px]",
+            wrapperClassNames?.closeButton
+          ),
+          ...wrapperClassNames,
         }}
         closeButton={
           <IconButton>
             <BiChevronLeft />
           </IconButton>
         }
+        scrollBehavior="inside"
         placement="center"
         size="full"
       >

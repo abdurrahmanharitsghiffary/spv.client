@@ -4,14 +4,16 @@ import PostCard from "../post/post-card";
 import { Divider } from "@nextui-org/divider";
 import Comment from "../comment";
 import { useGetPostById } from "@/lib/api/posts/query";
-import { useGetCommentByPostId } from "@/lib/apiv2";
+import { useGetCommentByPostId } from "@/lib/api/comments/query";
 import CommentSkeleton from "../comment/skeleton";
 import PostCardSkeleton from "../post/skeleton";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 
 export default function PostPage({ postId }: { postId: string }) {
-  const { post, isLoading, isSuccess } = useGetPostById(Number(postId));
+  const { post, isLoading, isSuccess, isError, error, fetchStatus } =
+    useGetPostById(Number(postId));
   const {
     postComments,
     data,
@@ -21,12 +23,16 @@ export default function PostPage({ postId }: { postId: string }) {
     isSuccess: isCommentSuccess,
     isLoading: isCommentLoading,
   } = useGetCommentByPostId(Number(postId));
-  const isDisabled = (data?.pageParams ?? []).some((params) => params === null);
+  const isDisabled =
+    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
     isDisabled,
     isFetching,
   });
+
+  useNotFoundRedirect(error, isError, postId === "-1" || postId === undefined);
+
   return (
     <>
       {isLoading ? (

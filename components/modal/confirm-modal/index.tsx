@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 import ModalLayout from "../layout";
 import { Button } from "@nextui-org/button";
 import { useConfirmState } from "@/stores/confirm-store";
@@ -7,7 +7,7 @@ import { TypographyH4 } from "@/components/ui/typography";
 import { Image } from "@nextui-org/image";
 import clsx from "clsx";
 
-export default function ConfirmModal() {
+function ConfirmModal() {
   const {
     closeColor,
     closeLabel,
@@ -83,3 +83,5 @@ export default function ConfirmModal() {
     </ModalLayout>
   );
 }
+
+export default ConfirmModal;

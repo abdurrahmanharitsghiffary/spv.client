@@ -15,10 +15,12 @@ export default function SavedPostsPage() {
     isLoading,
     isFetchingNextPage,
     isFetching,
+    isSuccess,
     fetchNextPage,
   } = useGetMySavedPosts();
 
-  const isDisabled = (data?.pageParams ?? []).some((params) => params === null);
+  const isDisabled =
+    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
 
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,

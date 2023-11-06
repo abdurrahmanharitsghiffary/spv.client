@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import {
   Grid,
@@ -7,12 +7,12 @@ import {
   SearchContext,
   SearchContextManager,
 } from "@giphy/react-components";
-import { useShowModalGif } from "@/hooks/use-modal-gif";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { IGif } from "@giphy/js-types";
 import { TypographyH4 } from "../ui/typography";
 import { useTheme } from "next-themes";
 import { useIsMd } from "@/hooks/use-media-query";
+import { useShowModalGif } from "@/stores/modal-gif-store";
 
 const minusWidth = 22;
 const gridClass = "w-full hide-scrollbar mx-auto pt-2";
@@ -45,13 +45,31 @@ const SearchGrid = ({
 }) => {
   const { fetchGifs, searchKey } = useContext(SearchContext);
 
+  useLayoutEffect(() => {
+    const classes = ["w-full", "absolute", "left-0", "right-0"];
+    const element = document.querySelector(".gjTepV.sc-hIPCWT");
+
+    if (element) {
+      classes.forEach((cl) => {
+        element.classList.add(cl);
+      });
+    }
+    return () => {
+      if (element) {
+        classes.forEach((cl) => {
+          element.classList.remove(cl);
+        });
+      }
+    };
+  }, []);
+
   return (
     <>
       <div
         className="w-full sticky z-[102] h-full pb-2 bg-content1"
         style={{ top: 50 }}
       >
-        <SearchBar autoFocus className="mx-[9px] " />
+        <SearchBar autoFocus className="mx-[6px] " />
       </div>
 
       <Grid
@@ -91,7 +109,7 @@ export default function GiphyGrid() {
 
   return (
     <>
-      <Tabs className="px-2 sticky -top-1 w-full bg-content1 py-2 z-[102]">
+      <Tabs className="px-2 sticky top-0 w-full bg-content1 py-2 z-[102]">
         <Tab key="search" title="Search">
           <SearchExperience>
             <SearchGrid mq={isMd} onGifClick={setGif} width={width} />

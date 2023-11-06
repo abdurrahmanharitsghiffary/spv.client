@@ -62,7 +62,6 @@ export default function useAxiosInterceptor() {
       instance.interceptors.request.eject(reqInterceptors);
       instance.interceptors.response.eject(resInterceptors);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   return instance;

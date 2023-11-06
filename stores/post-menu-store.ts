@@ -1,17 +1,17 @@
 "use client";
-import { PostExtended } from "@/types/post";
+import { PostId } from "@/types/post";
 import { useCallback } from "react";
 import { create } from "zustand";
 
 type State = {
-  selectedPost: PostExtended | null;
+  selectedPost: PostId | null;
   isOpen: boolean;
 };
 
 type Action = {
   onOpen: () => void;
   onClose: () => void;
-  setSelectedPost: (post: PostExtended | null) => void;
+  setSelectedPost: (post: PostId | null) => void;
 };
 
 export const usePostMenuStore = create<State & Action>((set) => ({
@@ -30,7 +30,7 @@ export const useShowPostMenu = () => {
   const onOpen = usePostMenuStore((state) => state.onOpen);
   const setSelectedPost = usePostMenuStore((state) => state.setSelectedPost);
 
-  const handleOpen = useCallback((post: PostExtended) => {
+  const handleOpen = useCallback((post: PostId) => {
     setSelectedPost(post);
     onOpen();
   }, []);

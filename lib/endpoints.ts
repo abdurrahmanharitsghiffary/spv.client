@@ -38,6 +38,8 @@ export const verifyAccountToken = (token: string) =>
 // User routes
 export const baseUserRoutes = (query?: { limit?: number; offset?: number }) =>
   withQuerys(urlBase("/users"), entries(query));
+export const blockedUserRoute = (query?: { limit?: number; offset?: number }) =>
+  withQuerys(constructUrl([baseUserRoutes(), "blocked"]), entries(query));
 export const userById = (userId: string) =>
   constructUrl([baseUserRoutes(), userId]);
 export const userPost = (
@@ -45,7 +47,7 @@ export const userPost = (
   query?: { limit?: number; offset?: number }
 ) => withQuerys(constructUrl([userById(userId), "posts"]), entries(query));
 export const userIsFollowed = (userId: number) =>
-  constructUrl([userById(userId.toString()), "isfollowed"]);
+  constructUrl([userById(userId.toString()), "followed"]);
 export const userFollowersById = (userId: string) =>
   constructUrl([userById(userId), "followers"]);
 export const userFollowedUsersById = (userId: string) =>
@@ -73,7 +75,7 @@ export const postCommentsByPostId = (
 export const postLikesByPostId = (postId: string) =>
   constructUrl([postById(postId), "likes"]);
 export const postIsLiked = (postId: string) =>
-  constructUrl([postById(postId), "isliked"]);
+  constructUrl([postById(postId), "liked"]);
 export const postImagesByPostId = (postId: string) =>
   constructUrl([postById(postId), "images"]);
 export const postImageByPostAndImageId = (postId: string, imageId: string) =>
@@ -87,7 +89,7 @@ export const commentLikesById = (commentId: string) =>
   constructUrl([commentById(commentId), "likes"]);
 
 export const commentIsLiked = (commentId: string) =>
-  constructUrl([commentById(commentId), "isliked"]);
+  constructUrl([commentById(commentId), "liked"]);
 
 // Logged user routes
 
@@ -97,10 +99,13 @@ export const mySavedPostsRoute = (query?: {
   offset?: number;
 }) =>
   withQuerys(constructUrl([baseMeRoutes, "posts", "saved"]), entries(query));
+export const blockUserRoute = constructUrl([baseMeRoutes, "block"]);
+export const blockUserByIdRoute = (userId: number) =>
+  constructUrl([blockUserRoute, userId.toString()]);
 export const mySavedPost = (postId: number) =>
   constructUrl([mySavedPostsRoute(), postId.toString()]);
 export const postIsSaved = (postId: number) =>
-  constructUrl([mySavedPost(postId), "isfollowed"]);
+  constructUrl([mySavedPost(postId), "bookmarked"]);
 export const myAccount = constructUrl([baseMeRoutes, "account"]);
 export const myAccountImages = constructUrl([myAccount, "images"]);
 export const myPosts = (query?: { limit?: number; offset?: number }) =>

@@ -24,3 +24,8 @@ export type PostLikeResponse = {
   likedBy: UserLike[];
   total: number;
 };
+
+export type PostId = {
+  id: number;
+  authorId: number;
+};

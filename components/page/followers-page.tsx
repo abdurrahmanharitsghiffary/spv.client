@@ -6,11 +6,14 @@ import UsersGridLayout from "../layout/users-grid-layout";
 import { TypographyH3 } from "../ui/typography";
 import UserCard from "../user/user-card";
 import UserCardSkeleton from "../user/user-card-skeleton";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 
 export default function FollowersPage() {
   const params = useParams();
-  const { userFollowersData, isSuccess, isLoading, isError } =
+  const { userFollowersData, isSuccess, isLoading, isError, error } =
     useGetUserFollowers(Number(params.userId));
+
+  useNotFoundRedirect(error, isError);
 
   const total = useMemo(
     () => userFollowersData?.data?.total ?? 0,

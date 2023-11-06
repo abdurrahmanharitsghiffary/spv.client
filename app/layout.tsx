@@ -4,10 +4,7 @@ import { Providers } from "./providers";
 import clsx from "clsx";
 import ImagePreview from "@/components/modal/image-preview";
 import ImageGallery from "@/components/modal/image-gallery";
-import ProfileMenu from "@/components/menu/profile-menu";
-import PhotoProfileMenu from "@/components/menu/photo-profile-menu";
 import ChatMenu from "@/components/menu/chat-menu";
-import UserMenu from "@/components/menu/user-menu";
 import ConfirmModal from "@/components/modal/confirm-modal";
 
 export default async function RootLayout({
@@ -42,10 +39,7 @@ export default async function RootLayout({
             </footer> */}
           {/* </div> */}
           <ConfirmModal />
-          <UserMenu />
           <ChatMenu />
-          <ProfileMenu />
-          <PhotoProfileMenu />
           <ImageGallery />
           <ImagePreview />
         </Providers>

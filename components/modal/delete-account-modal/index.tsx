@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useShowDeleteAccountModalControls } from "@/hooks/use-delete-account";
 import ModalLayout from "../layout";
-import { password as passwordValidation } from "@/lib/schema";
+import { zPassword as passwordValidation } from "@/lib/zod-schema";
 import { toast } from "react-toastify";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
@@ -11,7 +11,7 @@ import { useAuthSession } from "@/stores/auth-store";
 import InputPassword from "@/components/form/input/password";
 import { Button } from "@nextui-org/button";
 // FIX VALIDATE ERRORS
-export default function DeleteAccountModal() {
+function DeleteAccountModal() {
   const request = useAxiosInterceptor();
   const { setSession } = useAuthSession();
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function DeleteAccountModal() {
 
   useEffect(() => {
     if (errorMessage) {
-      passwordValidation
+      passwordValidation("Password")
         .safeParseAsync(password)
         .then((res) => {
           if (!res.success) {
@@ -40,7 +40,9 @@ export default function DeleteAccountModal() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await passwordValidation.safeParseAsync(password);
+    const result = await passwordValidation("Password").safeParseAsync(
+      password
+    );
     if (!result.success) {
       console.error(result.error.errors);
       setErrorMessage(result.error.errors?.[0]?.message);
@@ -99,3 +101,5 @@ export default function DeleteAccountModal() {
     </ModalLayout>
   );
 }
+
+export default DeleteAccountModal;

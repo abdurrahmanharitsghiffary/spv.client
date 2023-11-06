@@ -3,6 +3,7 @@
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   baseUserRoutes,
+  blockedUserRoute,
   userById,
   userFollowedUsersById,
   userFollowersById,
@@ -17,8 +18,9 @@ import {
   UserFollowerResponse,
   UserFollowingResponse,
 } from "@/types/user";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
+import { useMemo } from "react";
 
 export const useGetUsers = (
   options?: OffsetPaging,
@@ -62,11 +64,9 @@ export const useGetUserFollowers = (
   config?: AxiosRequestConfig
 ) => {
   const request = useAxiosInterceptor();
-  const {
-    data: userFollowersData,
-    error,
-    ...rest
-  } = useQuery<JsendSuccess<UserFollowerResponse>>({
+  const { data: userFollowersData, ...rest } = useQuery<
+    JsendSuccess<UserFollowerResponse>
+  >({
     queryKey: keys.userFollowers(userId),
     queryFn: () =>
       request
@@ -111,7 +111,41 @@ export const useGetUserIsFollowed = (
         .get(userIsFollowed(userId), config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    enabled: userId !== -1 && userId !== undefined,
   });
 
   return { isFollowed, ...rest };
+};
+
+export const useGetBlockedUsers = (
+  query?: { offset?: number; limit?: number },
+  config?: AxiosRequestConfig
+) => {
+  const request = useAxiosInterceptor();
+
+  const { data, ...rest } = useInfiniteQuery<
+    JsendWithPaging<UserAccountPublic[]>
+  >({
+    queryKey: [...keys.blockedUsers(), query],
+    queryFn: ({ pageParam }) =>
+      pageParam === null
+        ? Promise.resolve(undefined)
+        : request
+            .get(pageParam ? pageParam : blockedUserRoute(query), config)
+            .then((res) => res.data)
+            .catch((err) => Promise.reject(err?.response?.data)),
+    getNextPageParam: (res) => res?.pagination?.next ?? null,
+    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+  });
+  const blockedUsers = useMemo(
+    () => ({
+      ...data?.pages?.[0],
+      data: data?.pages
+        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
+        .flat(),
+    }),
+    [data]
+  );
+
+  return { data, blockedUsers, ...rest };
 };

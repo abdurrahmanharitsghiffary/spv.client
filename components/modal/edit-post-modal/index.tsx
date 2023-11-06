@@ -6,9 +6,6 @@ import {
   useShowEditPostDisclosure,
 } from "@/hooks/use-edit-post";
 import { Input, Textarea } from "@nextui-org/input";
-import { z } from "zod";
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "@/lib/createPostSchema";
-import { formatBytes } from "@/lib/formatBytes";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
@@ -20,36 +17,10 @@ import { TypographyMuted } from "@/components/ui/typography";
 import IconButton from "@/components/button/icon-button";
 import { BiChevronLeft } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
+import { UpdatePostSchema, updatePostSchema } from "@/lib/zod-schema/post";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 
-const updatePostSchema = z.object({
-  title: z.string().max(40, { message: "Title is to long" }).optional(),
-  content: z.string().optional(),
-  images: z
-    .any()
-    .refine(
-      (files) => files instanceof FileList || files instanceof Array,
-      "Invalid field value."
-    )
-    .refine(
-      (files) =>
-        Array.from((files as FileList) ?? []).every(
-          (file: File) => file.size <= MAX_FILE_SIZE
-        ),
-      `Max file size of each images is ${formatBytes(MAX_FILE_SIZE, "mb")}Mb.`
-    )
-    .refine(
-      (files) =>
-        Array.from((files as FileList) ?? []).every((file: File) =>
-          ACCEPTED_IMAGE_TYPES.includes(file?.type)
-        ),
-      ".jpg, .jpeg, .png files are accepted."
-    )
-    .optional(),
-});
-
-type UpdatePostSchema = z.infer<typeof updatePostSchema>;
-
-export default function EditPostModal() {
+function EditPostModal() {
   const postId = useGetSelectedPostId();
   const { post } = useGetPostById(postId);
   const {
@@ -143,7 +114,7 @@ export default function EditPostModal() {
           {...register("content")}
         />
         {imagesErrors?.message && (
-          <TypographyMuted className="text-danger !text-[12px]">
+          <TypographyMuted className="text-danger !text-[0.75rem]">
             {imagesErrors?.message.toString()}
           </TypographyMuted>
         )}
@@ -169,7 +140,7 @@ export default function EditPostModal() {
                 onChange={(e) => {
                   onChange(Array.from(e?.target?.files ?? []));
                 }}
-                accept="image/png,image/jpg,image/jpeg"
+                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 multiple={true}
               />
             )}
@@ -179,3 +150,5 @@ export default function EditPostModal() {
     </ModalLayout>
   );
 }
+
+export default EditPostModal;

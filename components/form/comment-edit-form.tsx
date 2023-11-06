@@ -17,20 +17,16 @@ import {
   useHideCommentEditForm,
 } from "@/stores/comment-edit-store";
 import clsx from "clsx";
-
-const commentEditSchema = z.object({
-  comment: z
-    .string({ required_error: "Comment is required" })
-    .nonempty({ message: "Comment must not be empty" }),
-});
-
-type CommentEditSchema = z.infer<typeof commentEditSchema>;
+import { CommentEditSchema, commentEditSchema } from "@/lib/zod-schema/comment";
+import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
+import { useGetComment } from "@/lib/api/comments/query";
 
 export default function CommentEditForm({ className }: { className?: string }) {
   const isOpen = useCommentEditStore((state) => state.isOpen);
-  const handleClose = useHideCommentEditForm();
+  const onClose = useHideCommentEditForm();
   const { updateCommentAsync } = useUpdateComment();
   const selectedComment = useGetSelectedEditComment();
+  const { comment } = useGetComment(selectedComment?.id ?? -1);
   const isSSR = useIsSSR();
   const {
     setValue,
@@ -44,12 +40,16 @@ export default function CommentEditForm({ className }: { className?: string }) {
     },
   } = useForm<CommentEditSchema>({
     resolver: zodResolver(commentEditSchema),
-    values: { comment: selectedComment?.comment ?? "" },
+    values: { comment: comment?.data?.comment ?? "" },
   });
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
 
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset();
       handleClose();
     }
   }, [isSubmitSuccessful]);
@@ -69,13 +69,20 @@ export default function CommentEditForm({ className }: { className?: string }) {
 
   const cl = clsx("z-[102] fixed bottom-0 left-0 right-0", className);
 
+  useBodyOverflowHidden(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className={cl}>
-      <Card className="shadow-none rounded-none ">
-        <Divider />
-        {/* {replyId.id && replyId.username ? (
+    <>
+      <div
+        className="fixed inset-0 z-[101] backdrop-blur-sm"
+        onClick={handleClose}
+      ></div>
+      <div className={cl}>
+        <Card className="shadow-none rounded-none ">
+          <Divider />
+          {/* {replyId.id && replyId.username ? (
             <Chip
               className="m-2 mb-0"
               onClose={() => setReplyId({ id: null, username: "" })}
@@ -85,67 +92,68 @@ export default function CommentEditForm({ className }: { className?: string }) {
           ) : (
             ""
           )} */}
-        <CardBody
-          className="p-2 flex-row flex justify-between items-center gap-2"
-          as="form"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="w-full relative">
-            {isSSR ? (
-              <Input type="text" placeholder="Write your comment..." />
-            ) : (
-              <div className="w-full relative flex items-center justify-start">
-                <Textarea
-                  className="h-fit"
-                  autoFocus
-                  classNames={{
-                    inputWrapper: currentComment ? "pr-[50px]" : "",
-                  }}
-                  minRows={1}
-                  maxRows={4}
-                  id="ctmdtf0rm"
-                  type="text"
-                  color={fieldIsError ? "danger" : "default"}
-                  isInvalid={fieldIsError}
-                  errorMessage={
-                    fieldIsError ? commentErrors?.message ?? "" : ""
-                  }
-                  placeholder="Write your comment..."
-                  {...register("comment")}
-                />
-                {currentComment ? (
-                  <Button
-                    type="submit"
-                    isIconOnly
-                    radius="full"
-                    color="primary"
-                    variant="light"
-                    className="absolute top-[6px] right-0"
-                  >
-                    <BiSend size={18} />
-                  </Button>
-                ) : (
-                  ""
-                )}
-              </div>
-            )}
-          </div>
-          <Recorder
-            className="text-[18px]"
-            onSpeechSuccess={handleSuccessSpeech}
-            // color="primary"
-            radius="md"
-          />
-          <Button
-            onClick={() => {
-              reset();
-              handleClose();
-            }}
+          <CardBody
+            className="p-2 flex-row flex justify-between items-center gap-2"
+            as="form"
+            onSubmit={handleSubmit(onSubmit)}
           >
-            Cancel
-          </Button>
-        </CardBody>
-      </Card>
-    </div>
+            <div className="w-full relative">
+              {isSSR ? (
+                <Input type="text" placeholder="Write your comment..." />
+              ) : (
+                <div className="w-full relative flex items-center justify-start">
+                  <Textarea
+                    className="h-fit"
+                    autoFocus
+                    classNames={{
+                      inputWrapper: currentComment ? "pr-[50px]" : "",
+                    }}
+                    minRows={1}
+                    maxRows={4}
+                    id="ctmdtf0rm"
+                    type="text"
+                    color={fieldIsError ? "danger" : "default"}
+                    isInvalid={fieldIsError}
+                    errorMessage={
+                      fieldIsError ? commentErrors?.message ?? "" : ""
+                    }
+                    placeholder="Write your comment..."
+                    {...register("comment")}
+                  />
+                  {currentComment ? (
+                    <Button
+                      type="submit"
+                      isIconOnly
+                      radius="full"
+                      color="primary"
+                      variant="light"
+                      className="absolute top-[6px] right-0 z-[103]"
+                    >
+                      <BiSend size={18} />
+                    </Button>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              )}
+            </div>
+            <Recorder
+              className="text-[1.125rem]"
+              onSpeechSuccess={handleSuccessSpeech}
+              // color="primary"
+              radius="md"
+            />
+            <Button
+              onClick={() => {
+                reset();
+                handleClose();
+              }}
+            >
+              Cancel
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
+    </>
   );
 }

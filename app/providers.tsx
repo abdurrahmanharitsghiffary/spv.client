@@ -18,10 +18,7 @@ export interface ProvidersProps {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry(failureCount, error) {
-        console.log(error, " lolololol");
-        return failureCount !== 3;
-      },
+      retry: 1,
     },
   },
 });

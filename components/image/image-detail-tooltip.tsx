@@ -2,7 +2,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import React, { ReactNode } from "react";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import Image from "next/image";
-import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
+import { MAX_FILE_SIZE } from "@/lib/zod-schema/image";
 
 export default function ImageDetailTooltip({
   children,

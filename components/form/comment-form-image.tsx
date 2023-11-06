@@ -3,10 +3,8 @@ import { Card, CardBody, Divider } from "@nextui-org/react";
 import React from "react";
 import { BiX } from "react-icons/bi";
 import ImageWithPreview from "../image/image-with-preview";
-import { TypographyMuted } from "../ui/typography";
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
-import { MAX_FILE_SIZE } from "@/lib/createPostSchema";
-import { formatBytes } from "@/lib/formatBytes";
+import ValidationErrorText from "../validation-error-text";
 
 function CommentFormImage({
   image,
@@ -40,16 +38,14 @@ function CommentFormImage({
           alt="Posted image"
         />
 
-        {image.size > MAX_FILE_SIZE && (
+        {/* {image.size > MAX_FILE_SIZE && (
           <TypographyMuted className="text-danger">
             File size is too large, max file size is{" "}
             {formatBytes(MAX_FILE_SIZE)}Kb
           </TypographyMuted>
-        )}
+        )} */}
         {isError && (
-          <TypographyMuted className="text-danger">
-            {errors?.toString()}
-          </TypographyMuted>
+          <ValidationErrorText>{errors?.toString()}</ValidationErrorText>
         )}
       </CardBody>
       <Button

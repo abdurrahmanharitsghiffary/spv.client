@@ -31,3 +31,8 @@ interface CommentLikeResponse {
   likedBy: UserLike[];
   total: number;
 }
+
+export type CommentId = {
+  id: number;
+  authorId: number;
+} | null;

@@ -6,20 +6,22 @@ import SingleComment from "@/components/comment/single-comment";
 import { CommentReply } from "@/components/comment";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useGetComment } from "@/lib/api/comments/query";
+import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
+import SingleCommentSkeleton from "@/components/comment/single-comment-skeleton";
 
 export default function CommentModal({
   params,
 }: {
   params: { commentId: string };
 }) {
-  const router = useRouter();
-  const { comment, isError, isLoading } = useGetComment(
+  const { comment, isError, isLoading, error } = useGetComment(
     Number(params?.commentId)
   );
 
+  useNotFoundRedirect(error, isError);
   useBodyOverflowHidden(true);
 
-  if (isLoading || isError) return null;
+  if (isLoading) return <SingleCommentSkeleton />;
 
   return (
     <>

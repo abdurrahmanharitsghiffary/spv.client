@@ -3,9 +3,10 @@ import React from "react";
 
 import MenuLayout from "../layout";
 import {
-  useCommentMenuControls,
+  useCommentMenuIsOpen,
   useGetSelectedComment,
-} from "./hooks/useCommentMenu";
+  useHideCommentMenu,
+} from "@/stores/comment-menu-store";
 import {
   AiFillHeart,
   AiOutlineDelete,
@@ -23,21 +24,23 @@ import { useSession } from "@/stores/auth-store";
 import { useShowCommentEditForm } from "@/stores/comment-edit-store";
 import { notifyToast } from "@/lib/toast";
 import { useParams, useRouter } from "next/navigation";
+import { useConfirm } from "@/stores/confirm-store";
 
 export default function CommentMenu() {
   const { commentId } = useParams();
   const router = useRouter();
   const session = useSession();
+  const onClose = useHideCommentMenu();
+  const isOpen = useCommentMenuIsOpen();
   const showCommentEditForm = useShowCommentEditForm();
-  const disclosure = useCommentMenuControls();
   const comment = useGetSelectedComment();
-
+  const confirm = useConfirm();
   const { isLiked } = useGetCommentIsLiked(comment?.id ?? -1);
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
 
-  const isAuthored = (comment?.user?.id ?? -1) === (session?.id ?? -2);
+  const isAuthored = (comment?.id ?? -1) === (session?.id ?? -2);
   const baseItems = [
     {
       key: "like-comment",
@@ -77,8 +80,8 @@ export default function CommentMenu() {
 
   return (
     <MenuLayout
-      onClose={disclosure.onClose}
-      isOpen={disclosure.isOpen}
+      onClose={onClose}
+      isOpen={isOpen}
       items={isAuthored ? items : publicItems}
       onAction={async (key) => {
         try {
@@ -91,6 +94,12 @@ export default function CommentMenu() {
           if (isAuthored) {
           }
           if (key === "delete-comment" && comment) {
+            await confirm({
+              title: "Delete",
+              body: "Are you sure want to delete this comment?",
+              confirmColor: "danger",
+              confirmLabel: "Delete",
+            });
             await deleteCommentAsync({ commentId: comment?.id });
           } else if (key === "edit-comment" && comment) {
             showCommentEditForm(comment);
@@ -106,7 +115,7 @@ export default function CommentMenu() {
           }
         } catch (err) {
         } finally {
-          disclosure.onClose();
+          onClose();
         }
       }}
     />

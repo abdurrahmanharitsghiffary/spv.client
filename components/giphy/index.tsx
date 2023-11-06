@@ -1,37 +1,42 @@
 "use client";
 import React from "react";
 import GiphyGrid from "./grid";
-import { Card, CardBody } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { BiChevronDown } from "react-icons/bi";
-import { useGifMenuControls } from "@/hooks/use-gif-menu";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
+import {
+  useGiphyGridIsOpen,
+  useHideGiphyGrid,
+} from "@/stores/giphy-grid-store";
+import ModalLayoutV2 from "../modal/layoutV2";
 
 export default function Giphy() {
-  const controls = useGifMenuControls();
-
-  useBodyOverflowHidden(controls.isOpen);
-
-  if (!controls.isOpen) return null;
+  const isOpen = useGiphyGridIsOpen();
+  const onClose = useHideGiphyGrid();
+  console.log(isOpen, " GiphyGrid isOpen");
+  useBodyOverflowHidden(isOpen);
 
   return (
-    <Card
+    <ModalLayoutV2
+      isOpen={isOpen}
+      onClose={onClose}
+      classNames={{ wrapper: "z-[102]", body: "px-0 relative py-0" }}
+    >
+      <GiphyGrid />
+    </ModalLayoutV2>
+  );
+}
+
+{
+  /* <Card
       radius="none"
       className="w-full h-[80%] fixed inset-x-0 bottom-0 z-[102]"
     >
       <div className="w-full p-1 bg-inherit flex justify-start">
-        <Button
-          isIconOnly
-          radius="full"
-          variant="light"
-          onClick={controls.onClose}
-        >
+        <Button isIconOnly radius="full" variant="light" onClick={onClose}>
           <BiChevronDown size={25} />
         </Button>
       </div>
       <CardBody className="p-0 w-full hide-scrollbar">
         <GiphyGrid />
       </CardBody>
-    </Card>
-  );
+    </Card> */
 }

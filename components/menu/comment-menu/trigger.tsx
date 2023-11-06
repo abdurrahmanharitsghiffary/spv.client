@@ -2,15 +2,15 @@
 import { Button } from "@nextui-org/button";
 import React from "react";
 import { FiMoreVertical } from "react-icons/fi";
-import { useShowCommentMenu } from "./hooks/useCommentMenu";
+import { useShowCommentMenu } from "@/stores/comment-menu-store";
 import clsx from "clsx";
-import { Comment } from "@/types/comment";
+import { CommentId } from "@/types/comment";
 
 export default function CommentMenuTrigger({
   comment,
   className,
 }: {
-  comment: Comment;
+  comment: CommentId;
   className?: string;
 }) {
   const onOpen = useShowCommentMenu();

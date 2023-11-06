@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import ModalLayout from "../layout";
 import { Image } from "@nextui-org/image";
 import { motion } from "framer-motion";
@@ -8,7 +8,7 @@ import AnimationControl from "./animation-control";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { MdBrokenImage } from "react-icons/md";
 
-export default function ImagePreview() {
+function ImagePreview() {
   const [animation, setAnimation] = useState({
     scale: 1,
     rotate: 0,
@@ -22,7 +22,6 @@ export default function ImagePreview() {
     handleClose();
     setIsError(false);
   };
-
   useBodyOverflowHidden(isOpen);
 
   return (
@@ -85,3 +84,5 @@ export default function ImagePreview() {
     </ModalLayout>
   );
 }
+
+export default ImagePreview;

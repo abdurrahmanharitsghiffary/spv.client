@@ -21,7 +21,7 @@ export default function NavActions({
     <div
       style={item?.style}
       className={clsx(
-        "w-full grid px-2 grid-flow-col text-[20px]",
+        "w-full grid px-2 grid-flow-col text-[1.25rem]",
         item ? "content-between" : "content-end",
         item?.className ?? ""
       )}

@@ -7,7 +7,7 @@ export default function IconButton({
   className,
   ...rest
 }: { children: React.ReactNode; className?: string } & ButtonProps) {
-  const cl = clsx("text-[20px]", className);
+  const cl = clsx("text-[1.25rem]", className);
 
   return (
     <Button isIconOnly variant="light" className={cl} radius="full" {...rest}>

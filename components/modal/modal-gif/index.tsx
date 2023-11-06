@@ -1,34 +1,42 @@
 "use client";
 import React from "react";
 import ModalLayout from "../layout";
-import { useGetGif, useGifModalControls } from "@/hooks/use-modal-gif";
 import { Gif } from "@giphy/react-components";
 import { Button } from "@nextui-org/button";
-import { useGifMenuClose } from "@/hooks/use-gif-menu";
-import { useGetReplyId, useSetReplyId } from "@/hooks/use-reply";
 import {
   useCreateComment,
   useCreateReplyComment,
 } from "@/lib/api/comments/mutation";
 import { useParams } from "next/navigation";
+import {
+  useGetSelectedCommentReplyId,
+  useResetReplyValue,
+} from "@/stores/comment-reply-store";
+import {
+  useGetGif,
+  useHideModalGif,
+  useModalGifIsOpen,
+} from "@/stores/modal-gif-store";
+import { useHideGiphyGrid } from "@/stores/giphy-grid-store";
 
-export default function ModalGif() {
-  const closeGifMenu = useGifMenuClose();
-  const gifControls = useGifModalControls();
+function ModalGif() {
+  const hideGiphyGrid = useHideGiphyGrid();
+  const isOpen = useModalGifIsOpen();
+  const onClose = useHideModalGif();
   const gif = useGetGif();
-  const setReplyId = useSetReplyId();
-  const replyId = useGetReplyId();
+  const resetReply = useResetReplyValue();
+  const replyId = useGetSelectedCommentReplyId();
   const { createComment } = useCreateComment();
   const { createReplyComment } = useCreateReplyComment();
   const { postId } = useParams();
 
   const handleCreateComment = () => {
     if (!postId) return null;
-    if (replyId.id)
+    if (replyId)
       return createReplyComment({
         imageSrc: gif?.images?.original?.url,
         comment: "",
-        commentId: replyId.id,
+        commentId: replyId,
       });
     return createComment({
       data: {
@@ -42,8 +50,8 @@ export default function ModalGif() {
   return (
     <ModalLayout
       backdrop="blur"
-      onClose={gifControls.onClose}
-      isOpen={gifControls.isOpen}
+      onClose={onClose}
+      isOpen={isOpen}
       classNames={{
         body: "p-0 m-0 shadow-medium",
         wrapper:
@@ -62,9 +70,9 @@ export default function ModalGif() {
           color="primary"
           onClick={() => {
             handleCreateComment();
-            setReplyId({ id: null, username: "" });
-            gifControls.onClose();
-            closeGifMenu();
+            resetReply();
+            onClose();
+            hideGiphyGrid();
           }}
         >
           Post
@@ -76,3 +84,5 @@ export default function ModalGif() {
     </ModalLayout>
   );
 }
+
+export default ModalGif;
