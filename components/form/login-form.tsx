@@ -31,7 +31,11 @@ export default function LoginForm() {
     toast.promise(loginAsync(data), {
       error: {
         render({ data }) {
-          return (data as any)?.data?.message ?? "Something went wrong!";
+          return (
+            (data as any)?.data?.message ??
+            (data as any)?.message ??
+            "Something went wrong!"
+          );
         },
       },
       pending: "Login to account....",

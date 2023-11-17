@@ -43,7 +43,11 @@ export default function SignUpForm() {
     await toast.promise(registerAsync(transformedData), {
       error: {
         render({ data }) {
-          return (data as any)?.message ?? "Something went wrong!";
+          return (
+            (data as any)?.message ??
+            (data as any)?.message ??
+            "Something went wrong!"
+          );
         },
       },
       pending: "Registering account....",

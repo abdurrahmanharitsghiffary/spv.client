@@ -1,16 +1,9 @@
 "use client";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Card } from "@nextui-org/card";
 import { Avatar } from "@nextui-org/avatar";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Comment as CommentType,
   CommentReply as CommentReplyType,
@@ -31,7 +24,7 @@ function Comment({
   level?: number;
 }) {
   const [isShow, setIsShow] = useState(false);
-  const commentData = useMemo(() => comment, [comment]);
+  // USE MEMO ??
   const containerRef = useRef<HTMLDivElement>(null);
 
   const style = `${
@@ -40,42 +33,9 @@ function Comment({
     className ?? ""
   }`;
 
-  const commentIds = useMemo(
-    () => (commentData as CommentReplyType)?.commentReply?.commentIds ?? [],
-    [commentData]
-  );
-
-  const handleScrollBottom = useCallback(() => {
-    const element = containerRef.current;
-    if (element) {
-      element.scrollIntoView({
-        behavior: "auto",
-        block: "end",
-        inline: "end",
-      });
-    }
-  }, [containerRef]);
-
-  const handleScrollTop = useCallback(() => {
-    const element = containerRef.current;
-    if (element) {
-      element.scrollIntoView({
-        behavior: "auto",
-        block: "start",
-        inline: "start",
-      });
-    }
-  }, [containerRef]);
-
-  useEffect(() => {
-    if (isShow) {
-      handleScrollBottom();
-    }
-
-    return () => {
-      if (isShow) handleScrollTop();
-    };
-  }, [isShow, handleScrollBottom, handleScrollTop]);
+  // USE MEMO ??
+  const commentIds =
+    (comment as CommentReplyType)?.commentReply?.commentIds ?? [];
 
   const handleReplyClick = (value: React.SetStateAction<boolean>) => {
     setIsShow(value);
@@ -89,9 +49,9 @@ function Comment({
     <div className="flex gap-2 relative py-2 w-full" ref={containerRef}>
       <Avatar
         as={NextLink}
-        href={`/users/${commentData?.user?.id}`}
-        name={commentData?.user?.username}
-        src={commentData?.user?.image?.src}
+        href={`/users/${comment?.user?.id}`}
+        name={comment?.user?.username}
+        src={comment?.user?.image?.src}
         className="absolute"
       />
       {level > 1 && (
@@ -100,23 +60,23 @@ function Comment({
 
       <Card className={style}>
         <CommentHeader
-          commentId={commentData?.id}
-          createdAt={commentData?.createdAt}
-          totalLikes={commentData?.total_likes}
-          userId={commentData?.user?.id}
-          username={commentData?.user?.username}
+          commentId={comment?.id}
+          createdAt={comment?.createdAt}
+          totalLikes={comment?.total_likes}
+          userId={comment?.user?.id}
+          username={comment?.user?.username}
         />
         <CommentBody
-          comment={commentData?.comment}
-          imageSrc={commentData?.image?.src}
+          comment={comment?.comment}
+          imageSrc={comment?.image?.src}
         />
         <CommentFooter
-          commentId={commentData?.id}
+          commentId={comment?.id}
           isShow={isShow}
           level={level}
           onReplyClick={handleReplyClick}
-          totalReply={commentData?.commentReply?.total}
-          username={commentData?.user?.username}
+          totalReply={comment?.commentReply?.total}
+          username={comment?.user?.username}
         />
         {isShow && commentIds?.length > 0 && (
           <CommentReplies
@@ -178,16 +138,15 @@ export function CommentReplies({
   const isOlderCommentAvailable =
     commentIds.length > 10 && commentIds.length - limit >= 0;
 
-  const reversedIds = useMemo(() => commentIds.slice().reverse(), [commentIds]);
-
   const ids = useMemo(() => {
+    const reversedIds = commentIds.slice().reverse() ?? [];
     if (!isOlderCommentAvailable) return reversedIds;
     return (reversedIds ?? []).length > 0
       ? reversedIds.slice(
           reversedIds.length - limit < 0 ? 0 : reversedIds.length - limit
         )
       : [];
-  }, [reversedIds, limit, isOlderCommentAvailable]);
+  }, [commentIds, limit, isOlderCommentAvailable]);
 
   const handleShowOlderComments = () => {
     if (limit <= commentIds.length && isOlderCommentAvailable)
@@ -219,3 +178,35 @@ export function CommentReplies({
     </>
   );
 }
+
+// const handleScrollBottom = useCallback(() => {
+//   const element = containerRef.current;
+//   if (element) {
+//     element.scrollIntoView({
+//       behavior: "auto",
+//       block: "end",
+//       inline: "end",
+//     });
+//   }
+// }, [containerRef]);
+
+// const handleScrollTop = useCallback(() => {
+//   const element = containerRef.current;
+//   if (element) {
+//     element.scrollIntoView({
+//       behavior: "auto",
+//       block: "start",
+//       inline: "start",
+//     });
+//   }
+// }, [containerRef]);
+
+// useEffect(() => {
+//   if (isShow) {
+//     handleScrollBottom();
+//   }
+
+//   // return () => {
+//   //   if (isShow) handleScrollTop();
+//   // };
+// }, [isShow, handleScrollBottom]);

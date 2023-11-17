@@ -39,8 +39,8 @@ export default function CommentMenu() {
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
-
-  const isAuthored = (comment?.id ?? -1) === (session?.id ?? -2);
+  console.log(comment, "comment");
+  const isAuthored = (comment?.authorId ?? -1) === (session?.id ?? -2);
   const baseItems = [
     {
       key: "like-comment",
@@ -92,26 +92,28 @@ export default function CommentMenu() {
           } else if (key === "delete-report-comment" && !isAuthored)
             return notifyToast("Cooming soon!");
           if (isAuthored) {
-          }
-          if (key === "delete-comment" && comment) {
-            await confirm({
-              title: "Delete",
-              body: "Are you sure want to delete this comment?",
-              confirmColor: "danger",
-              confirmLabel: "Delete",
-            });
-            await deleteCommentAsync({ commentId: comment?.id });
-          } else if (key === "edit-comment" && comment) {
-            showCommentEditForm(comment);
-          } else if (key === "delete-comment" && commentId) {
-            await deleteCommentAsync(
-              { commentId: Number(commentId) },
-              {
-                onSuccess: () => {
-                  router.back();
-                },
-              }
-            );
+            if (key === "delete-comment" && commentId) {
+              return await deleteCommentAsync(
+                { commentId: Number(commentId) },
+                {
+                  onSuccess: () => {
+                    router.back();
+                  },
+                }
+              );
+            } else if (key === "delete-comment" && comment) {
+              await confirm({
+                title: "Delete",
+                body: "Are you sure want to delete this comment?",
+                confirmColor: "danger",
+                confirmLabel: "Delete",
+              });
+              await deleteCommentAsync({ commentId: comment?.id });
+              return null;
+            } else if (key === "edit-comment" && comment) {
+              showCommentEditForm(comment);
+              return null;
+            }
           }
         } catch (err) {
         } finally {

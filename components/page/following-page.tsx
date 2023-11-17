@@ -1,7 +1,7 @@
 "use client";
 import { useGetUserFollowedUsers } from "@/lib/api/users/query";
 import { useParams } from "next/navigation";
-import React, { useMemo } from "react";
+import React from "react";
 import UsersGridLayout from "../layout/users-grid-layout";
 import { TypographyH3 } from "../ui/typography";
 import UserCard from "../user/user-card";
@@ -15,10 +15,7 @@ export default function FollowingPage() {
 
   useNotFoundRedirect(error, isError);
 
-  const total = useMemo(
-    () => userFollowedUsersData?.data?.total ?? 0,
-    [userFollowedUsersData]
-  );
+  const total = userFollowedUsersData?.data?.total ?? 0;
   return (
     <UsersGridLayout className="pt-8 px-2 pb-16">
       <TypographyH3 className="px-3 !text-base">

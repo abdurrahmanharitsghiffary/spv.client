@@ -39,6 +39,10 @@ export const zLastName = z
   .min(2, "Lastname must be at least 2 characters long.")
   .max(125, "Lastname must be 125 characters or fewer.");
 
+export const zConfirmPassword = z.string({
+  required_error: "Confirm password must not be empty.",
+});
+
 export const zPassword = (passwordId: string = "Password") =>
   z
     .string({ required_error: `${passwordId} must not be empty.` })

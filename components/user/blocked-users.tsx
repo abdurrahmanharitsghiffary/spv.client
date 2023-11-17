@@ -7,6 +7,7 @@ import UserCard from "./user-card";
 import { Spinner } from "@nextui-org/react";
 import UserCardSkeleton from "./user-card-skeleton";
 import BlockedUserCard from "./blocked-user-card";
+import { TypographyH4 } from "../ui/typography";
 
 export default function BlockedUsers() {
   const {
@@ -27,21 +28,23 @@ export default function BlockedUsers() {
   });
   return (
     <>
-      {isLoading
-        ? [1, 2, 3].map((item) => (
-            <UserCardSkeleton className="rounded-none shadow-none" key={item} />
+      {isLoading ? (
+        [1, 2, 3].map((item) => (
+          <UserCardSkeleton className="rounded-none shadow-none" key={item} />
+        ))
+      ) : isSuccess && (blockedUsers?.data ?? []).length > 0 ? (
+        blockedUsers?.data
+          ?.map((user) => ({ ...user, image: user.profile?.image }))
+          .map((user) => (
+            <BlockedUserCard
+              user={user}
+              key={user?.id}
+              className="rounded-none shadow-none"
+            />
           ))
-        : isSuccess &&
-          (blockedUsers?.data ?? []).length > 0 &&
-          blockedUsers?.data
-            ?.map((user) => ({ ...user, image: user.profile?.image }))
-            .map((user) => (
-              <BlockedUserCard
-                user={user}
-                key={user?.id}
-                className="rounded-none shadow-none"
-              />
-            ))}
+      ) : (
+        <TypographyH4>No blocked user</TypographyH4>
+      )}
       {isFetchingNextPage && <Spinner className="my-4" />}
       <div className="w-full" ref={ref}></div>
     </>

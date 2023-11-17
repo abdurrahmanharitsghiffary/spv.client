@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  zConfirmPassword,
   zEmail,
   zFirstName,
   zGender,
@@ -13,7 +14,7 @@ const FAILED_CONFIRMATION_MESSAGE =
 
 export const passwordValidationSchemaBase = z.object({
   password: zPassword("Password"),
-  confirmPassword: zPassword("Confirm password"),
+  confirmPassword: zConfirmPassword,
 });
 
 export const passwordValidationSchema = passwordValidationSchemaBase.refine(
@@ -53,7 +54,7 @@ export type ChangePasswordValidationSchema = z.infer<
 export const loginValidationSchema = z
   .object({
     password: zPassword("Password"),
-    confirmPassword: zPassword("Confirm password"),
+    confirmPassword: zConfirmPassword,
     email: zEmail,
   })
   .refine(

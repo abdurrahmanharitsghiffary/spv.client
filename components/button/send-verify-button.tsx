@@ -26,7 +26,9 @@ export default function SendVerifyButton({
               error: {
                 render({ data }) {
                   return (
-                    (data as any)?.data?.message ?? "Something went wrong!"
+                    (data as any)?.data?.message ??
+                    (data as any)?.message ??
+                    "Something went wrong!"
                   );
                 },
               },

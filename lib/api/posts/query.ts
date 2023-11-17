@@ -18,6 +18,7 @@ import { JsendSuccess, JsendWithPaging } from "@/types/response";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
+import { useInfinite } from "../hooks";
 
 export const useGetPosts = (
   options?: OffsetPaging,
@@ -58,31 +59,38 @@ export const useGetPostByUserId = (
   query?: { limit?: number; offset?: number },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
+  const { data: posts, ...rest } = useInfinite<PostExtended>({
     queryKey: [...keys.posts, userId, query, "users"],
-    queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(pageParam ? pageParam : userPost(userId.toString()), config)
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
-    getNextPageParam: (res) => res?.pagination?.next ?? null,
-    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+    query: query ?? {},
+    url: userPost(userId.toString()),
+    config,
   });
-  const posts = useMemo(
-    () => ({
-      ...data?.pages?.[0],
-      data: data?.pages
-        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-        .flat(),
-    }),
-    [data]
-  );
 
-  return { data, posts, ...rest };
+  // const request = useAxiosInterceptor();
+
+  // const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
+  //   queryKey: [...keys.posts, userId, query, "users"],
+  //   queryFn: ({ pageParam }) =>
+  //     pageParam === null
+  //       ? Promise.resolve(undefined)
+  //       : request
+  //           .get(pageParam ? pageParam : userPost(userId.toString()), config)
+  //           .then((res) => res.data)
+  //           .catch((err) => Promise.reject(err?.response?.data)),
+  //   getNextPageParam: (res) => res?.pagination?.next ?? null,
+  //   getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+  // });
+  // const posts = useMemo(
+  //   () => ({
+  //     ...data?.pages?.[0],
+  //     data: data?.pages
+  //       ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
+  //       .flat(),
+  //   }),
+  //   [data]
+  // );
+
+  return { posts, ...rest };
 };
 
 export const useGetPostFromFollowedUsers = (

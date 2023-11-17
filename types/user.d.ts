@@ -5,6 +5,7 @@ export interface UserAccountPublic {
   id: number;
   firstName: string;
   lastName: string;
+  fullName: string | null;
   username: string;
   profile: {
     birthDate: Date | null;
@@ -52,6 +53,7 @@ export interface UserSimplified {
   id: number;
   firstName: string;
   lastName: string;
+  fullName: string | null;
   username: string;
   image: Image;
 }

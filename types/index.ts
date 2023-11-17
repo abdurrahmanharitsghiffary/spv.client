@@ -48,6 +48,7 @@ export interface UpdateUserDataOptions {
   firstName?: string;
   lastName?: string;
   description?: string;
+  gender?: Gender;
 }
 
 export interface CreateNotificationData {
@@ -88,6 +89,7 @@ export type OffsetPaging = { limit?: number; offset?: number } | undefined;
 export type SearchOptions = OffsetPaging & {
   q?: string;
   type: "user" | "post" | "all";
+  filter?: "followed" | "not_followed";
 };
 
 export type OffsetPagingwithOrder =
@@ -101,3 +103,5 @@ export type SearchAllData = {
   posts: PaginationData<PostExtended[]>;
   users: PaginationData<UserAccountPublic[]>;
 };
+
+export type Gender = "male" | "female" | "not_say" | null;

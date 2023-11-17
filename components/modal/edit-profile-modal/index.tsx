@@ -25,6 +25,13 @@ import {
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import ValidationErrorText from "@/components/validation-error-text";
 import { Select, SelectItem } from "@nextui-org/select";
+import {
+  BsGenderAmbiguous,
+  BsGenderFemale,
+  BsGenderMale,
+  BsQuestion,
+} from "react-icons/bs";
+import GenderSelect from "@/components/gender-select";
 
 export default function EditProfileModal() {
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
@@ -68,6 +75,7 @@ export default function EditProfileModal() {
     await toast.promise(
       updateAccountAsync({
         data: {
+          gender: data?.gender === "not_say" ? null : data?.gender,
           firstName: data?.firstName,
           lastName: data?.lastName,
           username: data?.username,
@@ -126,28 +134,8 @@ export default function EditProfileModal() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="w-full flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="w-full flex gap-2 items-center">
-              <TypographyH4>Profile picture</TypographyH4>
-              <IconButton className="relative">
-                <AiOutlineEdit />
-                <Controller
-                  name="profileImage"
-                  control={control}
-                  render={({ field: { onChange } }) => (
-                    <input
-                      type="file"
-                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                      onChange={(e) => {
-                        onChange(e.target.files?.[0]);
-                      }}
-                      className="absolute inset-0 opacity-0"
-                    />
-                  )}
-                />
-              </IconButton>
-            </div>
-
+          <div className="flex flex-col gap-4 items-center">
+            <TypographyH4>Profile picture</TypographyH4>
             <Avatar
               name={myAccountInfo?.data?.username}
               src={
@@ -162,31 +150,33 @@ export default function EditProfileModal() {
                 {pIErr?.message.toString()}
               </ValidationErrorText>
             )}
+            <Button
+              color="secondary"
+              className="w-fit"
+              startContent={<AiOutlineEdit />}
+            >
+              Edit
+              <Controller
+                name="profileImage"
+                control={control}
+                render={({ field: { onChange } }) => (
+                  <input
+                    type="file"
+                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                    onChange={(e) => {
+                      onChange(e.target.files?.[0]);
+                    }}
+                    className="absolute inset-0 opacity-0"
+                  />
+                )}
+              />
+            </Button>
           </div>
 
-          <div className="w-full flex flex-col gap-2">
-            <div className="w-full flex gap-2 items-center">
-              <TypographyH4>Cover image</TypographyH4>
-              <IconButton className="relative">
-                <AiOutlineEdit />
-                <Controller
-                  name="coverImage"
-                  control={control}
-                  render={({ field: { onChange } }) => (
-                    <input
-                      type="file"
-                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                      onChange={(e) => {
-                        onChange(e.target.files?.[0]);
-                      }}
-                      className="absolute inset-0 opacity-0"
-                    />
-                  )}
-                />
-              </IconButton>
-            </div>
+          <div className="w-full flex flex-col gap-4">
+            <TypographyH4>Cover image</TypographyH4>
             <CoverImage
-              className="max-w-lg"
+              className="max-w-lg rounded-medium"
               src={
                 coverImage
                   ? URL.createObjectURL(coverImage)
@@ -198,6 +188,27 @@ export default function EditProfileModal() {
                 {cIErr?.message.toString()}
               </ValidationErrorText>
             )}
+            <Button
+              color="secondary"
+              className="w-fit"
+              startContent={<AiOutlineEdit />}
+            >
+              Edit
+              <Controller
+                name="coverImage"
+                control={control}
+                render={({ field: { onChange } }) => (
+                  <input
+                    type="file"
+                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                    onChange={(e) => {
+                      onChange(e.target.files?.[0]);
+                    }}
+                    className="absolute inset-0 opacity-0"
+                  />
+                )}
+              />
+            </Button>
           </div>
         </div>
         <Input
@@ -234,25 +245,11 @@ export default function EditProfileModal() {
           control={control}
           name="gender"
           render={({ field: { onChange, value } }) => (
-            <Select
-              variant="bordered"
-              color={gender?.message ? "danger" : "default"}
-              isInvalid={gender?.message ? true : false}
-              errorMessage={gender?.message}
-              label="Gender"
-              value={value}
+            <GenderSelect
               onChange={(e) => onChange(e.target.value)}
-            >
-              <SelectItem key="male" value="male">
-                Male
-              </SelectItem>
-              <SelectItem key="female" value="female">
-                Female
-              </SelectItem>
-              <SelectItem key="not_say" value="not_say">
-                Rather not say
-              </SelectItem>
-            </Select>
+              value={value ?? "not_say"}
+              message={gender?.message}
+            />
           )}
         />
         <Textarea

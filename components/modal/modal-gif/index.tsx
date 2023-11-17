@@ -28,23 +28,29 @@ function ModalGif() {
   const replyId = useGetSelectedCommentReplyId();
   const { createComment } = useCreateComment();
   const { createReplyComment } = useCreateReplyComment();
-  const { postId } = useParams();
+  const { postId, commentId } = useParams();
 
   const handleCreateComment = () => {
-    if (!postId) return null;
     if (replyId)
       return createReplyComment({
         imageSrc: gif?.images?.original?.url,
         comment: "",
         commentId: replyId,
       });
-    return createComment({
-      data: {
-        comment: "",
-        postId: Number(postId),
+    else if (commentId)
+      return createReplyComment({
+        commentId: Number(commentId),
         imageSrc: gif?.images?.original?.url,
-      },
-    });
+        comment: "",
+      });
+    else if (postId)
+      return createComment({
+        data: {
+          comment: "",
+          postId: Number(postId),
+          imageSrc: gif?.images?.original?.url,
+        },
+      });
   };
 
   return (

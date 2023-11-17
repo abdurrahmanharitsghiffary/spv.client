@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { TypographyP } from "../ui/typography";
 import { Link } from "@nextui-org/link";
 
@@ -13,13 +13,11 @@ export default function PostContent({
 
   const isExceedLimit = (content ?? "").length > 300;
 
-  const postContent = useMemo(() => {
-    const str = content ?? "";
+  let postContent = content ?? "";
 
-    if (!isExceedLimit) return str;
-    if (isShowMore) return str;
-    return str.slice(0, 270).trimEnd() + "...";
-  }, [isExceedLimit, isShowMore, content]);
+  if (isExceedLimit && !isShowMore)
+    postContent = (content ?? "").slice(0, 270).trimEnd() + "...";
+
   return (
     <>
       <TypographyP className="max-w-full break-words whitespace-normal !mt-0">

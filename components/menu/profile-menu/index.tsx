@@ -28,7 +28,6 @@ export default function ProfileMenu() {
   const confirm = useConfirm();
   const session = useSession();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const fullName = `${session?.firstName ?? ""} ${session?.lastName ?? ""}`;
 
   return (
     <MenuLayout
@@ -98,7 +97,7 @@ export default function ProfileMenu() {
                     });
                     await createPostAsync({
                       data: {
-                        content: `${fullName} updated their cover image`,
+                        content: `${session?.fullName} updated their cover image`,
                         images: [e?.target?.files?.[0]],
                       },
                     });

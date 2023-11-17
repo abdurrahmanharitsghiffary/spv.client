@@ -14,7 +14,8 @@ export default function CommentModal({
 
   return (
     <ModalLayoutV2
-      classNames={{ body: "px-0" }}
+      classNames={{ body: "px-0", footer: "p-0" }}
+      wrapperClassNames={{ wrapper: "z-[199]" }}
       isOpen
       onClose={() => router.back()}
       footer={

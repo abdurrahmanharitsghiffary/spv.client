@@ -16,7 +16,7 @@ export default function PostCardHeader({
   postId: PostId;
 }) {
   return (
-    <CardHeader>
+    <CardHeader className="justify-between">
       <User createdAt={createdAt} user={author} isPreview={isPreview} />
       <PostMenuTrigger post={postId} />
     </CardHeader>

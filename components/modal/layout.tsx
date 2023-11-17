@@ -91,7 +91,7 @@ const ModalLayout = forwardRef(
           scrollBehavior={scrollBehavior}
           classNames={{
             ...wrapperClassNames,
-            wrapper: wrapperClassNames?.wrapper ?? "" + " z-[200]",
+            wrapper: wrapperClassNames?.wrapper ?? "" + " z-[201]",
           }}
           closeButton={closeButton}
           placement={placement}

@@ -1,10 +1,9 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { navActionItems } from "./items";
 import ChatButton from "@/components/button/chat-button";
 import clsx from "clsx";
 import { getNavActionItem } from "./utils";
-import PreferencesButton from "@/components/button/preferences-button";
 
 export default function NavActions({
   pathname,

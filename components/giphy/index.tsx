@@ -11,7 +11,7 @@ import ModalLayoutV2 from "../modal/layoutV2";
 export default function Giphy() {
   const isOpen = useGiphyGridIsOpen();
   const onClose = useHideGiphyGrid();
-  console.log(isOpen, " GiphyGrid isOpen");
+
   useBodyOverflowHidden(isOpen);
 
   return (

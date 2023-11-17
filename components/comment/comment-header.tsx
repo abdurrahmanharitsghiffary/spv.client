@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { CardHeader } from "@nextui-org/card";
 import NextLink from "next/link";
 import { TypographyP } from "../ui/typography";
@@ -20,13 +20,10 @@ export default function CommentHeader({
   commentId: number | undefined;
   totalLikes: number | undefined;
 }) {
-  const comment: CommentId = useMemo(
-    () =>
-      (!commentId && commentId !== 0) || (!userId && userId !== 0)
-        ? null
-        : { authorId: userId, id: commentId },
-    [commentId, userId]
-  );
+  const comment: CommentId =
+    (!commentId && commentId !== 0) || (!userId && userId !== 0)
+      ? null
+      : { authorId: userId, id: commentId };
 
   return (
     <CardHeader className="pb-0 pt-0 flex justify-between w-full">

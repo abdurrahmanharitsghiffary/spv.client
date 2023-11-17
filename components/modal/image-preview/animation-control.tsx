@@ -34,7 +34,7 @@ export default function AnimationControl({
         onClick={() =>
           setAnimation((c) => ({
             ...c,
-            scale: c.scale + 0.5 > 1.5 ? 1.5 : c.scale + 0.5,
+            scale: c.scale + 0.25 > 1.5 ? 1.5 : c.scale + 0.25,
           }))
         }
       >
@@ -46,7 +46,7 @@ export default function AnimationControl({
         size="lg"
         radius="full"
         onClick={() =>
-          setAnimation((c) => ({ ...c, scale: c.scale - 0.5 || 0.5 }))
+          setAnimation((c) => ({ ...c, scale: c.scale - 0.25 || 0.25 }))
         }
       >
         <BiZoomOut size={20} />

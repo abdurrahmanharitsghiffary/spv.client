@@ -4,7 +4,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  productionBrowserSourceMaps: false,
+  // productionBrowserSourceMaps: false,
   env: {
     GIPHY_API_KEY: process.env.GIPHY_API_KEY,
   },

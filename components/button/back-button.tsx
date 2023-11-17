@@ -1,8 +1,8 @@
-import { Button, ButtonProps } from "@nextui-org/button";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { ButtonProps } from "@nextui-org/button";
 import React from "react";
 import { BiChevronLeft } from "react-icons/bi";
-import IconButton from "./button/icon-button";
+import IconButton from "./icon-button";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export default function BackButton({
   router,

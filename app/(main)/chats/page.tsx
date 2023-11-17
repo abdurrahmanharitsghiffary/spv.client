@@ -10,8 +10,8 @@ export default function ChatsPage() {
   return (
     <div className="w-full flex flex-col gap-1 p-4 pt-5 pb-16">
       <div className="flex flex-col gap-2">
-        <TypographyH4>Active users</TypographyH4>
-        <Slider>
+        <TypographyH4 className="!text-base">Active users</TypographyH4>
+        <Slider classNames={{ body: "gap-5" }}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((u) => (
             <ChatAvatar key={u} isOnline />
           ))}
@@ -22,10 +22,11 @@ export default function ChatsPage() {
         startContent={<FiSearch size={20} />}
         placeholder="Search users..."
         className="my-2"
+        radius="full"
         fullWidth
       />
-      <div className="flex flex-col gap-3 w-full">
-        <TypographyH4>All Chats</TypographyH4>
+      <div className="flex flex-col w-full">
+        <TypographyH4 className="!text-base">Chats (5)</TypographyH4>
         <ChatDisplay isOnline />
         <ChatDisplay isOnline />
         <ChatDisplay isOnline />

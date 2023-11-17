@@ -190,9 +190,7 @@ export default function MenuPage() {
             isSuccess && (
               <>
                 <TypographyMuted>{`${myAccountInfo?.data?.firstName} ${myAccountInfo?.data?.lastName}`}</TypographyMuted>
-                <p className="text-[0.75rem] text-default group-hover:text-default-800 dark:text-default-200 transition-all">
-                  View profile
-                </p>
+                <p className="text-[0.75rem]">View profile</p>
               </>
             )
           )}

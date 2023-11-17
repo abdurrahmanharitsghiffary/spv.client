@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function useSpeech() {
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(
@@ -22,19 +22,12 @@ export default function useSpeech() {
     "inactive"
   );
 
-  const isAudioStart = useMemo(
-    () => boolStatus.isAudioStart,
-    [boolStatus.isAudioStart]
-  );
-  const isSpeechStart = useMemo(
-    () => boolStatus.isSpeechStart,
-    [boolStatus.isSpeechStart]
-  );
-  const isStart = useMemo(() => boolStatus.isStart, [boolStatus.isStart]);
-  const isInactive = useMemo(
-    () => boolStatus.isInactive,
-    [boolStatus.isInactive]
-  );
+  const isAudioStart = boolStatus.isAudioStart;
+
+  const isSpeechStart = boolStatus.isSpeechStart;
+
+  const isStart = boolStatus.isStart;
+  const isInactive = boolStatus.isInactive;
 
   const onAudioStart = useCallback(() => {
     setBoolStatus((c) => ({ ...c, isAudioStart: true }));

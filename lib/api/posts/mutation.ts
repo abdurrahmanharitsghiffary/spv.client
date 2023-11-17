@@ -8,6 +8,7 @@ import {
   postImageByPostAndImageId,
   postImagesByPostId,
   postLikesByPostId,
+  urlBase,
 } from "@/lib/endpoints";
 import { getFormData } from "@/lib/getFormData";
 import { keys } from "@/lib/queryKey";
@@ -15,7 +16,13 @@ import { CreatePostData, UpdatePostDataOptions } from "@/types";
 import { JsendSuccess } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
-
+import { useOptimistic } from "../hooks";
+import { useCallback } from "react";
+type UpdatePostOptions = {
+  content?: string;
+  title?: string;
+  images?: File[];
+};
 export const useCreatePost = () => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
@@ -51,40 +58,20 @@ export const useCreatePost = () => {
 };
 
 export const useUpdatePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
-    mutate: updatePost,
-    mutateAsync: updatePostAsync,
+    optimistic: updatePost,
+    optimisticAsync: updatePostAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: {
+  } = useOptimistic<
+    {
       postId: number;
-      data: UpdatePostDataOptions;
-      config?: AxiosRequestConfig;
-    }) => {
-      const formData = getFormData(v.data);
-      return request
-        .patch(postById(v.postId.toString()), formData, {
-          ...v?.config,
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((res) => res.data as JsendSuccess<null>)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onMutate: async (v) => {
-      const title = v?.data?.title;
-      const content = v?.data?.content;
-      const images = v?.data?.images ?? [];
-      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
-      await queryClient.cancelQueries({ queryKey: keys.posts });
-      await queryClient.cancelQueries({ queryKey: keys.mePosts() });
-
-      const post = queryClient.getQueryData(keys.postById(v.postId));
-      const posts = queryClient.getQueryData(keys.posts);
-      const myPosts = queryClient.getQueryData(keys.mePosts());
-
+    } & UpdatePostOptions
+  >({
+    method: "patch",
+    baseUrl: urlBase("/posts/:postId"),
+    optimisticUpdater: (v) => {
+      const params = v?.params;
+      const { title, content, images = [], postId } = v?.body ?? {};
       const updatePostOptimistic = (old: any, type: "single" | "multiple") => {
         if (type === "single")
           return {
@@ -110,46 +97,158 @@ export const useUpdatePost = () => {
         };
       };
 
-      queryClient.setQueryData(keys.postById(v.postId), (old: any) =>
-        updatePostOptimistic(old, "single")
-      );
-
-      queryClient.setQueryData(keys.posts, (old: any) => ({
-        ...old,
-        data: (old?.data ?? []).map((item: any) => {
-          if (item?.id === v.postId)
-            return updatePostOptimistic(item, "multiple");
-          return item;
-        }),
-      }));
-
-      queryClient.setQueryData(keys.mePosts(), (old: any) => ({
-        ...old,
-        data: (old?.data ?? []).map((item: any) => {
-          if (item?.id === v.postId)
-            return updatePostOptimistic(item, "multiple");
-          return item;
-        }),
-      }));
-
-      return { post, posts, myPosts, postId: v.postId };
-    },
-    onError: (err, v, context) => {
-      queryClient.setQueryData(
-        keys.postById(context?.postId ?? -1),
-        context?.post
-      );
-      queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-      queryClient.setQueryData(keys.posts, context?.posts);
-    },
-    onSettled: (d, e, v) => {
-      queryClient.invalidateQueries(keys.postById(v.postId));
-      queryClient.invalidateQueries(keys.posts);
-      queryClient.invalidateQueries(keys.mePosts());
+      return [
+        {
+          queryKey: keys.postById(Number(params?.postId)),
+          updater: (oldData) => updatePostOptimistic(oldData, "single"),
+        },
+        {
+          queryKey: keys.posts,
+          updater: (old: any) => ({
+            ...old,
+            data: (old?.data ?? []).map((item: any) => {
+              if (item?.id === postId)
+                return updatePostOptimistic(item, "multiple");
+              return item;
+            }),
+          }),
+        },
+        {
+          queryKey: keys.mePosts(),
+          updater: (old: any) => ({
+            ...old,
+            data: (old?.data ?? []).map((item: any) => {
+              if (item?.id === postId)
+                return updatePostOptimistic(item, "multiple");
+              return item;
+            }),
+          }),
+        },
+      ];
     },
   });
+  // const request = useAxiosInterceptor();
+  // const queryClient = useQueryClient();
 
-  return { updatePost, updatePostAsync, ...rest };
+  // const {
+  //   mutate: updatePost,
+  //   mutateAsync: updatePostAsync,
+  //   ...rest
+  // } = useMutation({
+  //   mutationFn: (v: {
+  //     postId: number;
+  //     data: UpdatePostDataOptions;
+  //     config?: AxiosRequestConfig;
+  //   }) => {
+  //     const formData = getFormData(v.data);
+  //     return request
+  //       .patch(postById(v.postId.toString()), formData, {
+  //         ...v?.config,
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       })
+  //       .then((res) => res.data as JsendSuccess<null>)
+  //       .catch((err) => Promise.reject(err?.response?.data));
+  //   },
+  //   onMutate: async (v) => {
+  //     const title = v?.data?.title;
+  //     const content = v?.data?.content;
+  //     const images = v?.data?.images ?? [];
+  //     await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
+  //     await queryClient.cancelQueries({ queryKey: keys.posts });
+  //     await queryClient.cancelQueries({ queryKey: keys.mePosts() });
+
+  //     const post = queryClient.getQueryData(keys.postById(v.postId));
+  //     const posts = queryClient.getQueryData(keys.posts);
+  //     const myPosts = queryClient.getQueryData(keys.mePosts());
+
+  //     const updatePostOptimistic = (old: any, type: "single" | "multiple") => {
+  //       if (type === "single")
+  //         return {
+  //           ...old,
+  //           data: {
+  //             ...old?.data,
+  //             title: title ? title : old?.title,
+  //             content: content ? content : old?.content,
+  //             images:
+  //               images?.length > 0
+  //                 ? images.map((item) => ({ src: URL.createObjectURL(item) }))
+  //                 : old?.content,
+  //           },
+  //         };
+  //       return {
+  //         ...old,
+  //         title: title ? title : old?.title,
+  //         content: content ? content : old?.content,
+  //         images:
+  //           images?.length > 0
+  //             ? images.map((item) => ({ src: URL.createObjectURL(item) }))
+  //             : old?.content,
+  //       };
+  //     };
+
+  //     queryClient.setQueryData(keys.postById(v.postId), (old: any) =>
+  //       updatePostOptimistic(old, "single")
+  //     );
+
+  //     queryClient.setQueryData(keys.posts, (old: any) => ({
+  //       ...old,
+  //       data: (old?.data ?? []).map((item: any) => {
+  //         if (item?.id === v.postId)
+  //           return updatePostOptimistic(item, "multiple");
+  //         return item;
+  //       }),
+  //     }));
+
+  //     queryClient.setQueryData(keys.mePosts(), (old: any) => ({
+  //       ...old,
+  //       data: (old?.data ?? []).map((item: any) => {
+  //         if (item?.id === v.postId)
+  //           return updatePostOptimistic(item, "multiple");
+  //         return item;
+  //       }),
+  //     }));
+
+  //     return { post, posts, myPosts, postId: v.postId };
+  //   },
+  //   onError: (err, v, context) => {
+  //     queryClient.setQueryData(
+  //       keys.postById(context?.postId ?? -1),
+  //       context?.post
+  //     );
+  //     queryClient.setQueryData(keys.mePosts(), context?.myPosts);
+  //     queryClient.setQueryData(keys.posts, context?.posts);
+  //   },
+  //   onSettled: (d, e, v) => {
+  //     queryClient.invalidateQueries(keys.postById(v.postId));
+  //     queryClient.invalidateQueries(keys.posts);
+  //     queryClient.invalidateQueries(keys.mePosts());
+  //   },
+  // });
+
+  const updatePostCb = useCallback(
+    ({ postId, data }: { postId: number; data: UpdatePostOptions }) =>
+      updatePost({
+        body: { postId, ...data },
+        params: { postId },
+        formData: true,
+      }),
+    [updatePost]
+  );
+  const updatePostAsyncCb = useCallback(
+    ({ postId, data }: { postId: number; data: UpdatePostOptions }) =>
+      updatePostAsync({
+        body: { postId, ...data },
+        params: { postId },
+        formData: true,
+      }),
+    [updatePostAsync]
+  );
+
+  return {
+    updatePost: updatePostCb,
+    updatePostAsync: updatePostAsyncCb,
+    ...rest,
+  };
 };
 
 export const useDeletePost = () => {

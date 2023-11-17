@@ -1,6 +1,6 @@
 import "@/styles/globals.css";
 import { fontSans } from "@/config/fonts";
-import { Providers } from "./providers";
+import { Providers } from "../components/providers";
 import clsx from "clsx";
 import ImagePreview from "@/components/modal/image-preview";
 import ImageGallery from "@/components/modal/image-gallery";

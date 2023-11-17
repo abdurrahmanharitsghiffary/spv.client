@@ -15,10 +15,12 @@ export default function PostActionButton({
   isPreview,
   postId,
   totalComments,
+  totalLikes,
 }: {
   isPostPage?: boolean;
   postId: number;
   totalComments: number;
+  totalLikes: number;
   isPreview?: boolean;
 }) {
   const { likePost } = useLikePost();
@@ -39,7 +41,7 @@ export default function PostActionButton({
           ) : (
             <FiThumbsUp />
           )}
-          {totalComments ?? 0}
+          {totalLikes ?? 0}
         </Button>
       </Tooltip>
       <Tooltip content="Comment">

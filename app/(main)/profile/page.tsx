@@ -9,7 +9,7 @@ import {
   TypographyP,
 } from "@/components/ui/typography";
 import { Divider } from "@nextui-org/divider";
-import React, { useMemo } from "react";
+import React from "react";
 import ProfileInfo from "@/components/profile/profile-info";
 import { useGetMyAccountInfo, useGetMyPosts } from "@/lib/api/account/query";
 import ProfileActionButton from "@/components/profile/profile-action-button";
@@ -37,10 +37,8 @@ export default function ProfilePage() {
     isDisabled,
     isFetching,
   });
-  const fullName = `${myAccountInfo?.data?.firstName ?? ""} ${
-    myAccountInfo?.data?.lastName ?? ""
-  }`;
-  const userPosts = useMemo(() => myPosts?.data ?? [], [myPosts]);
+
+  const userPosts = myPosts?.data ?? [];
   const followers = myAccountInfo?.data?.followedBy?.total ?? 0;
   const following = myAccountInfo?.data?.following?.total ?? 0;
   const totalPost = myAccountInfo?.data?.posts?.total ?? 0;
@@ -60,7 +58,9 @@ export default function ProfilePage() {
               src={myAccountInfo?.data?.profile?.image?.src ?? ""}
             />
             <div className="flex flex-col justify-start items-center w-full px-4">
-              <TypographyH3 className="text-center">{fullName}</TypographyH3>
+              <TypographyH3 className="text-center">
+                {myAccountInfo?.data?.fullName}
+              </TypographyH3>
               <TypographyMuted className="text-center">
                 {myAccountInfo?.data?.username}
               </TypographyMuted>
@@ -80,7 +80,7 @@ export default function ProfilePage() {
         )
       )}
       <Divider className="mt-7" />
-      <CreatePostForm isNotPostPage withPreview={false} />
+      <CreatePostForm isNotPostPage withPreview={false} autoFocus={false} />
       <PostsGridLayout>
         {isPostLoading
           ? [1, 2, 3, 4, 5].map((item) => <PostCardSkeleton key={item} />)

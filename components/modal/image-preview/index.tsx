@@ -29,7 +29,7 @@ function ImagePreview() {
       // ref={constraintRef}
       id="image-preview"
       key={src}
-      wrapperClassNames={{ wrapper: "overflow-hidden z-[101]" }}
+      wrapperClassNames={{ wrapper: "overflow-hidden z-[202]" }}
       classNames={{
         wrapper: "my-0 h-auto min-h-[100dvh] bg-[rgba(0,0,0,.5)]",
       }}
@@ -75,7 +75,7 @@ function ImagePreview() {
             width={150}
             height={150}
             removeWrapper
-            onClick={(e) => e.stopPropagation()}
+            // onClick={(e) => e.stopPropagation()}
             className="max-w-sm w-full h-auto md:max-w-xl mx-auto"
           />
         )}

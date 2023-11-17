@@ -1,5 +1,5 @@
 import { Card, CardProps } from "@nextui-org/card";
-import React, { useMemo } from "react";
+import React from "react";
 import { Divider } from "@nextui-org/divider";
 import { PostExtended } from "@/types/post";
 import PostCardHeader from "./post-card-header";
@@ -23,8 +23,10 @@ export default function PostCard(
   const title = post?.title ?? "";
   const content = post?.content ?? "";
 
-  const images = useMemo(() => post?.images ?? [], [post?.images]);
-  const author = useMemo(() => post?.author, [post?.author]);
+  // USE MEMO ??
+  const images = post?.images ?? [];
+  // USE MEMO ??
+  const author = post?.author;
 
   const postId = { authorId: post!?.author?.id, id: post!?.id };
   if (!post) return null;
@@ -47,6 +49,7 @@ export default function PostCard(
       <Divider />
       <PostCardFooter
         postId={post?.id}
+        totalLikes={post?.total_likes ?? 0}
         totalComments={post?.comments?.total ?? 0}
         isPostPage={isPostPage}
         isPreview={isPreview}

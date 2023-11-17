@@ -45,7 +45,6 @@ export default function CommentForm({
   const replyId = useGetSelectedCommentReplyId();
   const replyUsername = useReplyStore((state) => state?.username) ?? "";
   const resetReply = useResetReplyValue();
-
   const { postId, commentId } = useParams();
   const { createCommentAsync } = useCreateComment();
   const { createReplyCommentAsync } = useCreateReplyComment();
@@ -76,8 +75,7 @@ export default function CommentForm({
     setValue("image", null);
   }, []);
 
-  const showGifMenu = useShowGiphyGrid();
-  const gifMenuIsOpen = useGiphyGridIsOpen();
+  // const gifMenuIsOpen = useGiphyGridIsOpen();
   const currentComment = watch("comment");
   const [formHeight, setFormHeight] = useState(0);
   const formContainerRef = useCallback(
@@ -85,14 +83,11 @@ export default function CommentForm({
       setFormHeight(node?.offsetHeight < 67 ? 67 : node?.offsetHeight ?? 67);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentComment, replyId, file, gifMenuIsOpen, errors.image]
+    [currentComment, replyId, file, errors.image]
   );
 
   const fieldIsError = errors.comment?.message ? true : false;
 
-  const handleGifMenu = () => {
-    showGifMenu();
-  };
   console.log(replyId);
   const onSubmit: SubmitHandler<CreateCommentSchema> = (data) => {
     // toast.promise(
@@ -170,7 +165,6 @@ export default function CommentForm({
                     classNames={{
                       inputWrapper: currentComment || file ? "pr-[50px]" : "",
                     }}
-                    isDisabled={gifMenuIsOpen}
                     autoFocus
                     minRows={1}
                     maxRows={4}
@@ -193,7 +187,6 @@ export default function CommentForm({
                       color="primary"
                       variant="light"
                       className="absolute top-[6px] right-0 z-[102]"
-                      isDisabled={gifMenuIsOpen}
                     >
                       <BiSend size={18} />
                     </Button>
@@ -209,11 +202,7 @@ export default function CommentForm({
               // color="primary"
               radius="md"
             />
-            <CommentFormPopover
-              control={control}
-              isGifMenuOpen={gifMenuIsOpen}
-              onGifMenuOpen={handleGifMenu}
-            />
+            <CommentFormPopover control={control} />
           </CardBody>
         </Card>
       </div>

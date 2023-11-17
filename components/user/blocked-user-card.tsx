@@ -28,9 +28,9 @@ export default function BlockedUserCard({
             </div>
 
             <div className="flex flex-col gap-1 truncate w-[75%]">
-              <TypographyLarge className="!text-base truncate">{`${
-                user?.firstName ?? ""
-              } ${user?.lastName ?? ""}`}</TypographyLarge>
+              <TypographyLarge className="!text-base truncate">
+                {user?.fullName}
+              </TypographyLarge>
               <TypographyMuted className="text-xs truncate">
                 {user?.username}
               </TypographyMuted>

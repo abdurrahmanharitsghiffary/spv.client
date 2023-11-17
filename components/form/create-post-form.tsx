@@ -22,7 +22,9 @@ export default function CreatePostForm({
   withPreview = true,
   isNotPostPage = false,
   className,
+  autoFocus,
 }: {
+  autoFocus?: boolean;
   withPreview?: boolean;
   isNotPostPage?: boolean;
   className?: string;
@@ -107,7 +109,7 @@ export default function CreatePostForm({
             isInvalid={errors.content?.message !== undefined}
             errorMessage={errors.content?.message}
             color={errors.content?.message ? "danger" : "default"}
-            autoFocus
+            autoFocus={autoFocus}
             minRows={4}
             maxRows={5}
             placeholder="Write your thought..."

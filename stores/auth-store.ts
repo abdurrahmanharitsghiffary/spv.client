@@ -6,6 +6,7 @@ export interface Session {
   id: number;
   firstName: string;
   lastName: string;
+  fullName: string;
   email: string;
   username: string;
   iat: number;

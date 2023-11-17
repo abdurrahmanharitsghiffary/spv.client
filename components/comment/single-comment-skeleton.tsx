@@ -7,7 +7,7 @@ import { FiMoreVertical } from "react-icons/fi";
 
 export default function SingleCommentSkeleton() {
   return (
-    <div className="w-full flex flex-col p-4 justify-center items-start">
+    <div className="w-full flex flex-col p-4 justify-center items-start relative">
       <div className="w-full flex gap-2 items-center">
         <Avatar />
         <div className="flex w-[60%] flex-col gap-2 justify-center">
@@ -15,7 +15,7 @@ export default function SingleCommentSkeleton() {
           <Skeleton className="w-[20%] h-2 rounded-medium" />
         </div>
       </div>
-      <div className="flex gap-2 justify-between items-center absolute top-[58px] right-4">
+      <div className="flex gap-2 justify-between items-center absolute top-0 right-4">
         <Button
           isIconOnly
           variant="light"

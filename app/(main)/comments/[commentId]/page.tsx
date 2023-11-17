@@ -10,7 +10,7 @@ import CommentSkeleton from "@/components/comment/skeleton";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 
 export default function CommentPage({
-  params,
+  params = { commentId: "-1" },
 }: {
   params: { commentId: string };
 }) {

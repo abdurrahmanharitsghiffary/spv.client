@@ -68,7 +68,7 @@ export default function MenuLayout({
                   }
             }
             transition={{
-              duration: 0.2,
+              duration: 0.1,
               ease: "easeIn",
             }}
             exit={
@@ -82,8 +82,8 @@ export default function MenuLayout({
              shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed md:min-h-screen md:overflow-y-auto md:hide-scrollbar md:rounded-t-none md:max-w-sm"
             style={
               isMd
-                ? { zIndex: 200, insetBlock: 0, right: 0 }
-                : { zIndex: 200, left: "50%", translateX: "-50%" }
+                ? { zIndex: 201, insetBlock: 0, right: 0 }
+                : { zIndex: 201, left: "50%", translateX: "-50%" }
             }
           >
             {isMd ? (
@@ -139,7 +139,7 @@ export default function MenuLayout({
         <motion.div
           animate={{ opacity: 1 }}
           initial={{ opacity: 0 }}
-          className="fixed inset-0 z-[199] bg-opacity-0"
+          className="fixed inset-0 z-[200] bg-opacity-0"
           onClick={() => onClose()}
         ></motion.div>
       )}

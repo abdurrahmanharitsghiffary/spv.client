@@ -1,10 +1,11 @@
-import BackButton from "@/components/back-button";
+import BackButton from "@/components/button/back-button";
+import SearchButton from "@/components/button/search-button";
 import ChatMenuTrigger from "@/components/menu/chat-menu/trigger";
 import ProfileMenuTrigger from "@/components/menu/profile-menu/trigger";
 import UserMenuTrigger from "@/components/menu/user-menu/trigger";
 import { TypographyLarge, TypographyMuted } from "@/components/ui/typography";
 import { Avatar } from "@nextui-org/react";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export interface NavItemsAction {
   keys?: string[];
@@ -27,6 +28,18 @@ export const navActionItems: NavItemsAction[] = [
       "/users/blocked",
     ],
     action: (router) => <BackButton router={router} />,
+  },
+  {
+    key: "search-button",
+    className: "justify-end",
+    keys: ["/menu"],
+    action(router) {
+      return (
+        <>
+          <SearchButton />
+        </>
+      );
+    },
   },
   {
     key: "null-items",
