@@ -10,7 +10,7 @@ export default function ChatDisplay({ isOnline }: { isOnline?: boolean }) {
   return (
     <Link
       href="/chats/1"
-      className="flex gap-3 w-full items-center last:border-none border-b-1 border-divider py-2"
+      className="flex gap-3 w-full justify-between items-center last:border-none border-b-1 border-divider py-2"
     >
       {isOnline ? (
         <Badge
@@ -49,7 +49,7 @@ export default function ChatDisplay({ isOnline }: { isOnline?: boolean }) {
         </div>
         <Time
           date={new Date(Date.now() - 3000000000)}
-          className="w-[20%] !text-[0.75rem] self-start"
+          className="w-[20%] !text-[0.75rem] self-start text-right"
         />
       </div>
     </Link>

@@ -17,6 +17,7 @@ import {
 import { useLogout } from "@/lib/api/auth";
 import { FiLogOut } from "react-icons/fi";
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import InputFile from "@/components/input/file";
 
 export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
@@ -71,10 +72,8 @@ export default function ProfileMenu() {
           label: "Upload cover image",
           action: (
             <form className="absolute w-0 h-0" encType="multipart/form-data">
-              <input
-                type="file"
+              <InputFile
                 ref={fileInputRef}
-                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 onChange={async (e) => {
                   if (!e?.target?.files?.[0]) return null;
                   try {

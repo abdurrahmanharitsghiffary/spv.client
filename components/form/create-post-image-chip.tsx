@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+"use client";
+import React, { useCallback, useState } from "react";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import Image from "next/image";
 import { Chip } from "@nextui-org/chip";
@@ -28,6 +29,7 @@ export default function CreatePostImageChip({
   className?: string;
   wrapperClassName?: string;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const handleClose = useCallback(
     (image: File) => {
       if (!onCloseClick || !images) return null;
@@ -67,6 +69,10 @@ export default function CreatePostImageChip({
       >
         {Array.from(images ?? []).map((image) => (
           <Tooltip
+            isOpen={isOpen}
+            onOpenChange={(isOpen) => setIsOpen(isOpen)}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
             classNames={{ base: "rounded-md h-auto" }}
             key={image.name}
             content={

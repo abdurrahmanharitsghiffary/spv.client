@@ -44,7 +44,7 @@ export default function SignUpForm() {
       error: {
         render({ data }) {
           return (
-            (data as any)?.message ??
+            (data as any)?.data?.message ??
             (data as any)?.message ??
             "Something went wrong!"
           );

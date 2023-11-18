@@ -4,14 +4,13 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Textarea } from "@nextui-org/input";
 import { useIsSSR } from "@react-aria/ssr";
-import { BsCardImage } from "react-icons/bs";
 import { Button } from "@nextui-org/react";
 import { BiSend } from "react-icons/bi";
 import CommentFormImage from "./comment-form-image";
 import clsx from "clsx";
 import Recorder from "../recorder";
 import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import FileButton from "../input/file-btn";
 
 export default function ChatForm() {
   const {
@@ -98,25 +97,17 @@ export default function ChatForm() {
             className="text-[1.125rem]"
             onSpeechSuccess={handleResultChange}
           />
-          <Button className="relative" radius="md" isIconOnly>
-            <BsCardImage size={18} />
-            <Controller
-              name="image"
-              control={control}
-              render={({ field: { onChange } }) => (
-                <input
-                  type="file"
-                  multiple={false}
-                  accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                  className="absolute inset-0 opacity-0"
-                  onChange={(e) => {
-                    onChange(e?.target?.files?.[0] ?? null);
-                    e.target.value = "";
-                  }}
-                />
-              )}
-            />
-          </Button>
+          <Controller
+            name="image"
+            control={control}
+            render={({ field: { onChange } }) => (
+              <FileButton
+                onChange={(e) => {
+                  onChange(e.target?.files?.[0] ?? null);
+                }}
+              />
+            )}
+          />
         </form>
       </div>
     </div>

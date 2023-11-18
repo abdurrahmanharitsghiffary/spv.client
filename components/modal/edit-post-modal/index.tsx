@@ -19,6 +19,7 @@ import { BiChevronLeft } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
 import { UpdatePostSchema, updatePostSchema } from "@/lib/zod-schema/post";
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import InputFile from "@/components/input/file";
 
 function EditPostModal() {
   const postId = useGetSelectedPostId();
@@ -133,14 +134,12 @@ function EditPostModal() {
             control={control}
             name="images"
             render={({ field: { onChange } }) => (
-              <input
+              <InputFile
                 className="opacity-0 z-[10] absolute inset-0"
-                type="file"
                 id="edit_post_images"
                 onChange={(e) => {
                   onChange(Array.from(e?.target?.files ?? []));
                 }}
-                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 multiple={true}
               />
             )}

@@ -9,6 +9,7 @@ import { Controller, Control } from "react-hook-form";
 import { AiOutlineGif } from "react-icons/ai";
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import { useShowGiphyGrid } from "@/stores/giphy-grid-store";
+import InputFile from "../input/file";
 
 export default function CommentFormPopover({
   control,
@@ -80,19 +81,16 @@ export default function CommentFormPopover({
         control={control}
         name="image"
         render={({ field: { onChange, ref } }) => (
-          <input
+          <InputFile
             ref={(node) => {
               ref(node);
               inputRef.current = node;
             }}
-            multiple={false}
             onChange={(e) => {
               onChange(e.target?.files?.[0] ?? null);
               e.target.value = "";
             }}
             className="absolute opacity-0 hidden"
-            type="file"
-            accept={ACCEPTED_IMAGE_TYPES.join(",")}
           />
         )}
       />

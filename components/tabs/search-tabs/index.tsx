@@ -35,7 +35,7 @@ export default function SearchTabs() {
       <Tabs
         selectedKey={selectedTab}
         onSelectionChange={handleChange}
-        className="font-semibold fixed inset-x-0 z-[40] bg-background border-b-1 border-divider pt-0 px-2 pb-0 top-[60px]"
+        className="fixed inset-x-0 z-[40] bg-background border-b-1 border-divider pt-0 px-2 pb-0 top-[60px]"
         classNames={{
           tabContent: "px-1",
           tab: "w-[54px]",

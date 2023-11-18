@@ -3,18 +3,17 @@ import {
   useHidePhotoProfileMenu,
   usePhotoProfileMenuIsOpen,
 } from "@/stores/photo-profile-store";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import MenuLayout from "../layout";
 import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
 import {
   useDeleteMyAccountImage,
   useUpdateMyAccountImage,
-  useUpdateMyCoverImage,
 } from "@/lib/api/account/mutation";
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import InputFile from "@/components/input/file";
 
 export default function PhotoProfileMenu() {
   const isOpen = usePhotoProfileMenuIsOpen();
@@ -55,10 +54,8 @@ export default function PhotoProfileMenu() {
           label: "Upload photo profile",
           action: (
             <form className="absolute w-0 h-0" encType="multipart/form-data">
-              <input
-                type="file"
+              <InputFile
                 ref={fileInputRef}
-                accept={ACCEPTED_IMAGE_TYPES.join(",")}
                 onChange={async (e) => {
                   if (!e?.target?.files?.[0]) return null;
                   try {

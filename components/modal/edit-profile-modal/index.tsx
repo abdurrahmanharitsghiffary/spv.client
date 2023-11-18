@@ -32,6 +32,7 @@ import {
   BsQuestion,
 } from "react-icons/bs";
 import GenderSelect from "@/components/gender-select";
+import InputFile from "@/components/input/file";
 
 export default function EditProfileModal() {
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
@@ -160,13 +161,10 @@ export default function EditProfileModal() {
                 name="profileImage"
                 control={control}
                 render={({ field: { onChange } }) => (
-                  <input
-                    type="file"
-                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                  <InputFile
                     onChange={(e) => {
                       onChange(e.target.files?.[0]);
                     }}
-                    className="absolute inset-0 opacity-0"
                   />
                 )}
               />
@@ -198,13 +196,10 @@ export default function EditProfileModal() {
                 name="coverImage"
                 control={control}
                 render={({ field: { onChange } }) => (
-                  <input
-                    type="file"
-                    accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                  <InputFile
                     onChange={(e) => {
                       onChange(e.target.files?.[0]);
                     }}
-                    className="absolute inset-0 opacity-0"
                   />
                 )}
               />

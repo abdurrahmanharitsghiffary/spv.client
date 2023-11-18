@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
-import { TypographyH4, TypographyMuted } from "../ui/typography";
+import { TypographyH3, TypographyH4, TypographyMuted } from "../ui/typography";
 import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { BsCardImage } from "react-icons/bs";
@@ -17,6 +17,7 @@ import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import FileButton from "../input/file-btn";
 
 export default function CreatePostForm({
   withPreview = true,
@@ -94,7 +95,7 @@ export default function CreatePostForm({
         onSubmit={handleSubmit(onSubmit)}
         encType="multipart/form-data"
       >
-        {!isNotPostPage && <TypographyH4>Create a new post</TypographyH4>}
+        {!isNotPostPage && <TypographyH3>Create a new post</TypographyH3>}
         <Input
           maxLength={40}
           isInvalid={errors.title?.message !== undefined}
@@ -122,30 +123,23 @@ export default function CreatePostForm({
           />
           <ul className="absolute bg-default-100 border-t-1 border-divider bottom-1 rounded-b-medium flex inset-x-0 justify-end p-1 w-full">
             <li className="relative w-fit">
-              <Button
-                color="secondary"
-                isIconOnly
-                variant="light"
-                radius="full"
-              >
-                <BsCardImage />
-                <Controller
-                  control={control}
-                  name="images"
-                  render={({ field: { onChange } }) => (
-                    <input
-                      className="opacity-0 z-[10] absolute inset-0"
-                      type="file"
-                      id="file_input"
-                      onChange={(e) => {
-                        onChange(Array.from(e?.target?.files ?? []));
-                      }}
-                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
-                      multiple={true}
-                    />
-                  )}
-                />
-              </Button>
+              <Controller
+                control={control}
+                name="images"
+                render={({ field: { onChange } }) => (
+                  <FileButton
+                    color="secondary"
+                    inputProps={{ id: "file_input" }}
+                    radius="full"
+                    variant="light"
+                    inputClassName="opacity-0 z-[10] absolute inset-0"
+                    onChange={(e) => {
+                      onChange(Array.from(e?.target?.files ?? []));
+                    }}
+                    multiple={true}
+                  />
+                )}
+              />
             </li>
           </ul>
         </div>
@@ -191,7 +185,7 @@ export default function CreatePostForm({
 
       {withPreview && (
         <div className="w-full flex flex-col gap-2 pb-16">
-          <TypographyH4 className="px-4">Preview</TypographyH4>
+          <TypographyH4 className="px-4 !text-base">Preview</TypographyH4>
           <PostCard
             shadow="none"
             radius="none"
@@ -203,4 +197,35 @@ export default function CreatePostForm({
       )}
     </>
   );
+}
+
+{
+  /* <Button
+                color="secondary"
+                isIconOnly
+                variant="light"
+                radius="full"
+              >
+                <BsCardImage />
+                <Controller
+                  control={control}
+                  name="images"
+                  render={({ field: { onChange } }) => (
+                    <>
+                    <FileButton color="secondary" inputProps={{id:"file_input"}} radius="full" variant="light" inputClassName="opacity-0 z-[10] absolute inset-0" onChange={(e) => {
+                        onChange(Array.from(e?.target?.files ?? []));
+                      }} multiple={true}/>
+                     <input
+                      className=""
+                      type="file"
+                      id="file_input"
+                      onChange={}
+                      accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                      multiple={true}
+                    />
+                    </>
+                   
+                  )}
+                />
+              </Button> */
 }
