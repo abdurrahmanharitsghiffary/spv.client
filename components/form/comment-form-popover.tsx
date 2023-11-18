@@ -7,7 +7,6 @@ import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { BsCardImage } from "react-icons/bs";
 import { Controller, Control } from "react-hook-form";
 import { AiOutlineGif } from "react-icons/ai";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import { useShowGiphyGrid } from "@/stores/giphy-grid-store";
 import InputFile from "../input/file";
 

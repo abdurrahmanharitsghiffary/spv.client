@@ -12,7 +12,6 @@ import {
   useUpdateMyCoverImage,
 } from "@/lib/api/account/mutation";
 import { toast } from "react-toastify";
-import IconButton from "@/components/button/icon-button";
 import { Avatar } from "@nextui-org/avatar";
 import CoverImage from "@/components/image/cover-image";
 import { TypographyH4 } from "@/components/ui/typography";
@@ -22,15 +21,7 @@ import {
   EditProfileValidationSchema,
   editProfileValidationSchema,
 } from "@/lib/zod-schema/user";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import ValidationErrorText from "@/components/validation-error-text";
-import { Select, SelectItem } from "@nextui-org/select";
-import {
-  BsGenderAmbiguous,
-  BsGenderFemale,
-  BsGenderMale,
-  BsQuestion,
-} from "react-icons/bs";
 import GenderSelect from "@/components/gender-select";
 import InputFile from "@/components/input/file";
 

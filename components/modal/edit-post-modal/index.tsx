@@ -18,7 +18,6 @@ import IconButton from "@/components/button/icon-button";
 import { BiChevronLeft } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
 import { UpdatePostSchema, updatePostSchema } from "@/lib/zod-schema/post";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import InputFile from "@/components/input/file";
 
 function EditPostModal() {

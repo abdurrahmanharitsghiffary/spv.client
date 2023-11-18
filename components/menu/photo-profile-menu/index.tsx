@@ -14,6 +14,7 @@ import { useCreatePost } from "@/lib/api/posts/mutation";
 import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
 import InputFile from "@/components/input/file";
+import { toast } from "react-toastify";
 
 export default function PhotoProfileMenu() {
   const isOpen = usePhotoProfileMenuIsOpen();
@@ -41,7 +42,24 @@ export default function PhotoProfileMenu() {
               confirmLabel: "Delete",
               closeLabel: "Cancel",
             });
-            await deleteAccountImageAsync({});
+            await toast.promise(
+              deleteAccountImageAsync({})
+                .then((res) => res.data)
+                .catch((err) => Promise.reject(err?.response?.data)),
+              {
+                pending: "Changing profile picture...",
+                success: "Profile picture changed successfully",
+                error: {
+                  render({ data }) {
+                    return (
+                      (data as any)?.data?.message ??
+                      (data as any)?.message ??
+                      "Something went wrong!"
+                    );
+                  },
+                },
+              }
+            );
           } catch (err) {
           } finally {
             onClose();

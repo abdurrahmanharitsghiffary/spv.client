@@ -16,8 +16,8 @@ import {
 } from "@/stores/profile-menu-store";
 import { useLogout } from "@/lib/api/auth";
 import { FiLogOut } from "react-icons/fi";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import InputFile from "@/components/input/file";
+import { toast } from "react-toastify";
 
 export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
@@ -91,9 +91,26 @@ export default function ProfileMenu() {
                         base: "!h-full !w-full",
                       },
                     });
-                    await updateCoverImageAsync({
-                      image: e?.target?.files?.[0],
-                    });
+                    await toast.promise(
+                      updateCoverImageAsync({
+                        image: e?.target?.files?.[0],
+                      })
+                        .then((res) => res.data)
+                        .catch((err) => Promise.reject(err?.response?.data)),
+                      {
+                        pending: "Changing profile picture...",
+                        success: "Profile picture changed successfully",
+                        error: {
+                          render({ data }) {
+                            return (
+                              (data as any)?.data?.message ??
+                              (data as any)?.message ??
+                              "Something went wrong!"
+                            );
+                          },
+                        },
+                      }
+                    );
                     await createPostAsync({
                       data: {
                         content: `${session?.fullName} updated their cover image`,
