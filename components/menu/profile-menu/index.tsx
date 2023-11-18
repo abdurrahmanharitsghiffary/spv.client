@@ -95,11 +95,11 @@ export default function ProfileMenu() {
                       updateCoverImageAsync({
                         image: e?.target?.files?.[0],
                       })
-                        .then((res) => res.data)
-                        .catch((err) => Promise.reject(err?.response?.data)),
+                        .then((res) => res)
+                        .catch((err) => Promise.reject(err)),
                       {
-                        pending: "Changing profile picture...",
-                        success: "Profile picture changed successfully",
+                        pending: "Changing cover picture...",
+                        success: "Cover picture changed successfully",
                         error: {
                           render({ data }) {
                             return (
@@ -143,3 +143,5 @@ export default function ProfileMenu() {
     />
   );
 }
+
+// WHEN UPDATING PROFILE FROM PROFILE MODAL SHOULD POST ABOUT UPDATING PHOTO?

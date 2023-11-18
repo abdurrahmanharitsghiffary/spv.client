@@ -91,9 +91,26 @@ export default function PhotoProfileMenu() {
                         base: "!h-full !w-full",
                       },
                     });
-                    await updateAccountImageAsync({
-                      image: e?.target?.files?.[0],
-                    });
+                    await toast.promise(
+                      updateAccountImageAsync({
+                        image: e?.target?.files?.[0],
+                      })
+                        .then((res) => res)
+                        .catch((err) => Promise.reject(err)),
+                      {
+                        pending: "Changing profile picture...",
+                        success: "Profile picture changed successfully",
+                        error: {
+                          render({ data }) {
+                            return (
+                              (data as any)?.data?.message ??
+                              (data as any)?.message ??
+                              "Something went wrong!"
+                            );
+                          },
+                        },
+                      }
+                    );
                     await createPostAsync({
                       data: {
                         content: `${
