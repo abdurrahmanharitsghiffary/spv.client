@@ -21,6 +21,10 @@ import { useIsSSR } from "@react-aria/ssr";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useShowDeleteAccountModal } from "@/hooks/use-delete-account";
 import { IoLanguage } from "react-icons/io5";
+import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
+import { toast } from "react-toastify";
+import { urlBase } from "@/lib/endpoints";
+import { useAuthSession } from "@/stores/auth-store";
 
 type ListboxItem = {
   label: string;
@@ -38,9 +42,10 @@ type ListboxWithSectionItem = {
 export default function MenuPage() {
   const { myAccountInfo, isLoading, isSuccess } = useGetMyAccountInfo();
   const onOpen = useShowChangePasswordModal();
+  const { setSession } = useAuthSession();
   const { setTheme, theme } = useTheme();
   const router = useRouter();
-  const isSSR = useIsSSR();
+  const request = useAxiosInterceptor();
   const showProfileEdit = useShowEditProfile();
   const { logoutAsync } = useLogout();
   const confirm = useConfirm();
@@ -77,6 +82,39 @@ export default function MenuPage() {
           body: "Are you sure want to delete this account?",
           title: "Delete",
         });
+
+        if (choice && myAccountInfo?.data?.provider === "GOOGLE") {
+          const choice2 = await confirm({
+            confirmLabel: "Delete",
+            confirmColor: "danger",
+            body: "Confirm again to delete your account \n(account will be deleted).",
+            title: "Delete",
+          });
+          if (choice2) {
+            await toast.promise(
+              request
+                .delete(urlBase("/auth/google"))
+                .then((res) => res.data)
+                .catch((err) => Promise.reject(err?.response?.data)),
+              {
+                error: {
+                  render({ data }) {
+                    return (
+                      (data as any)?.data?.message ?? "Something went wrong!"
+                    );
+                  },
+                },
+                pending: "Submitting...",
+                success: "Account successfully deleted",
+              }
+            );
+            setSession(null);
+            router.push("/login");
+            return null;
+          } else {
+            return null;
+          }
+        }
 
         if (choice) {
           showDeleteModal();
@@ -166,6 +204,19 @@ export default function MenuPage() {
       icon: <FiLogOut />,
     },
   ];
+
+  if (myAccountInfo?.data?.provider !== null) {
+    if (
+      (items as any)?.[1]?.section?.items &&
+      (items as any)?.[1]?.section?.items?.length > 0
+    ) {
+      const secItems = (items as any)?.[1]?.section?.items;
+      (items as any)[1].section.items = secItems.filter(
+        (item: any) => item.key !== "account-password"
+      );
+    }
+  }
+
   console.log(myAccountInfo);
   return (
     <>

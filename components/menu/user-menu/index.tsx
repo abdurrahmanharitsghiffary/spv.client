@@ -2,7 +2,7 @@
 import React from "react";
 import MenuLayout from "../layout";
 import { useHideUserMenu, useUserMenuIsOpen } from "@/stores/user-menu-store";
-import { BiBlock, BiHeart } from "react-icons/bi";
+import { BiBlock } from "react-icons/bi";
 import { GoReport } from "react-icons/go";
 import { BsChat } from "react-icons/bs";
 import {

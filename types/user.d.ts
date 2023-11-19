@@ -1,5 +1,5 @@
 import { Post } from "./post";
-import { Image, ImageV2 } from "./profile";
+import { Image } from "./profile";
 
 export interface UserAccountPublic {
   id: number;
@@ -32,8 +32,9 @@ export interface UserAccountPublic {
 
 export interface UserAccount extends UserAccountPublic {
   email: string;
+  provider: "GOOGLE" | null;
   verified: boolean;
-  role: $Enums.Role;
+  role: "admin" | "user";
 }
 
 export interface User {

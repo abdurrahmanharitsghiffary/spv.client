@@ -15,8 +15,11 @@ import {
   loginValidationSchema,
 } from "@/lib/zod-schema/auth";
 import ValidationErrorText from "../validation-error-text";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -25,10 +28,13 @@ export default function LoginForm() {
     resolver: zodResolver(loginValidationSchema),
   });
   const { error, loginAsync } = useLogin();
-  const errorMessage: string = (error as any)?.data?.message ?? "";
+  const googleLoginErrorMessage = searchParams.get("err_message");
+  console.log(googleLoginErrorMessage);
+  const errorMessage: string = (error as any)?.data?.message ?? null;
 
-  const onSubmit: SubmitHandler<LoginValidationSchema> = (data) => {
-    toast.promise(loginAsync(data), {
+  const onSubmit: SubmitHandler<LoginValidationSchema> = async (data) => {
+    router.replace("/login");
+    await toast.promise(loginAsync(data), {
       error: {
         render({ data }) {
           return (
@@ -54,20 +60,25 @@ export default function LoginForm() {
       classNames={{ footer: "pt-0" }}
       footer={
         <div className="flex w-full flex-col gap-2">
-          {errorMessage && (
-            <ValidationErrorText>{errorMessage}</ValidationErrorText>
-          )}
+          <ValidationErrorText className="!text-[0.875rem]">
+            {errorMessage ?? googleLoginErrorMessage ?? ""}
+          </ValidationErrorText>
           <Link as={NextLink} size="sm" href="/resetpassword">
             Forget your password?
           </Link>
           <Button type="submit" size="md" radius="sm" color="primary">
             Login
           </Button>
+          <div className="w-full text-center mx-auto before:w-full before:bg-divider before:p-[1px] before:rounded-md before:content-[''] before:inset-x-0 relative before:mx-auto before:absolute before:top-1/2 before:-translate-y-1/2">
+            <p className="bg-background relative mx-auto px-2 w-fit">or</p>
+          </div>
           <Button
             size="md"
             color="secondary"
             type="button"
             radius="sm"
+            as={NextLink}
+            href="http://localhost:5000/api/auth/google"
             endContent={<FcGoogle size={20} />}
           >
             Sign in with Google
