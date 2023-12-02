@@ -3,7 +3,6 @@ import React, { useEffect, useMemo } from "react";
 import { TypographyH3, TypographyH4, TypographyMuted } from "../ui/typography";
 import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
-import { BsCardImage } from "react-icons/bs";
 import PostCard from "../post/post-card";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +15,6 @@ import { PostExtended } from "@/types/post";
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import FileButton from "../input/file-btn";
 
 export default function CreatePostForm({
@@ -95,7 +93,9 @@ export default function CreatePostForm({
         onSubmit={handleSubmit(onSubmit)}
         encType="multipart/form-data"
       >
-        {!isNotPostPage && <TypographyH3>Create a new post</TypographyH3>}
+        {!isNotPostPage && (
+          <TypographyH3 className="!text-xl">Create a new post</TypographyH3>
+        )}
         <Input
           maxLength={40}
           isInvalid={errors.title?.message !== undefined}
@@ -191,7 +191,7 @@ export default function CreatePostForm({
             radius="none"
             isPreview
             className={`rounded-none w-full`}
-            post={post as PostExtended}
+            post={post as unknown as PostExtended}
           />
         </div>
       )}

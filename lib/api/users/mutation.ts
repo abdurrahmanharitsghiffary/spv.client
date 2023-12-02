@@ -4,7 +4,7 @@ import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { blockUserByIdRoute, blockUserRoute, userById } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { UpdateUserDataOptions } from "@/types";
-import { JsendSuccess } from "@/types/response";
+import { ApiResponseT } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 
@@ -24,7 +24,7 @@ export const useUpdateUser = () => {
     }) =>
       request
         .patch(userById(v.userId.toString()), v?.data, v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (d, v) => {
       queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
@@ -46,7 +46,7 @@ export const useDeleteUser = () => {
     mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
       request
         .delete(userById(v.userId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (d, v) => {
       queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });

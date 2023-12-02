@@ -1,29 +1,20 @@
 import { Image } from "./profile";
-import { UserLike, UserSimplified } from "./user";
+import { UserLike, UserSimplifiedWF } from "./user";
 
 interface CommentSimplified {
   id: number;
   postId: number;
   comment: string;
   image: Image;
-  user: UserSimplified;
+  user: UserSimplifiedWF;
+  isLiked: boolean;
   createdAt: Date;
-  updateAt: Date;
+  updatedAt: Date;
   total_likes: number;
 }
 
-interface CommentReply extends CommentSimplified {
-  commentReply: {
-    commentIds: number[];
-    total: number;
-  };
-}
-
 export interface Comment extends CommentSimplified {
-  commentReply: {
-    commentIds: number[];
-    total: number;
-  };
+  replies: { ids: number[]; total: number };
 }
 
 interface CommentLikeResponse {

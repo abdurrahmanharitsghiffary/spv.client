@@ -4,8 +4,8 @@ import MenuLayout from "../layout";
 import {
   useGetSelectedPost,
   useHidePostMenu,
+  usePostMenuActions,
   usePostMenuIsOpen,
-  useSetSelectedPost,
 } from "@/stores/post-menu-store";
 import {
   AiFillHeart,
@@ -36,7 +36,7 @@ export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
   const onClose = useHidePostMenu();
   const session = useSession();
-  const setSelectedPost = useSetSelectedPost();
+  const { setSelectedPost } = usePostMenuActions();
   const selectedPost = useGetSelectedPost();
   const { isLiked } = useGetPostIsLiked(selectedPost?.id ?? -1);
   const { isSaved } = useGetPostIsSaved(selectedPost?.id ?? -1);

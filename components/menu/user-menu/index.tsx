@@ -1,7 +1,10 @@
 "use client";
 import React from "react";
 import MenuLayout from "../layout";
-import { useHideUserMenu, useUserMenuIsOpen } from "@/stores/user-menu-store";
+import {
+  useUserMenuActions,
+  useUserMenuIsOpen,
+} from "@/stores/user-menu-store";
 import { BiBlock } from "react-icons/bi";
 import { GoReport } from "react-icons/go";
 import { BsChat } from "react-icons/bs";
@@ -18,7 +21,7 @@ import { useBlockUser } from "@/lib/api/users/mutation";
 export default function UserMenu() {
   const confirm = useConfirm();
   const isOpen = useUserMenuIsOpen();
-  const onClose = useHideUserMenu();
+  const { onClose } = useUserMenuActions();
   const router = useRouter();
   const params = useParams();
   const { followAccountAsync } = useFollowAccount();

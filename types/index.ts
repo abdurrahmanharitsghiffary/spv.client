@@ -1,5 +1,5 @@
 import { SVGProps } from "react";
-import { Post, PostExtended } from "./post";
+import { PostExtended } from "./post";
 import { UserAccountPublic } from "./user";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
@@ -12,6 +12,14 @@ export type DisclosureMinified = {
   onClose: () => void;
 };
 
+export type DisclosureStoreMinified = {
+  isOpen: DisclosureMinified["isOpen"];
+  actions: {
+    onOpen: DisclosureMinified["onOpen"];
+    onClose: DisclosureMinified["onClose"];
+  };
+};
+
 export type Disclosure = {
   onOpenChange: () => void;
   isControlled: boolean;
@@ -20,12 +28,11 @@ export type Disclosure = {
 } & DisclosureMinified;
 
 export type NotificationType =
-  | "post"
+  | "liking_post"
+  | "liking_comment"
   | "comment"
-  | "like_post"
-  | "like_comment"
   | "follow"
-  | "reply_comment";
+  | "replying_comment";
 
 export type LoginData = {
   email: string;
@@ -78,12 +85,12 @@ export interface CreateCommentData {
   imageSrc?: string;
 }
 
-export interface CreateChatData {
-  recipientId: number;
-  message: string;
+export interface CreateMessageData {
+  chatRoomId: number;
+  message?: string;
   image?: File;
 }
-
+export type Key = string | number;
 export type OffsetPaging = { limit?: number; offset?: number } | undefined;
 
 export type SearchOptions = OffsetPaging & {

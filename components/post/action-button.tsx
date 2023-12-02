@@ -1,7 +1,6 @@
 "use client";
 import { useLikePost, useUnlikePost } from "@/lib/api/posts/mutation";
 import { useGetPostIsLiked } from "@/lib/api/posts/query";
-import { PostExtended } from "@/types/post";
 import { Button, ButtonGroup } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import Link from "next/link";

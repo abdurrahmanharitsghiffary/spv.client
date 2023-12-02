@@ -133,7 +133,7 @@ export default function EditProfileModal() {
               src={
                 profileImage
                   ? URL.createObjectURL(profileImage)
-                  : myAccountInfo?.data?.profile?.image?.src
+                  : myAccountInfo?.data?.profile?.avatarImage?.src
               }
               className="w-32 h-32"
             />

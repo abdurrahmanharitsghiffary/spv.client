@@ -16,6 +16,7 @@ import {
 } from "@/lib/zod-schema/auth";
 import ValidationErrorText from "../validation-error-text";
 import { useRouter, useSearchParams } from "next/navigation";
+import TextDivider from "../text-divider";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -30,18 +31,13 @@ export default function LoginForm() {
   const { error, loginAsync } = useLogin();
   const googleLoginErrorMessage = searchParams.get("err_message");
   console.log(googleLoginErrorMessage);
-  const errorMessage: string = (error as any)?.data?.message ?? null;
+  const errorMessage: string = (error as any)?.message ?? null;
 
   const onSubmit: SubmitHandler<LoginValidationSchema> = async (data) => {
-    router.replace("/login");
     await toast.promise(loginAsync(data), {
       error: {
         render({ data }) {
-          return (
-            (data as any)?.data?.message ??
-            (data as any)?.message ??
-            "Something went wrong!"
-          );
+          return (data as any)?.message ?? "Something went wrong!";
         },
       },
       pending: "Login to account....",
@@ -69,9 +65,7 @@ export default function LoginForm() {
           <Button type="submit" size="md" radius="sm" color="primary">
             Login
           </Button>
-          <div className="w-full text-center mx-auto before:w-full before:bg-divider before:p-[1px] before:rounded-md before:content-[''] before:inset-x-0 relative before:mx-auto before:absolute before:top-1/2 before:-translate-y-1/2">
-            <p className="bg-background relative mx-auto px-2 w-fit">or</p>
-          </div>
+          <TextDivider>or</TextDivider>
           <Button
             size="md"
             color="secondary"
@@ -83,6 +77,7 @@ export default function LoginForm() {
           >
             Sign in with Google
           </Button>
+
           <div className="flex text-[0.875rem] gap-1">
             <p>No have account? </p>
             <Link href="/signup" size="sm" as={NextLink}>

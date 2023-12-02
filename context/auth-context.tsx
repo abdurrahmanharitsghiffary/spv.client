@@ -1,6 +1,6 @@
 "use client";
 import SpaceVerseApi from "@/lib/api";
-import { useAuthSession } from "@/stores/auth-store";
+import { useSetSession } from "@/stores/auth-store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,7 +11,7 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function AuthProvider({
         }
       })
       .catch((err) => {
-        if (err?.response?.data?.data?.message === "You are unauthenticated!") {
+        if (err?.response?.data?.message === "You are unauthenticated!") {
           router.push("/login");
         }
       });

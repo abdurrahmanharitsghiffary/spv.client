@@ -36,4 +36,4 @@ export const useSession = () => {
   return session;
 };
 
-export const useAuthSession = () => useAuthStore();
+export const useSetSession = () => useAuthStore((state) => state.setSession);

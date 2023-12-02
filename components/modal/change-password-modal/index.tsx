@@ -58,7 +58,7 @@ function ChangePasswordModal() {
         pending: "Changing password...",
         error: {
           render({ data }) {
-            return (data as any)?.data?.message ?? "Something went wrong!";
+            return (data as any)?.message ?? "Something went wrong!";
           },
         },
         success: "Password successfully changed",

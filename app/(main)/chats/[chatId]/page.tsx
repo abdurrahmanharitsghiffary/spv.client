@@ -1,13 +1,16 @@
-import ChatBubble from "@/components/chat/chat-bubble";
+import ChatPage from "@/components/page/chat-page";
 import ChatForm from "@/components/form/chat-form";
 import React from "react";
 
-export default function ChatPage({ params }: { params: { chatId: string } }) {
-  const { chatId } = params;
-
+export default function Chat({ params }: { params: { chatId: string } }) {
   return (
     <>
-      <div
+      <ChatPage />
+      <ChatForm />
+    </>
+  );
+}
+/* <div
         className="pt-5 flex flex-col gap-5 px-4 w-full pb-20"
         // style={{
         //   backgroundSize: "100%",
@@ -40,8 +43,4 @@ export default function ChatPage({ params }: { params: { chatId: string } }) {
             isRecipient={[0, 2, 4, 5, 7, 8, 10].some((ite) => ite === it)}
           />
         ))}
-      </div>
-      <ChatForm />
-    </>
-  );
-}
+      </div> */

@@ -3,14 +3,14 @@ import React from "react";
 import GiphyGrid from "./grid";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import {
+  useGiphyGridActions,
   useGiphyGridIsOpen,
-  useHideGiphyGrid,
 } from "@/stores/giphy-grid-store";
 import ModalLayoutV2 from "../modal/layoutV2";
 
 export default function Giphy() {
   const isOpen = useGiphyGridIsOpen();
-  const onClose = useHideGiphyGrid();
+  const { onClose } = useGiphyGridActions();
 
   useBodyOverflowHidden(isOpen);
 

@@ -1,6 +1,6 @@
 "use client";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import { UserAccount } from "@/types/user";
 import { AxiosRequestConfig } from "axios";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -14,14 +14,15 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
-import { Chat } from "@/types/chat";
 import { PostExtended } from "@/types/post";
 import { useMemo } from "react";
+import { useInfinite } from "../hooks";
+import { ChatRoom } from "@/types/chat";
 
 export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: myAccountInfo, ...rest } = useQuery<JsendSuccess<UserAccount>>({
+  const { data: myAccountInfo, ...rest } = useQuery<ApiResponseT<UserAccount>>({
     queryKey: keys.meAccount(),
     queryFn: () =>
       request
@@ -33,22 +34,18 @@ export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
   return { myAccountInfo, ...rest };
 };
 
-export const useGetMyChats = (
-  query?: OffsetPaging,
+export const useGetMyAssociatedChatRooms = (
+  query: Record<string, any> = { limit: "20", offset: "0" },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data: myChats, ...rest } = useQuery<JsendWithPaging<Chat[]>>({
+  const { data: chatRooms, ...rest } = useInfinite<ChatRoom>({
+    query: query as Record<string, any>,
+    url: myChatsEp(),
     queryKey: [...keys.meChats(), query],
-    queryFn: () =>
-      request
-        .get(myChatsEp(query), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+    config,
   });
 
-  return { myChats, ...rest };
+  return { chatRooms, ...rest };
 };
 
 export const useGetMyPosts = (
@@ -57,7 +54,9 @@ export const useGetMyPosts = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
+  const { data, ...rest } = useInfiniteQuery<
+    ApiPagingObjectResponse<PostExtended[]>
+  >({
     queryKey: [...keys.mePosts(), query],
     queryFn: ({ pageParam }) =>
       pageParam === null
@@ -89,7 +88,7 @@ export const useGetMyFollowers = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
   const { data: myFollowers, ...rest } = useQuery<
-    JsendSuccess<{ followerIds: number[]; total: number }>
+    ApiResponseT<{ followerIds: number[]; total: number }>
   >({
     queryKey: keys.meFollowers(),
     queryFn: () =>
@@ -106,7 +105,7 @@ export const useGetMyFollowedUsers = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
   const { data: myFollowedUsers, ...rest } = useQuery<
-    JsendSuccess<{ followedUserIds: number[]; total: number }>
+    ApiResponseT<{ followedUserIds: number[]; total: number }>
   >({
     queryKey: keys.meFollowing(),
     queryFn: () =>

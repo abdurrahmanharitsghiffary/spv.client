@@ -11,7 +11,7 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
-import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import {
   UserAccount,
   UserAccountPublic,
@@ -28,16 +28,16 @@ export const useGetUsers = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: usersData, ...rest } = useQuery<JsendWithPaging<UserAccount[]>>(
-    {
-      queryKey: [...keys.users, options],
-      queryFn: () =>
-        request
-          .get(baseUserRoutes(options), config)
-          .then((res) => res.data)
-          .catch((err) => Promise.reject(err?.response?.data)),
-    }
-  );
+  const { data: usersData, ...rest } = useQuery<
+    ApiPagingObjectResponse<UserAccount[]>
+  >({
+    queryKey: [...keys.users, options],
+    queryFn: () =>
+      request
+        .get(baseUserRoutes(options), config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
 
   return { usersData, ...rest };
 };
@@ -45,7 +45,7 @@ export const useGetUsers = (
 export const useGetUserById = (userId: number, config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: userData, ...rest } = useQuery<JsendSuccess<UserAccountPublic>>(
+  const { data: userData, ...rest } = useQuery<ApiResponseT<UserAccountPublic>>(
     {
       queryKey: keys.userById(userId),
       queryFn: () =>
@@ -65,7 +65,7 @@ export const useGetUserFollowers = (
 ) => {
   const request = useAxiosInterceptor();
   const { data: userFollowersData, ...rest } = useQuery<
-    JsendSuccess<UserFollowerResponse>
+    ApiResponseT<UserFollowerResponse>
   >({
     queryKey: keys.userFollowers(userId),
     queryFn: () =>
@@ -85,7 +85,7 @@ export const useGetUserFollowedUsers = (
   const request = useAxiosInterceptor();
 
   const { data: userFollowedUsersData, ...rest } = useQuery<
-    JsendSuccess<UserFollowingResponse>
+    ApiResponseT<UserFollowingResponse>
   >({
     queryKey: keys.userFollowedUsers(userId),
     queryFn: () =>
@@ -104,7 +104,7 @@ export const useGetUserIsFollowed = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isFollowed, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isFollowed, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: keys.isFollowing(userId),
     queryFn: () =>
       request
@@ -124,7 +124,7 @@ export const useGetBlockedUsers = (
   const request = useAxiosInterceptor();
 
   const { data, ...rest } = useInfiniteQuery<
-    JsendWithPaging<UserAccountPublic[]>
+    ApiPagingObjectResponse<UserAccountPublic[]>
   >({
     queryKey: [...keys.blockedUsers(), query],
     queryFn: ({ pageParam }) =>

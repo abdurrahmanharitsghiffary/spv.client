@@ -7,7 +7,7 @@ import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { BsCardImage } from "react-icons/bs";
 import { Controller, Control } from "react-hook-form";
 import { AiOutlineGif } from "react-icons/ai";
-import { useShowGiphyGrid } from "@/stores/giphy-grid-store";
+import { useGiphyGridActions } from "@/stores/giphy-grid-store";
 import InputFile from "../input/file";
 
 export default function CommentFormPopover({
@@ -24,7 +24,7 @@ export default function CommentFormPopover({
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const onClose = () => setIsOpen(false);
-  const showGifMenu = useShowGiphyGrid();
+  const { onOpen: showGifMenu } = useGiphyGridActions();
 
   return (
     <>

@@ -9,6 +9,10 @@ export const keys = {
   comments: ["comments"] as const,
   comment: ["comment"] as const,
   user: ["user"] as const,
+  chat: ["chat"] as const,
+  chatByRoomId: (roomId: number) => ["chat", roomId] as const,
+  messagebyRoomId: (roomId: number) => ["message", roomId] as const,
+  participantByRoomId: (roomId: number) => ["participant", roomId] as const,
   isFollowing: (userId: number) =>
     [...keys.userById(userId), "isFollow"] as const,
   meAccount: () => [...keys.me, "account"] as const,

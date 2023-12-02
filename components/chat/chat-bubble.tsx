@@ -8,10 +8,12 @@ export default function ChatBubble({
   text,
   isRecipient,
   image,
+  date,
 }: {
   image?: string;
   text: string;
   isRecipient?: boolean;
+  date: Date;
 }) {
   return (
     <div
@@ -45,7 +47,7 @@ export default function ChatBubble({
           isRecipient ? "self-start" : "self-end",
           "!text-[0.688rem]"
         )}
-        customDate={new Date(Date.now())}
+        customDate={date}
       />
     </div>
   );

@@ -26,12 +26,8 @@ import {
 import {
   useGetSelectedCommentReplyId,
   useResetReplyValue,
-  useReplyStore,
+  useGetSelectedCommentReplyUsername,
 } from "@/stores/comment-reply-store";
-import {
-  useGiphyGridIsOpen,
-  useShowGiphyGrid,
-} from "@/stores/giphy-grid-store";
 
 export default function CommentForm({
   hideSpacer,
@@ -43,7 +39,7 @@ export default function CommentForm({
   spacerClassName?: string;
 }) {
   const replyId = useGetSelectedCommentReplyId();
-  const replyUsername = useReplyStore((state) => state?.username) ?? "";
+  const replyUsername = useGetSelectedCommentReplyUsername() ?? "";
   const resetReply = useResetReplyValue();
   const { postId, commentId } = useParams();
   const { createCommentAsync } = useCreateComment();

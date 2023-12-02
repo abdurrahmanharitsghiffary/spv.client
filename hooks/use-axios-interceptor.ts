@@ -1,6 +1,6 @@
 "use client";
 import { refreshTokenRoute } from "@/lib/endpoints";
-import { useAuthSession, useSession } from "@/stores/auth-store";
+import { useSetSession, useSession } from "@/stores/auth-store";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ const instance = axios.create({ withCredentials: true });
 export default function useAxiosInterceptor() {
   const session = useSession();
   const router = useRouter();
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   useEffect(() => {
     const reqInterceptors = instance.interceptors.request.use(
       (config) => {

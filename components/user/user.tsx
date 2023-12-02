@@ -17,7 +17,7 @@ export default function User({
     return (
       <NextUser
         className="font-semibold"
-        avatarProps={{ src: user?.image?.src }}
+        avatarProps={{ src: user?.avatarImage?.src }}
         classNames={{ description: "text-muted-foreground" }}
         name={user?.username}
         description={
@@ -30,7 +30,7 @@ export default function User({
     <NextUser
       as={Link}
       href={`/users/${user?.id}`}
-      avatarProps={{ src: user?.image?.src }}
+      avatarProps={{ src: user?.avatarImage?.src }}
       className="font-semibold"
       name={user?.username}
       classNames={{ description: "text-muted-foreground" }}

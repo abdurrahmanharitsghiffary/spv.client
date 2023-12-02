@@ -7,19 +7,19 @@ import UsersTab, { UserTabLoading } from "./users-tab";
 import PostsTab, { PostTabLoading } from "./posts-tab";
 import { useGetSearchResult } from "@/lib/api/search";
 import InputSearch from "@/components/input/search";
-import { SearchAllData } from "@/types";
+import { Key, SearchAllData } from "@/types";
 
 type SearchType = "post" | "user" | "all";
 
 export default function SearchTabs() {
   const [searchInput, setSearchInput] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<React.Key>("all");
+  const [selectedTab, setSelectedTab] = useState<Key>("all");
   const { searchResult, isLoading, isSuccess } = useGetSearchResult({
     q: searchInput,
     limit: 10,
     type: selectedTab as SearchType,
   });
-  const handleChange = (key: React.Key) => {
+  const handleChange = (key: Key) => {
     setSelectedTab(key);
   };
 

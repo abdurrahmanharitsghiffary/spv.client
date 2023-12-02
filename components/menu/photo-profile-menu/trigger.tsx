@@ -1,5 +1,5 @@
 "use client";
-import { useShowPhotoProfileMenu } from "@/stores/photo-profile-store";
+import { usePhotoProfileActions } from "@/stores/photo-profile-store";
 import { Button } from "@nextui-org/button";
 import clsx from "clsx";
 import React from "react";
@@ -15,7 +15,7 @@ export default function PhotoProfileMenuTrigger({
     className
   );
 
-  const onOpen = useShowPhotoProfileMenu();
+  const { onOpen } = usePhotoProfileActions();
 
   return (
     <Button

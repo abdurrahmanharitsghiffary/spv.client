@@ -3,7 +3,7 @@ import { Avatar } from "@nextui-org/avatar";
 import clsx from "clsx";
 import Link from "next/link";
 import React from "react";
-import { UserSimplifiedV2 } from "@/types/user";
+import { UserSimplified } from "@/types/user";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import UnblockButton from "../button/unblock-button";
 
@@ -12,8 +12,9 @@ export default function BlockedUserCard({
   user,
 }: {
   className?: string;
-  user: UserSimplifiedV2 | undefined;
+  user: UserSimplified | undefined;
 }) {
+  console.log(user, "User simpl");
   const cl = clsx("w-full dark:bg-inherit", className);
   return (
     <Card className={cl}>
@@ -24,7 +25,7 @@ export default function BlockedUserCard({
             href={`/users/${user?.id}`}
           >
             <div className="w-[25%] h-fit flex justify-start items-center">
-              <Avatar name={user?.username} src={user?.image?.src} />
+              <Avatar name={user?.username} src={user?.avatarImage?.src} />
             </div>
 
             <div className="flex flex-col gap-1 truncate w-[75%]">

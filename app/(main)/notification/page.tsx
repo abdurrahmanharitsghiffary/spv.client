@@ -54,15 +54,13 @@ export default function NotificationPage() {
             "comment",
             "comment",
             "follow",
-            "like_comment",
-            "like_post",
-            "post",
-            "reply_comment",
-            "like_post",
+            "liking_comment",
+            "liking_post",
+            "replying_comment",
+            "liking_post",
             "follow",
-            "like_comment",
-            "post",
-            "reply_comment",
+            "liking_comment",
+            "replying_comment",
           ] as NotificationType[]
         ).map((notification, i) => (
           <NotificationCard

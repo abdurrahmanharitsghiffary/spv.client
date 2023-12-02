@@ -8,7 +8,7 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { CreateCommentData } from "@/types";
-import { JsendSuccess } from "@/types/response";
+import { ApiResponseT } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useParams } from "next/navigation";
@@ -118,7 +118,7 @@ export const useDeleteComment = () => {
     mutationFn: (v: { commentId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(commentById(v.commentId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -157,7 +157,7 @@ export const useUpdateComment = () => {
           { comment: v?.comment },
           v?.config
         )
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -221,22 +221,22 @@ export const useLikeComment = () => {
                   total_likes: (item?.total_likes ?? 0) + 1,
                 };
               }
-              if (item?.commentReply?.comments) {
-                return {
-                  ...item,
-                  commentReply: {
-                    ...item?.commentReply,
-                    comments: item?.commentReply?.comments?.map((it: any) => {
-                      if (it?.id === v.commentId)
-                        return {
-                          ...it,
-                          total_likes: (it?.total_likes ?? 0) + 1,
-                        };
-                      return it;
-                    }),
-                  },
-                };
-              }
+              // if (item?.commentReply?.comments) {
+              //   return {
+              //     ...item,
+              //     commentReply: {
+              //       ...item?.commentReply,
+              //       comments: item?.commentReply?.comments?.map((it: any) => {
+              //         if (it?.id === v.commentId)
+              //           return {
+              //             ...it,
+              //             total_likes: (it?.total_likes ?? 0) + 1,
+              //           };
+              //         return it;
+              //       }),
+              //     },
+              //   };
+              // }
               return item;
             }),
           };
@@ -319,25 +319,25 @@ export const useUnlikeComment = () => {
                       : (item?.total_likes ?? 0) - 1,
                 };
               }
-              if (item?.commentReply?.comments) {
-                return {
-                  ...item,
-                  commentReply: {
-                    ...item?.commentReply,
-                    comments: item?.commentReply?.comments?.map((it: any) => {
-                      if (it?.id === v.commentId)
-                        return {
-                          ...it,
-                          total_likes:
-                            (it?.total_likes ?? 0) - 1 === -1
-                              ? 0
-                              : (it?.total_likes ?? 0) - 1,
-                        };
-                      return it;
-                    }),
-                  },
-                };
-              }
+              // if (item?.commentReply?.comments) {
+              //   return {
+              //     ...item,
+              //     commentReply: {
+              //       ...item?.commentReply,
+              //       comments: item?.commentReply?.comments?.map((it: any) => {
+              //         if (it?.id === v.commentId)
+              //           return {
+              //             ...it,
+              //             total_likes:
+              //               (it?.total_likes ?? 0) - 1 === -1
+              //                 ? 0
+              //                 : (it?.total_likes ?? 0) - 1,
+              //           };
+              //         return it;
+              //       }),
+              //     },
+              //   };
+              // }
               return item;
             }),
           };

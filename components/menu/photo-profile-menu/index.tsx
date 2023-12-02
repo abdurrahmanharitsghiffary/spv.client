@@ -1,6 +1,6 @@
 "use client";
 import {
-  useHidePhotoProfileMenu,
+  usePhotoProfileActions,
   usePhotoProfileMenuIsOpen,
 } from "@/stores/photo-profile-store";
 import React, { useRef } from "react";
@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 
 export default function PhotoProfileMenu() {
   const isOpen = usePhotoProfileMenuIsOpen();
-  const onClose = useHidePhotoProfileMenu();
+  const { onClose } = usePhotoProfileActions();
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { deleteAccountImageAsync } = useDeleteMyAccountImage();
   const { createPostAsync } = useCreatePost();
@@ -51,11 +51,7 @@ export default function PhotoProfileMenu() {
                 success: "Profile picture changed successfully",
                 error: {
                   render({ data }) {
-                    return (
-                      (data as any)?.data?.message ??
-                      (data as any)?.message ??
-                      "Something went wrong!"
-                    );
+                    return (data as any)?.message ?? "Something went wrong!";
                   },
                 },
               }
@@ -103,9 +99,7 @@ export default function PhotoProfileMenu() {
                         error: {
                           render({ data }) {
                             return (
-                              (data as any)?.data?.message ??
-                              (data as any)?.message ??
-                              "Something went wrong!"
+                              (data as any)?.message ?? "Something went wrong!"
                             );
                           },
                         },

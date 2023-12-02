@@ -10,7 +10,7 @@ import {
 import { keys } from "@/lib/queryKey";
 import { OffsetPagingwithOrder } from "@/types";
 import { Comment, CommentLikeResponse } from "@/types/comment";
-import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
@@ -21,7 +21,9 @@ export const useGetCommentByPostId = (
   config?: AxiosRequestConfig
 ) => {
   const request = useAxiosInterceptor();
-  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<Comment[]>>({
+  const { data, ...rest } = useInfiniteQuery<
+    ApiPagingObjectResponse<Comment[]>
+  >({
     getNextPageParam: (res) => res?.pagination?.next,
     getPreviousPageParam: (res) => res?.pagination?.previous,
     queryKey: keys.postComments(postId),
@@ -58,7 +60,7 @@ export const useGetComment = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: comment, ...rest } = useQuery<JsendSuccess<Comment>>({
+  const { data: comment, ...rest } = useQuery<ApiResponseT<Comment>>({
     queryKey: keys.commentById(commentId),
     queryFn: () =>
       request
@@ -77,7 +79,7 @@ export const useGetCommentLikes = (
   const request = useAxiosInterceptor();
 
   const { data: commentLikes, ...rest } = useQuery<
-    JsendSuccess<CommentLikeResponse>
+    ApiResponseT<CommentLikeResponse>
   >({
     queryKey: keys.commentLikes(commentId),
     queryFn: () =>
@@ -96,7 +98,7 @@ export const useGetCommentIsLiked = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isLiked, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isLiked, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: keys.commentIsLiked(commentId ?? -1),
     queryFn: () =>
       request

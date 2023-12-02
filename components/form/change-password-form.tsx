@@ -38,7 +38,7 @@ export default function ChangePasswordForm({ token }: { token: string }) {
         {
           error: {
             render({ data }) {
-              return (data as any)?.data?.message ?? "Something went wrong";
+              return (data as any)?.message ?? "Something went wrong";
             },
           },
           pending: "Reseting password...",

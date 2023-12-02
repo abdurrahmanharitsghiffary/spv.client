@@ -10,15 +10,16 @@ type Action = {
   onClose: () => void;
 };
 
-export const useUserMenuStore = create<State & Action>((set) => ({
+export const useUserMenuStore = create<State & { actions: Action }>((set) => ({
   isOpen: false,
-  onOpen: () => set((state) => ({ ...state, isOpen: true })),
-  onClose: () => set((state) => ({ ...state, isOpen: false })),
+  actions: {
+    onOpen: () => set((state) => ({ ...state, isOpen: true })),
+    onClose: () => set((state) => ({ ...state, isOpen: false })),
+  },
 }));
 
-export const useShowUserMenu = () => useUserMenuStore((state) => state.onOpen);
-
-export const useHideUserMenu = () => useUserMenuStore((state) => state.onClose);
+export const useUserMenuActions = () =>
+  useUserMenuStore((state) => state.actions);
 
 export const useUserMenuIsOpen = () =>
   useUserMenuStore((state) => state.isOpen);

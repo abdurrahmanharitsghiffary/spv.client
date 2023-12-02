@@ -1,7 +1,7 @@
 "use client";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { useAuthSession } from "@/stores/auth-store";
-import { JsendSuccess } from "@/types/response";
+import { useSetSession } from "@/stores/auth-store";
+import { ApiResponseT } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { loginRoute, logoutRoute, signUpRoute } from "../endpoints";
@@ -12,7 +12,7 @@ import axios from "axios";
 // FORGET PASSWORD IMPLEMENT
 
 export const useLogin = () => {
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -26,7 +26,7 @@ export const useLogin = () => {
         .post(loginRoute, data, { withCredentials: true })
         .then(
           (res) =>
-            res.data as JsendSuccess<{
+            res.data as ApiResponseT<{
               access_token: string;
               token_type: string;
               expires_in: number;
@@ -50,7 +50,7 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const request = useAxiosInterceptor();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -63,7 +63,7 @@ export const useLogout = () => {
     mutationFn: () =>
       request
         .post(logoutRoute, {}, { withCredentials: true })
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err.response.data)),
     onSuccess: (data, v, ctx) => {
       setSession(null);

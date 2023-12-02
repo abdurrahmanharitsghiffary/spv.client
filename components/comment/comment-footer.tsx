@@ -4,10 +4,7 @@ import { useBreakpoints } from "@/hooks/use-media-query";
 import { CardFooter } from "@nextui-org/card";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import {
-  useSetSeletedCommentReplyId,
-  useSetSeletedCommentReplyUsername,
-} from "@/stores/comment-reply-store";
+import { useCommentReplyActions } from "@/stores/comment-reply-store";
 import { useRouter } from "next/navigation";
 
 export default function CommentFooter({
@@ -27,8 +24,8 @@ export default function CommentFooter({
 }) {
   const router = useRouter();
   const breakpoints = useBreakpoints();
-  const setReplyId = useSetSeletedCommentReplyId();
-  const setReplyUsername = useSetSeletedCommentReplyUsername();
+  const { setSelectedCommentReplyId, setSelectedCommentReplyUsername } =
+    useCommentReplyActions();
 
   const childCommentTotal = totalReply ?? 0;
 
@@ -51,8 +48,8 @@ export default function CommentFooter({
           if (level > levelLimit) return null;
           router.replace("#cm9ti2pt");
           onReplyClick(true);
-          setReplyId(commentId ?? null);
-          setReplyUsername(username ?? "");
+          setSelectedCommentReplyId(commentId ?? null);
+          setSelectedCommentReplyUsername(username ?? "");
         }}
       >
         Reply

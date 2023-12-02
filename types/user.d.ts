@@ -1,17 +1,18 @@
-import { Post } from "./post";
 import { Image } from "./profile";
 
 export interface UserAccountPublic {
   id: number;
   firstName: string;
+  isOnline: boolean;
   lastName: string;
   fullName: string | null;
   username: string;
+  isFollowed: boolean;
   profile: {
     birthDate: Date | null;
-    gender: $Enums.Gender | null;
+    gender: "male" | "female" | null;
     description: string | null;
-    image: Image;
+    avatarImage: Image;
     coverImage: Image;
   } | null;
   followedBy: {
@@ -37,49 +38,38 @@ export interface UserAccount extends UserAccountPublic {
   role: "admin" | "user";
 }
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  hashedPassword: string;
-  profile: Profile;
-  createdAt: Date;
-  updatedAt: Date;
-  followedBy: User[];
-  following: User[];
-  posts: Post[];
-}
-
 export interface UserSimplified {
   id: number;
   firstName: string;
-  lastName: string;
+  isOnline: boolean;
   fullName: string | null;
+  lastName: string;
   username: string;
-  image: Image;
-}
-
-export interface UserSimplifiedV2 extends UserSimplified {
-  image: Image;
+  avatarImage: Image;
 }
 
 export interface UserNotification {
   title: string;
   content: string;
-  type: $Enums.NotificationType;
+  type:
+    | "liking_post"
+    | "liking_comment"
+    | "comment"
+    | "follow"
+    | "replying_comment";
   url: string | null;
   createdAt: Date;
 }
 
 export interface UserFollowerResponse {
   userId: number;
-  followers: UserSimplifiedV2[];
+  followers: UserSimplified[];
   total: number;
 }
 
 export interface UserFollowingResponse {
   userId: number;
-  followedUsers: UserSimplifiedV2[];
+  followedUsers: UserSimplified[];
   total: number;
 }
 
@@ -90,3 +80,9 @@ export interface UserLike {
   id: number;
   username: string;
 }
+
+export interface UserSimplifiedWF extends UserSimplified {
+  isFollowed: boolean;
+}
+
+export type SearchFilter = "followed" | "not_followed";

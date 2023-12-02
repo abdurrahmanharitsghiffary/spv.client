@@ -61,7 +61,7 @@ export default function UserPage({ params }: { params: { userId: string } }) {
             />
             <ProfileImage
               isNotOwned
-              src={userData?.data?.profile?.image?.src ?? ""}
+              src={userData?.data?.profile?.avatarImage?.src ?? ""}
             />
             <div className="flex flex-col justify-start items-center w-full px-4">
               <TypographyH3 className="text-center">

@@ -3,7 +3,7 @@
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { SearchAllData, SearchOptions } from "@/types";
 import { PostExtended } from "@/types/post";
-import { JsendWithPaging } from "@/types/response";
+import { ApiPagingObjectResponse } from "@/types/response";
 import { UserAccountPublic } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
@@ -17,7 +17,9 @@ export const useGetSearchResult = (
   const request = useAxiosInterceptor();
 
   const { data: searchResult, ...rest } = useQuery<
-    JsendWithPaging<UserAccountPublic[] | PostExtended[] | SearchAllData>
+    ApiPagingObjectResponse<
+      UserAccountPublic[] | PostExtended[] | SearchAllData
+    >
   >({
     queryKey: keys.search(options),
     queryFn: () =>

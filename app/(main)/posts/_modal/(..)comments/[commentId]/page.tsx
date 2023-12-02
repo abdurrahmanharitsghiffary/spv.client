@@ -25,7 +25,7 @@ export default function CommentModal() {
       <SingleComment comment={comment?.data ?? null} />
       <Divider />
       <div className="flex flex-col justify-center items-start p-4 pb-0">
-        {comment?.data?.commentReply?.commentIds?.map((id) => (
+        {comment?.data?.replies?.ids?.map((id) => (
           <CommentReply commentId={id} key={id} level={0} />
         ))}
       </div>

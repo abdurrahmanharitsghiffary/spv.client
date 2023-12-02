@@ -13,35 +13,30 @@ type Action = {
   setSelectedCommentReplyId: (id: number | null) => void;
 };
 
-export const useReplyStore = create<State & Action>((set) => ({
+export const useReplyStore = create<State & { actions: Action }>((set) => ({
   id: null,
-  setSelectedCommentReplyId: (id) => set((state) => ({ ...state, id })),
-  setSelectedCommentReplyUsername: (username) =>
-    set((state) => ({ ...state, username })),
+  actions: {
+    setSelectedCommentReplyId: (id) => set((state) => ({ ...state, id })),
+    setSelectedCommentReplyUsername: (username) =>
+      set((state) => ({ ...state, username })),
+  },
 }));
 
 export const useGetSelectedCommentReplyId = () =>
   useReplyStore((state) => state.id);
-export const useSetSeletedCommentReplyId = () => {
-  const setReplyId = useReplyStore((state) => state.setSelectedCommentReplyId);
 
-  return useCallback((id: number | null) => setReplyId(id), []);
-};
+export const useGetSelectedCommentReplyUsername = () =>
+  useReplyStore((state) => state.username);
 
-export const useSetSeletedCommentReplyUsername = () => {
-  const setReplyUsername = useReplyStore(
-    (state) => state.setSelectedCommentReplyUsername
-  );
-
-  return useCallback((username?: string) => setReplyUsername(username), []);
-};
+export const useCommentReplyActions = () =>
+  useReplyStore((state) => state.actions);
 
 export const useResetReplyValue = () => {
-  const sId = useSetSeletedCommentReplyId();
-  const sUsername = useSetSeletedCommentReplyUsername();
+  const { setSelectedCommentReplyId, setSelectedCommentReplyUsername } =
+    useCommentReplyActions();
 
   return useCallback(() => {
-    sId(null);
-    sUsername(undefined);
+    setSelectedCommentReplyId(null);
+    setSelectedCommentReplyUsername(undefined);
   }, []);
 };

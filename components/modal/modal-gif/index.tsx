@@ -17,10 +17,10 @@ import {
   useHideModalGif,
   useModalGifIsOpen,
 } from "@/stores/modal-gif-store";
-import { useHideGiphyGrid } from "@/stores/giphy-grid-store";
+import { useGiphyGridActions } from "@/stores/giphy-grid-store";
 
 function ModalGif() {
-  const hideGiphyGrid = useHideGiphyGrid();
+  const { onClose: hideGiphyGrid } = useGiphyGridActions();
   const isOpen = useModalGifIsOpen();
   const onClose = useHideModalGif();
   const gif = useGetGif();

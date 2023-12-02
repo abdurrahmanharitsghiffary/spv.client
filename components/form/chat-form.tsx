@@ -11,8 +11,12 @@ import clsx from "clsx";
 import Recorder from "../recorder";
 import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
 import FileButton from "../input/file-btn";
+import { useCreateMessage } from "@/lib/api/chats/mutation";
+import { useParams } from "next/navigation";
 
 export default function ChatForm() {
+  const { createMessage, createMessageAsync } = useCreateMessage();
+  const { chatId } = useParams();
   const {
     formState: { errors, isSubmitSuccessful },
     control,
@@ -27,11 +31,22 @@ export default function ChatForm() {
   });
 
   useEffect(() => {
-    if (isSubmitSuccessful) reset();
+    if (isSubmitSuccessful) {
+      reset();
+    }
   }, [isSubmitSuccessful]);
 
   const isSSR = useIsSSR();
-  const onSubmit: SubmitHandler<CreateChatSchema> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<CreateChatSchema> = async (data) => {
+    await createMessageAsync({
+      formData: true,
+      body: {
+        chatRoomId: Number(chatId),
+        message: data.chat ?? "",
+        image: data.image,
+      },
+    });
+  };
   const image = watch("image");
   console.log(watch("image"));
   const handleImageReset = useCallback(() => {

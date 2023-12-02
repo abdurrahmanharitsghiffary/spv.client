@@ -14,7 +14,7 @@ import {
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
 import { PostExtended, PostLikeResponse } from "@/types/post";
-import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
@@ -26,7 +26,9 @@ export const useGetPosts = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+  const { data: posts, ...rest } = useQuery<
+    ApiPagingObjectResponse<PostExtended[]>
+  >({
     queryKey: [...keys.posts, options],
     queryFn: () =>
       request
@@ -41,7 +43,7 @@ export const useGetPosts = (
 export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: post, ...rest } = useQuery<JsendSuccess<PostExtended>>({
+  const { data: post, ...rest } = useQuery<ApiResponseT<PostExtended>>({
     queryKey: keys.postById(postId),
     queryFn: () =>
       request
@@ -68,7 +70,7 @@ export const useGetPostByUserId = (
 
   // const request = useAxiosInterceptor();
 
-  // const { data, ...rest } = useInfiniteQuery<JsendWithPaging<PostExtended[]>>({
+  // const { data, ...rest } = useInfiniteQuery<ApiPagingObjectResponse<PostExtended[]>>({
   //   queryKey: [...keys.posts, userId, query, "users"],
   //   queryFn: ({ pageParam }) =>
   //     pageParam === null
@@ -100,7 +102,7 @@ export const useGetPostFromFollowedUsers = (
   const request = useAxiosInterceptor();
 
   const { data: followedUsersPost, ...rest } = useQuery<
-    JsendWithPaging<PostExtended[]>
+    ApiPagingObjectResponse<PostExtended[]>
   >({
     queryKey: [...keys.posts, options],
     queryFn: () =>
@@ -119,7 +121,7 @@ export const useGetPostLikeByPostId = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: postLikes, ...rest } = useQuery<JsendSuccess<PostLikeResponse>>(
+  const { data: postLikes, ...rest } = useQuery<ApiResponseT<PostLikeResponse>>(
     {
       queryKey: keys.postLikes(postId),
       queryFn: () =>
@@ -139,7 +141,7 @@ export const useGetPostIsLiked = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isLiked, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isLiked, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: [...keys.posts, "likes", postId],
     queryFn: () =>
       request
@@ -161,7 +163,7 @@ export const useGetMySavedPosts = (
   const request = useAxiosInterceptor();
 
   const { data, ...rest } = useInfiniteQuery<
-    JsendWithPaging<(PostExtended & { assignedAt: Date })[]>
+    ApiPagingObjectResponse<(PostExtended & { assignedAt: Date })[]>
   >({
     queryKey: [...keys.posts, "saved", query],
     queryFn: ({ pageParam }) =>
@@ -194,7 +196,7 @@ export const useGetPostIsSaved = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isSaved, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isSaved, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: [...keys.posts, "saved", postId],
     queryFn: () =>
       request

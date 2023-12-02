@@ -1,6 +1,6 @@
 import { getUrl } from "./getUrl";
 
-export const base = "http://localhost:5000";
+export const base = process.env.BASE_API_ROUTE ?? "http://localhost:5000";
 
 export const urlBase = (path: string) => getUrl({ base, path: "/api" + path });
 export const constructUrl = (urls: string[]) => urls.join("/");
@@ -138,7 +138,6 @@ export const chatsByRecipientId = (
     constructUrl([baseChatRoutes, "users", recipientId]),
     entries(query)
   );
-
 // Search routes
 export const searchRoute = (query?: {
   limit?: number;
@@ -149,3 +148,5 @@ export const searchRoute = (query?: {
 
 // Refresh token route
 export const refreshTokenRoute = urlBase("/refresh");
+
+export const baseMessageRoutes = urlBase("/messages");

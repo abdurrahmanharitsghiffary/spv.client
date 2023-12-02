@@ -1,6 +1,7 @@
 import BottomBar from "@/components/bottombar";
 import Giphy from "@/components/giphy";
 import Layout from "@/components/layout/layout";
+import ChatMenu from "@/components/menu/chat-menu";
 import CommentMenu from "@/components/menu/comment-menu";
 import PostMenu from "@/components/menu/post-menu";
 import UserMenu from "@/components/menu/user-menu";
@@ -26,6 +27,7 @@ export default function MainLayout({
       <ModalGif />
       <UserMenu />
       <CommentMenu />
+      <ChatMenu />
       <BottomBar />
       <PostMenu />
       <EditPostModal />

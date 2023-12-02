@@ -2,7 +2,7 @@
 import { clsx } from "clsx";
 import React from "react";
 import { FiMoreVertical } from "react-icons/fi";
-import { useShowProfileMenu } from "../../../stores/profile-menu-store";
+import { useProfileMenuActions } from "@/stores/profile-menu-store";
 import IconButton from "@/components/button/icon-button";
 
 export default function ProfileMenuTrigger({
@@ -10,7 +10,7 @@ export default function ProfileMenuTrigger({
 }: {
   className?: string;
 }) {
-  const onOpen = useShowProfileMenu();
+  const { onOpen } = useProfileMenuActions();
   const cl = clsx("", className);
   return (
     <IconButton onClick={onOpen} className={cl}>

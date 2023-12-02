@@ -7,7 +7,7 @@ export function useNotFoundRedirect(
   customCondition?: boolean
 ) {
   const router = useRouter();
-  const errorMessage = (error as any)?.data?.message ?? "";
+  const errorMessage = (error as any)?.message ?? "";
 
   useEffect(() => {
     if (

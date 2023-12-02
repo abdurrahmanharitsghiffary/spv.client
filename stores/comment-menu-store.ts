@@ -15,21 +15,25 @@ type Action = {
   onClose: () => void;
 };
 
-export const useCommentMenuStore = create<State & Action>((set) => ({
-  isOpen: false,
-  onOpen: () => set((state) => ({ ...state, isOpen: true })),
-  onClose: () => set((state) => ({ ...state, isOpen: false })),
-  comment: null,
-  setComment: (comment) =>
-    set((state) => ({
-      ...state,
-      comment: comment === null ? null : { ...state.comment, ...comment },
-    })),
-}));
+export const useCommentMenuStore = create<State & { actions: Action }>(
+  (set) => ({
+    isOpen: false,
+    comment: null,
+    actions: {
+      onOpen: () => set((state) => ({ ...state, isOpen: true })),
+      onClose: () => set((state) => ({ ...state, isOpen: false })),
+
+      setComment: (comment) =>
+        set((state) => ({
+          ...state,
+          comment: comment === null ? null : { ...state.comment, ...comment },
+        })),
+    },
+  })
+);
 
 export const useShowCommentMenu = () => {
-  const open = useCommentMenuStore((state) => state.onOpen);
-  const setComment = useSetSelectedComment();
+  const { setComment, onOpen: open } = useCommentActions();
 
   return useCallback((comment: CommentId | null) => {
     setComment(comment);
@@ -38,8 +42,7 @@ export const useShowCommentMenu = () => {
 };
 
 export const useHideCommentMenu = () => {
-  const close = useCommentMenuStore((state) => state.onClose);
-  const setComment = useSetSelectedComment();
+  const { setComment, onClose: close } = useCommentActions();
 
   return useCallback(() => {
     setComment(null);
@@ -53,5 +56,5 @@ export const useCommentMenuIsOpen = () =>
 export const useGetSelectedComment = () =>
   useCommentMenuStore((state) => state.comment);
 
-export const useSetSelectedComment = () =>
-  useCommentMenuStore((state) => state.setComment);
+export const useCommentActions = () =>
+  useCommentMenuStore((state) => state.actions);

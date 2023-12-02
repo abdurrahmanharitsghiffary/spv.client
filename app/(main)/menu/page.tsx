@@ -24,7 +24,7 @@ import { IoLanguage } from "react-icons/io5";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { toast } from "react-toastify";
 import { urlBase } from "@/lib/endpoints";
-import { useAuthSession } from "@/stores/auth-store";
+import { useSetSession } from "@/stores/auth-store";
 
 type ListboxItem = {
   label: string;
@@ -42,7 +42,7 @@ type ListboxWithSectionItem = {
 export default function MenuPage() {
   const { myAccountInfo, isLoading, isSuccess } = useGetMyAccountInfo();
   const onOpen = useShowChangePasswordModal();
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const { setTheme, theme } = useTheme();
   const router = useRouter();
   const request = useAxiosInterceptor();
@@ -99,9 +99,7 @@ export default function MenuPage() {
               {
                 error: {
                   render({ data }) {
-                    return (
-                      (data as any)?.data?.message ?? "Something went wrong!"
-                    );
+                    return (data as any)?.message ?? "Something went wrong!";
                   },
                 },
                 pending: "Submitting...",
@@ -227,7 +225,7 @@ export default function MenuPage() {
         <div className="w-fit">
           <Avatar
             className="dark:group-hover:bg-default-300 dark:transition-all"
-            src={myAccountInfo?.data?.profile?.image?.src ?? ""}
+            src={myAccountInfo?.data?.profile?.avatarImage?.src ?? ""}
             name={myAccountInfo?.data?.username}
           />
         </div>

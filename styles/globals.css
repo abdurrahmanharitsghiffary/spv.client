@@ -10,6 +10,10 @@
   display: none; /* Safari and Chrome */
 }
 
+input[class*="!bg-transparent"] {
+  background-color: inherit !important;
+}
+
 @keyframes fadeIn {
   0% {
     transform: scale(0);

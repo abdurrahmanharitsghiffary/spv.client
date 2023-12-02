@@ -13,12 +13,12 @@ export default function UserCardSquare({
   className?: string;
   user: UserAccountPublic;
 }) {
-  const cl = clsx("w-[130px] h-auto p-2", className);
+  const cl = clsx("w-[130px] bg-transparent h-auto p-2", className);
   return (
     <Card className={cl} shadow="none" radius="md">
-      <CardBody className="flex flex-col gap-2 p-0 w-full items-start">
+      <CardBody className="flex flex-col gap-2 p-0 w-full items-center">
         <Avatar
-          src={user.profile?.image?.src}
+          src={user.profile?.avatarImage?.src}
           alt={user?.username}
           className="rounded-medium w-full h-auto aspect-square"
         />

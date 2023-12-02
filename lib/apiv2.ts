@@ -38,11 +38,11 @@ import {
   postIsLiked,
 } from "./endpoints";
 import { useRouter } from "next/navigation";
-import { useAuthSession } from "@/stores/auth-store";
+import { useSetSession } from "@/stores/auth-store";
 import axios, { AxiosRequestConfig } from "axios";
 import { keys } from "./queryKey";
 import { getFormData } from "./getFormData";
-import { JsendSuccess, JsendWithPaging } from "@/types/response";
+import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import {
   UserAccount,
   UserAccountPublic,
@@ -124,7 +124,7 @@ type OffsetPagingwithOrder =
 
 export const useGetMyInfo = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
-  const { data: myInfo, ...rest } = useQuery<JsendSuccess<UserAccount>>({
+  const { data: myInfo, ...rest } = useQuery<ApiResponseT<UserAccount>>({
     queryFn: () =>
       request
         .get(myAccountEp, config)
@@ -137,7 +137,7 @@ export const useGetMyInfo = (config?: AxiosRequestConfig) => {
 };
 
 export const useLogin = () => {
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const request = useAxiosInterceptor();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -148,7 +148,7 @@ export const useLogin = () => {
         .post(loginRoute, data)
         .then(
           (res) =>
-            res.data as JsendSuccess<{
+            res.data as ApiResponseT<{
               access_token: string;
               token_type: string;
               expires_in: number;
@@ -174,7 +174,7 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const request = useAxiosInterceptor();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -183,7 +183,7 @@ export const useLogout = () => {
     mutationFn: () =>
       request
         .post(logoutRoute)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err.response.data)),
     onSuccess: (data, v, ctx) => {
       setSession(null);
@@ -244,7 +244,7 @@ export const useUpdateUser = () => {
     }) =>
       request
         .patch(userById(v.userId.toString()), v?.data, v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (d, v) => {
       queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
@@ -266,7 +266,7 @@ export const useDeleteUser = () => {
     mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
       request
         .delete(userById(v.userId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (d, v) => {
       queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
@@ -284,7 +284,7 @@ export const useGetUserFollowers = (
     data: userFollowersData,
     error,
     ...rest
-  } = useQuery<JsendSuccess<UserFollowerResponse>>({
+  } = useQuery<ApiResponseT<UserFollowerResponse>>({
     queryKey: keys.userFollowers(userId),
     queryFn: () =>
       axios
@@ -302,7 +302,7 @@ export const useGetUserIsFollowed = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isFollowed, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isFollowed, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: keys.isFollowing(userId),
     queryFn: () =>
       request
@@ -319,7 +319,7 @@ export const useGetUserFollowedUsers = (
   config?: AxiosRequestConfig
 ) => {
   const { data: userFollowedUsersData, ...rest } = useQuery<
-    JsendSuccess<UserFollowingResponse>
+    ApiResponseT<UserFollowingResponse>
   >({
     queryKey: keys.userFollowedUsers(userId),
     queryFn: () =>
@@ -338,7 +338,9 @@ export const useGetPosts = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+  const { data: posts, ...rest } = useQuery<
+    ApiPagingObjectResponse<PostExtended[]>
+  >({
     queryKey: keys.posts,
     queryFn: () =>
       request
@@ -355,7 +357,9 @@ export const useGetPostByUserId = (
   query?: { limit?: number; offset?: number },
   config?: AxiosRequestConfig
 ) => {
-  const { data: posts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+  const { data: posts, ...rest } = useQuery<
+    ApiPagingObjectResponse<PostExtended[]>
+  >({
     queryKey: [...keys.posts, userId, query, "users"],
     queryFn: () =>
       axios
@@ -370,7 +374,7 @@ export const useGetPostByUserId = (
 export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: post, ...rest } = useQuery<JsendSuccess<PostExtended>>({
+  const { data: post, ...rest } = useQuery<ApiResponseT<PostExtended>>({
     queryKey: keys.postById(postId),
     queryFn: () =>
       request
@@ -389,7 +393,7 @@ export const useGetPostFromFollowedUsers = (
   const request = useAxiosInterceptor();
 
   const { data: followedUsersPost, ...rest } = useQuery<
-    JsendWithPaging<PostExtended[]>
+    ApiPagingObjectResponse<PostExtended[]>
   >({
     queryKey: keys.posts,
     queryFn: () =>
@@ -407,7 +411,9 @@ export const useGetCommentByPostId = (
   options?: OffsetPagingwithOrder,
   config?: AxiosRequestConfig
 ) => {
-  const { data, ...rest } = useInfiniteQuery<JsendWithPaging<Comment[]>>({
+  const { data, ...rest } = useInfiniteQuery<
+    ApiPagingObjectResponse<Comment[]>
+  >({
     getNextPageParam: (res) => res?.pagination?.next,
     getPreviousPageParam: (res) => res?.pagination?.previous,
     queryKey: keys.postComments(postId),
@@ -442,7 +448,7 @@ export const useGetPostLikeByPostId = (
   postId: number,
   config?: AxiosRequestConfig
 ) => {
-  const { data: postLikes, ...rest } = useQuery<JsendSuccess<PostLikeResponse>>(
+  const { data: postLikes, ...rest } = useQuery<ApiResponseT<PostLikeResponse>>(
     {
       queryKey: keys.postLikes(postId),
       queryFn: () =>
@@ -502,7 +508,7 @@ export const useUpdatePost = () => {
       const formData = getFormData(v.data);
       return request
         .patch(postById(v.postId.toString()), formData, v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -525,7 +531,7 @@ export const useDeletePost = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(postById(v.postId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -673,7 +679,7 @@ export const useDeletepostImages = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(postImagesByPostId(v.postId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -703,7 +709,7 @@ export const useDeletePostImage = () => {
           postImageByPostAndImageId(v.postId.toString(), v.imageId.toString()),
           v?.config
         )
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -789,7 +795,7 @@ export const useGetComment = (
   commentId: number,
   config?: AxiosRequestConfig
 ) => {
-  const { data: comment, ...rest } = useQuery<JsendSuccess<Comment>>({
+  const { data: comment, ...rest } = useQuery<ApiResponseT<Comment>>({
     queryKey: keys.commentById(commentId),
     queryFn: () =>
       axios
@@ -806,7 +812,7 @@ export const useGetCommentLikes = (
   config?: AxiosRequestConfig
 ) => {
   const { data: commentLikes, ...rest } = useQuery<
-    JsendSuccess<CommentLikeResponse>
+    ApiResponseT<CommentLikeResponse>
   >({
     queryKey: keys.commentById(commentId),
     queryFn: () =>
@@ -831,7 +837,7 @@ export const useDeleteComment = () => {
     mutationFn: (v: { commentId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(commentById(v.commentId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -1012,7 +1018,7 @@ export const useUpdateComment = () => {
           { comment: v?.comment },
           v?.config
         )
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -1028,7 +1034,7 @@ export const useUpdateComment = () => {
 export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: myAccountInfo, ...rest } = useQuery<JsendSuccess<UserAccount>>({
+  const { data: myAccountInfo, ...rest } = useQuery<ApiResponseT<UserAccount>>({
     queryKey: keys.meAccount(),
     queryFn: () =>
       request
@@ -1046,7 +1052,7 @@ export const useGetMyChats = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: myChats, ...rest } = useQuery<JsendWithPaging<Chat[]>>({
+  const { data: myChats, ...rest } = useQuery<ApiPagingObjectResponse<Chat[]>>({
     queryKey: keys.meChats(),
     queryFn: () =>
       request
@@ -1064,7 +1070,9 @@ export const useGetMyPosts = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: myPosts, ...rest } = useQuery<JsendWithPaging<PostExtended[]>>({
+  const { data: myPosts, ...rest } = useQuery<
+    ApiPagingObjectResponse<PostExtended[]>
+  >({
     queryKey: keys.mePosts(),
     queryFn: () =>
       request
@@ -1080,7 +1088,7 @@ export const useGetMyFollowers = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
   const { data: myFollowers, ...rest } = useQuery<
-    JsendSuccess<{ followerIds: number[]; total: number }>
+    ApiResponseT<{ followerIds: number[]; total: number }>
   >({
     queryKey: keys.meFollowers(),
     queryFn: () =>
@@ -1097,7 +1105,7 @@ export const useGetMyFollowedUsers = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
   const { data: myFollowedUsers, ...rest } = useQuery<
-    JsendSuccess<{ followedUserIds: number[]; total: number }>
+    ApiResponseT<{ followedUserIds: number[]; total: number }>
   >({
     queryKey: keys.meFollowing(),
     queryFn: () =>
@@ -1427,7 +1435,7 @@ export const useGetSearchResult = (
   const request = useAxiosInterceptor();
 
   const { data: searchResult, ...rest } = useQuery<
-    JsendWithPaging<UserAccountPublic[] | PostExtended[]>
+    ApiPagingObjectResponse<UserAccountPublic[] | PostExtended[]>
   >({
     queryKey: keys.search(options),
     queryFn: () =>
@@ -1506,7 +1514,7 @@ export const useGetPostIsLiked = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: isLiked, ...rest } = useQuery<JsendSuccess<boolean>>({
+  const { data: isLiked, ...rest } = useQuery<ApiResponseT<boolean>>({
     queryKey: [...keys.posts, "likes", postId],
     queryFn: () =>
       request

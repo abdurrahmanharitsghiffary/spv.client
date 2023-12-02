@@ -7,13 +7,13 @@ import { toast } from "react-toastify";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
 import { useRouter } from "next/navigation";
-import { useAuthSession } from "@/stores/auth-store";
+import { useSetSession } from "@/stores/auth-store";
 import InputPassword from "@/components/form/input/password";
 import { Button } from "@nextui-org/button";
 // FIX VALIDATE ERRORS
 function DeleteAccountModal() {
   const request = useAxiosInterceptor();
-  const { setSession } = useAuthSession();
+  const setSession = useSetSession();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [password, setPassword] = useState<string>("");
@@ -57,7 +57,7 @@ function DeleteAccountModal() {
         {
           error: {
             render({ data }) {
-              return (data as any)?.data?.message ?? "Something went wrong!";
+              return (data as any)?.message ?? "Something went wrong!";
             },
           },
           pending: "Submitting...",

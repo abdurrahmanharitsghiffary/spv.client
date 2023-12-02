@@ -13,7 +13,7 @@ import {
 import { getFormData } from "@/lib/getFormData";
 import { keys } from "@/lib/queryKey";
 import { CreatePostData, UpdatePostDataOptions } from "@/types";
-import { JsendSuccess } from "@/types/response";
+import { ApiResponseT } from "@/types/response";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useOptimistic } from "../hooks";
@@ -146,7 +146,7 @@ export const useUpdatePost = () => {
   //         ...v?.config,
   //         headers: { "Content-Type": "multipart/form-data" },
   //       })
-  //       .then((res) => res.data as JsendSuccess<null>)
+  //       .then((res) => res.data as ApiResponseT<null>)
   //       .catch((err) => Promise.reject(err?.response?.data));
   //   },
   //   onMutate: async (v) => {
@@ -263,7 +263,7 @@ export const useDeletePost = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(postById(v.postId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: () => {
@@ -515,7 +515,7 @@ export const useDeletepostImages = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(postImagesByPostId(v.postId.toString()), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -545,7 +545,7 @@ export const useDeletePostImage = () => {
           postImageByPostAndImageId(v.postId.toString(), v.imageId.toString()),
           v?.config
         )
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -568,7 +568,7 @@ export const useSavePost = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .post(mySavedPostsRoute(), { postId: v.postId }, v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
@@ -614,7 +614,7 @@ export const useDeleteSavedPost = () => {
     mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
       return request
         .delete(mySavedPost(v.postId), v?.config)
-        .then((res) => res.data as JsendSuccess<null>)
+        .then((res) => res.data as ApiResponseT<null>)
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {

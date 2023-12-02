@@ -10,17 +10,16 @@ type Action = {
   onClose: () => void;
 };
 
-const usePhotoProfile = create<State & Action>((set) => ({
+const usePhotoProfile = create<State & { actions: Action }>((set) => ({
   isOpen: false,
-  onOpen: () => set((state) => ({ ...state, isOpen: true })),
-  onClose: () => set((state) => ({ ...state, isOpen: false })),
+  actions: {
+    onOpen: () => set((state) => ({ ...state, isOpen: true })),
+    onClose: () => set((state) => ({ ...state, isOpen: false })),
+  },
 }));
 
-export const useShowPhotoProfileMenu = () =>
-  usePhotoProfile((state) => state.onOpen);
-
-export const useHidePhotoProfileMenu = () =>
-  usePhotoProfile((state) => state.onClose);
+export const usePhotoProfileActions = () =>
+  usePhotoProfile((state) => state.actions);
 
 export const usePhotoProfileMenuIsOpen = () =>
   usePhotoProfile((state) => state.isOpen);

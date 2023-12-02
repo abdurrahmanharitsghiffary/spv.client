@@ -11,7 +11,7 @@ import { useCreatePost } from "@/lib/api/posts/mutation";
 import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
 import {
-  useHideProfileMenu,
+  useProfileMenuActions,
   useProfileMenuIsOpen,
 } from "@/stores/profile-menu-store";
 import { useLogout } from "@/lib/api/auth";
@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 
 export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
-  const onClose = useHideProfileMenu();
+  const { onClose } = useProfileMenuActions();
   const { logoutAsync } = useLogout();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { deleteCoverImageAsync } = useDeleteMyCoverImage();
@@ -103,9 +103,7 @@ export default function ProfileMenu() {
                         error: {
                           render({ data }) {
                             return (
-                              (data as any)?.data?.message ??
-                              (data as any)?.message ??
-                              "Something went wrong!"
+                              (data as any)?.message ?? "Something went wrong!"
                             );
                           },
                         },

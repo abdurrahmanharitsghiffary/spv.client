@@ -1,29 +1,66 @@
 "use client";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { JsendWithPaging } from "@/types/response";
+import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
 import {
   QueryKey,
   SetDataOptions,
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { AxiosRequestConfig, Method } from "axios";
+import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
 import { getFormData } from "../getFormData";
 
 type MutationMethod = "post" | "patch" | "delete" | "put";
+
+export const useQ = <T>({
+  query,
+  queryKey,
+  url,
+  config,
+}: {
+  queryKey?: QueryKey | undefined;
+  query?: Record<string, any>;
+  url: string;
+  config?: AxiosRequestConfig;
+}) => {
+  const request = useAxiosInterceptor();
+  let newUrl = new URL(url);
+
+  if (query) {
+    for (let [key, value] of Object.entries(query ?? {})) {
+      newUrl.searchParams.set(key, value);
+    }
+  }
+
+  const q = useQuery<ApiResponseT<T>>({
+    queryKey: queryKey,
+    queryFn: () =>
+      request
+        .get(newUrl.href, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+  });
+
+  return q;
+};
 
 export const useInfinite = <T>({
   queryKey,
   query,
   url,
   config,
+  queryConfig,
 }: {
   queryKey?: QueryKey | undefined;
   query: Record<string, any>;
   url: string;
   config?: AxiosRequestConfig;
+  queryConfig?: {
+    refetchOnWindowFocus?: boolean;
+  };
 }) => {
   const request = useAxiosInterceptor();
 
@@ -37,17 +74,18 @@ export const useInfinite = <T>({
     data: infiniteData,
     isSuccess,
     ...rest
-  } = useInfiniteQuery<JsendWithPaging<T[]>>({
+  } = useInfiniteQuery<ApiPagingObjectResponse<T[]>>({
     queryKey: queryKey,
     queryFn: ({ pageParam }) =>
       pageParam === null
         ? Promise.resolve(undefined)
         : request
-            .get(pageParam ? pageParam : url, config)
+            .get(pageParam ? pageParam : reqUrl.href, config)
             .then((res) => res.data)
             .catch((err) => Promise.reject(err?.response?.infiniteData)),
     getNextPageParam: (res) => res?.pagination?.next ?? null,
     getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+    ...queryConfig,
   });
 
   const isFetchNextNotAvailable =
@@ -67,14 +105,19 @@ export const useInfinite = <T>({
   return { data, infiniteData, isSuccess, isFetchNextNotAvailable, ...rest };
 };
 
-export const useMutate = <T>({
+export const useMutate = <T, P = {}>({
   method,
-  invalidateTags = [],
+  invalidateTags,
   baseUrl,
 }: {
   method: MutationMethod;
   baseUrl: string;
-  invalidateTags?: QueryKey[];
+  invalidateTags?: (v: {
+    body?: T | undefined;
+    formData?: boolean | undefined;
+    params?: Record<string, string | number> | undefined;
+    config?: AxiosRequestConfig<any> | undefined;
+  }) => QueryKey[];
 }) => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
@@ -83,7 +126,7 @@ export const useMutate = <T>({
     mutationFn: (v: {
       body?: T;
       formData?: boolean;
-      params?: Record<string, string | number>;
+      params?: Record<string, string | number> & P;
       config?: AxiosRequestConfig;
     }) => {
       let newUrl = baseUrl;
@@ -91,6 +134,11 @@ export const useMutate = <T>({
       const formData = v?.formData
         ? getFormData((body as Record<string, string>) ?? {})
         : null;
+
+      for (let [key, value] of Object.entries(v?.params ?? {})) {
+        console.log(key, value, " k v");
+        newUrl = newUrl.replaceAll(`:${key}`, value.toString());
+      }
 
       for (let [key, value] of Object.entries(v?.params ?? {})) {
         newUrl = newUrl.replaceAll(`:${key}`, value.toString());
@@ -120,8 +168,8 @@ export const useMutate = <T>({
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
-      if (invalidateTags?.length > 0) {
-        invalidateTags?.forEach((tag) => {
+      if (invalidateTags && invalidateTags(v)?.length > 0) {
+        invalidateTags(v)?.forEach((tag) => {
           queryClient.invalidateQueries({ queryKey: tag });
         });
       }

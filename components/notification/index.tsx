@@ -12,16 +12,16 @@ const getContent = (type: NotificationType) => {
     case "follow": {
       return { user: "Joki", content: "started following you" };
     }
-    case "like_post": {
+    case "liking_post": {
       return { user: "Jeki", content: "liked your recent post" };
     }
-    case "like_comment": {
+    case "liking_comment": {
       return { user: "Koki", content: "liked your comment" };
     }
-    case "post": {
-      return { user: "Bokir", content: "created a new post" };
-    }
-    case "reply_comment": {
+    // case "post": {
+    //   return { user: "Bokir", content: "created a new post" };
+    // }
+    case "replying_comment": {
       return { user: "Juki", content: "replied your comment on a post..." };
     }
     default: {

@@ -1,7 +1,7 @@
 import UsersGridLayout from "@/components/layout/users-grid-layout";
 import UserCard from "@/components/user/user-card";
 import UserCardSkeleton from "@/components/user/user-card-skeleton";
-import { UserAccountPublic, UserSimplifiedV2 } from "@/types/user";
+import { UserAccountPublic, UserSimplified } from "@/types/user";
 import React from "react";
 
 export function UserTabLoading() {
@@ -16,13 +16,14 @@ export function UserTabLoading() {
 
 export default function UsersTab({ users }: { users: UserAccountPublic[] }) {
   // USE MEMO ??
-  const usersData: UserSimplifiedV2[] =
+  const usersData: UserSimplified[] =
     users?.map((user) => ({
+      isOnline: user?.isOnline,
       firstName: user?.firstName,
       id: user?.id,
       fullName: user?.fullName,
       lastName: user?.lastName,
-      image: user?.profile?.image,
+      avatarImage: user?.profile?.avatarImage,
       username: user?.username,
     })) ?? [];
 

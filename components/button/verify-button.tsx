@@ -24,7 +24,7 @@ export default function VerifyButton({ token }: { token: string }) {
           },
           error: {
             render({ data }) {
-              return (data as any)?.data?.message ?? "Something went wrong";
+              return (data as any)?.message ?? "Something went wrong";
             },
           },
           pending: "Verifying account...",

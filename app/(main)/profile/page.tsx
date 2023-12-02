@@ -55,7 +55,7 @@ export default function ProfilePage() {
               className="mb-20 pt-2"
             />
             <ProfileImage
-              src={myAccountInfo?.data?.profile?.image?.src ?? ""}
+              src={myAccountInfo?.data?.profile?.avatarImage?.src ?? ""}
             />
             <div className="flex flex-col justify-start items-center w-full px-4">
               <TypographyH3 className="text-center">

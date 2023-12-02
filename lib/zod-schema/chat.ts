@@ -1,16 +1,18 @@
 import { z } from "zod";
-import { zText } from ".";
 import { zImage } from "./image";
 
 export const createChatSchema = z
   .object({
-    chat: zText("Chat"),
+    chat: z.string().optional(),
     image: zImage.optional(),
   })
-  .refine((arg) => {
-    if (!arg.image) return true;
-    if (!arg.chat) return false;
-    return true;
-  });
+  .refine(
+    (arg) => {
+      if (arg.image) return true;
+      if (!arg.chat) return false;
+      return true;
+    },
+    { message: "Chat must not be empty.", path: ["chat"] }
+  );
 
 export type CreateChatSchema = z.infer<typeof createChatSchema>;

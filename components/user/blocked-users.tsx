@@ -34,7 +34,7 @@ export default function BlockedUsers() {
         ))
       ) : isSuccess && (blockedUsers?.data ?? []).length > 0 ? (
         blockedUsers?.data
-          ?.map((user) => ({ ...user, image: user.profile?.image }))
+          ?.map((user) => ({ ...user, avatarImage: user.profile?.avatarImage }))
           .map((user) => (
             <BlockedUserCard
               user={user}

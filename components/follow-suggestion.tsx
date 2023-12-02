@@ -17,8 +17,8 @@ export default function FollowSuggestion() {
     return null;
 
   return (
-    <div className="w-full flex flex-col gap-2">
-      <TypographyH4 className="!text-base px-4">
+    <div className="w-full flex flex-col gap-2 px-2">
+      <TypographyH4 className="!text-base px-2">
         Users recommendations
       </TypographyH4>
       <Slider>

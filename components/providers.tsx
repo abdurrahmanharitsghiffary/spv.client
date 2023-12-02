@@ -9,6 +9,7 @@ import ImagePreviewProvider from "@/context/image-preview-context";
 import ImageGalleryProvider from "@/context/image-gallery-context";
 import ToastProvider from "@/components/toastify-container";
 import EditPostProvider from "@/context/edit-post-context";
+import SocketProvider from "@/context/socket-context";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -27,16 +28,18 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <NextUIProvider>
-        <ImageGalleryProvider>
-          <ImagePreviewProvider>
-            <EditPostProvider>
-              <NextThemesProvider {...themeProps}>
-                {children}
-              </NextThemesProvider>
-            </EditPostProvider>
-            <ToastProvider />
-          </ImagePreviewProvider>
-        </ImageGalleryProvider>
+        <SocketProvider>
+          <ImageGalleryProvider>
+            <ImagePreviewProvider>
+              <EditPostProvider>
+                <NextThemesProvider {...themeProps}>
+                  {children}
+                </NextThemesProvider>
+              </EditPostProvider>
+              <ToastProvider />
+            </ImagePreviewProvider>
+          </ImageGalleryProvider>
+        </SocketProvider>
       </NextUIProvider>
     </QueryClientProvider>
   );

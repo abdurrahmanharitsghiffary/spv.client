@@ -1,14 +1,20 @@
 "use client";
 import React from "react";
 import MenuLayout from "../layout";
-import { useChatMenuIsOpen, useHideChatMenu } from "@/stores/chat-menu-store";
+import {
+  useChatMenuActions,
+  useChatMenuIsOpen,
+} from "@/stores/chat-menu-store";
 import { BiUser } from "react-icons/bi";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function ChatMenu() {
+  const { chatId } = useParams();
   const router = useRouter();
   const isOpen = useChatMenuIsOpen();
-  const onClose = useHideChatMenu();
+  const { onClose } = useChatMenuActions();
+
+  if (!chatId) return null;
 
   return (
     <MenuLayout
@@ -17,7 +23,7 @@ export default function ChatMenu() {
       onAction={(key) => {
         switch (key) {
           case "profile": {
-            router.push("/users/1");
+            router.push(`/profile/${chatId}`);
           }
         }
       }}

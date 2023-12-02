@@ -4,10 +4,7 @@ import { Card } from "@nextui-org/card";
 import { Avatar } from "@nextui-org/avatar";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import {
-  Comment as CommentType,
-  CommentReply as CommentReplyType,
-} from "@/types/comment";
+import { Comment as CommentType } from "@/types/comment";
 import { useGetComment } from "@/lib/api/comments/query";
 import CommentSkeleton from "./skeleton";
 import CommentHeader from "./comment-header";
@@ -34,8 +31,7 @@ function Comment({
   }`;
 
   // USE MEMO ??
-  const commentIds =
-    (comment as CommentReplyType)?.commentReply?.commentIds ?? [];
+  const commentIds = comment?.replies?.ids ?? [];
 
   const handleReplyClick = (value: React.SetStateAction<boolean>) => {
     setIsShow(value);
@@ -51,7 +47,7 @@ function Comment({
         as={NextLink}
         href={`/users/${comment?.user?.id}`}
         name={comment?.user?.username}
-        src={comment?.user?.image?.src}
+        src={comment?.user?.avatarImage?.src}
         className="absolute"
       />
       {level > 1 && (
@@ -75,7 +71,7 @@ function Comment({
           isShow={isShow}
           level={level}
           onReplyClick={handleReplyClick}
-          totalReply={comment?.commentReply?.total}
+          totalReply={comment?.replies?.total}
           username={comment?.user?.username}
         />
         {isShow && commentIds?.length > 0 && (
