@@ -172,7 +172,7 @@ export default function CreatePostForm({
           </Button>
         </div>
 
-        {!isNotPostPage && (
+        {/* {!isNotPostPage && (
           <Button
             type="submit"
             color="primary"
@@ -180,7 +180,7 @@ export default function CreatePostForm({
           >
             Create Post
           </Button>
-        )}
+        )} */}
       </form>
 
       {withPreview && (

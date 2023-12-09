@@ -36,12 +36,13 @@ export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
 
 export const useGetMyAssociatedChatRooms = (
   query: Record<string, any> = { limit: "20", offset: "0" },
+  type: "all" | "group" | "personal" = "all",
   config?: AxiosRequestConfig
 ) => {
   const { data: chatRooms, ...rest } = useInfinite<ChatRoom>({
-    query: query as Record<string, any>,
+    query: { ...query, type } as Record<string, any>,
     url: myChatsEp(),
-    queryKey: [...keys.meChats(), query],
+    queryKey: [...keys.meChats(), { ...query, type }],
     config,
   });
 

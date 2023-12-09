@@ -12,10 +12,11 @@ export default function InputSearch({
 }: InputProps) {
   return (
     <Input
+      isClearable
       autoFocus={autoFocus ?? true}
-      startContent={startContent ?? <FiSearch size={20} />}
-      type={type ?? "search"}
-      variant={variant ?? "faded"}
+      startContent={startContent ?? <FiSearch size={18} />}
+      type={type ?? "text"}
+      variant={variant ?? "flat"}
       placeholder={placeholder ?? "Search..."}
       {...rest}
     />

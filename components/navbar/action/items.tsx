@@ -24,6 +24,7 @@ export const navActionItems: NavItemsAction[] = [
       "/users/:userId/following",
       "/chats",
       "/users/blocked",
+      "group/:groupId",
     ],
     action: (router) => <BackButton router={router} />,
   },
@@ -41,7 +42,7 @@ export const navActionItems: NavItemsAction[] = [
   },
   {
     key: "null-items",
-    keys: ["/search", "/posts"],
+    keys: ["/search"],
     action: null,
   },
   {

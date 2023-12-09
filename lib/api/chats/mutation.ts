@@ -3,7 +3,7 @@
 import { baseChatRoutes, baseMessageRoutes } from "@/lib/endpoints";
 import { useMutate } from "../hooks";
 import { keys } from "@/lib/queryKey";
-import { CreateMessageData } from "@/types";
+import { CreateMessageData, ParticipantsField } from "@/types";
 
 export const useCreateMessage = () => {
   const {
@@ -42,7 +42,7 @@ export const useCreateGroupChat = () => {
     mutateAsync: createGroupChatAsync,
     ...rest
   } = useMutate<{
-    participants: number[];
+    participants: ParticipantsField[];
     title?: string;
     description?: string;
     image: File;
@@ -62,10 +62,10 @@ export const useUpdateGroupChat = () => {
     ...rest
   } = useMutate<
     {
-      participants?: number[];
+      participants?: ParticipantsField[];
       title?: string;
       description?: string;
-      image: File;
+      image?: File;
     },
     { groupId: number }
   >({
@@ -115,4 +115,40 @@ export const useLeaveGroupChat = () => {
   });
 
   return { leaveGroupChat, leaveGroupChatAsync, ...rest };
+};
+
+export const useAddGroupParticipants = () => {
+  const {
+    mutate: addParticipants,
+    mutateAsync: addParticipantsAsync,
+    ...rest
+  } = useMutate<{ participants: ParticipantsField[] }, { roomId: number }>({
+    baseUrl: baseChatRoutes + "/:roomId/partcipants",
+    method: "patch",
+    invalidateTags: (v) => [
+      keys.meChats(),
+      keys.participantByRoomId(Number(v.params?.roomId)),
+      keys.chatByRoomId(Number(v.params?.roomId)),
+    ],
+  });
+
+  return { addParticipants, addParticipantsAsync, ...rest };
+};
+
+export const useRemoveParticipants = () => {
+  const {
+    mutate: removeParticipants,
+    mutateAsync: removeParticipantsAsync,
+    ...rest
+  } = useMutate<{ ids: number[] }, { roomId: number }>({
+    baseUrl: baseChatRoutes + "/:roomId/partcipants",
+    method: "delete",
+    invalidateTags: (v) => [
+      keys.meChats(),
+      keys.participantByRoomId(Number(v.params?.roomId)),
+      keys.chatByRoomId(Number(v.params?.roomId)),
+    ],
+  });
+
+  return { removeParticipants, removeParticipantsAsync, ...rest };
 };

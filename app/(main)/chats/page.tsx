@@ -9,12 +9,12 @@ import { Socket_Event } from "@/lib/socket-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { keys } from "@/lib/queryKey";
 import { useGetMyAssociatedChatRooms } from "@/lib/api/account/query";
-import CreateRoomButton from "@/components/button/create-room-button";
 import CreateRoomModal from "@/components/modal/create-room-modal";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import CreateGroupModal from "@/components/modal/create-group-modal";
 import UserCardSkeleton from "@/components/user/user-card-skeleton";
 import CreateRoomSpeedDial from "@/components/speed-dial/create-room";
+import InputSearch from "@/components/input/search";
 
 export default function ChatsPage() {
   const { chatRooms, isSuccess, isError, isLoading } =
@@ -49,32 +49,24 @@ export default function ChatsPage() {
           ))}
         </Slider> */}
       </div>
-      <Input
-        type="search"
-        variant="bordered"
-        startContent={<FiSearch size={20} />}
+      <InputSearch
         placeholder="Search users..."
-        className="my-2 px-4"
-        radius="full"
         fullWidth
+        className="px-2"
+        radius="full"
+        autoFocus={false}
       />
       <div className="flex flex-col w-full">
-        {totalRooms > 0 ? (
-          <TypographyH4 className="!text-base px-4">
-            Chats ({totalRooms})
-          </TypographyH4>
-        ) : (
-          isSuccess && (
-            <div className="w-full h-full flex justify-center items-center flex-col gap-2 absolute left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2">
-              <IoChatbubbleEllipses size={25} />
-              No chat available
-            </div>
-          )
+        {isSuccess && totalRooms === 0 && (
+          <div className="w-full h-full flex justify-center items-center flex-col gap-2 absolute left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2">
+            <IoChatbubbleEllipses size={25} />
+            No chat available
+          </div>
         )}
         {isLoading
           ? [1, 2, 3].map((id) => (
               <UserCardSkeleton
-                className="rounded-none shadow-none my-4"
+                className="rounded-none shadow-none my-0"
                 key={id}
               />
             ))

@@ -18,7 +18,7 @@ export default function BottomBar() {
       className=" fixed shadow-none rounded-none left-0 right-0 bottom-0 z-[100]"
     >
       <Divider />
-      <CardBody className="p-0 h-[3.5rem]">
+      <CardBody className="p-0 h-12">
         <ul className="flex justify-around w-full h-full items-center">
           {items.map((item) => (
             <li key={item.url} className="w-full h-full block relative">

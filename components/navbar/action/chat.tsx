@@ -18,6 +18,10 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
     Number(chatId)
   );
 
+  const chatRoomData = chatRoom?.data;
+
+  const isGroupChat = chatRoomData?.isGroupChat ?? false;
+
   const user = (chatRoom?.data?.participants.users ?? []).filter(
     (participant) => participant.id !== session?.id
   )?.[0];
@@ -42,16 +46,24 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
           isSuccess && (
             <>
               <Avatar
-                name={user?.fullName ?? ""}
-                src={user?.avatarImage?.src ?? ""}
+                name={
+                  isGroupChat ? chatRoomData?.title ?? "" : user?.fullName ?? ""
+                }
+                src={
+                  isGroupChat
+                    ? chatRoomData?.picture?.src ?? ""
+                    : user?.avatarImage?.src ?? ""
+                }
               />
               <div className="flex flex-col w-[80%]">
                 <TypographyLarge className="!text-base">
-                  {user?.fullName}
+                  {isGroupChat ? chatRoomData?.title ?? "" : user?.fullName}
                 </TypographyLarge>
-                <TypographyMuted className="!text-xs">
-                  {user?.username}
-                </TypographyMuted>
+                {!isGroupChat && (
+                  <TypographyMuted className="!text-xs">
+                    {user?.username}
+                  </TypographyMuted>
+                )}
               </div>
             </>
           )

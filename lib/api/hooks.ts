@@ -20,10 +20,12 @@ export const useQ = <T>({
   queryKey,
   url,
   config,
+  qConfig,
 }: {
   queryKey?: QueryKey | undefined;
   query?: Record<string, any>;
   url: string;
+  qConfig?: { enabled?: boolean };
   config?: AxiosRequestConfig;
 }) => {
   const request = useAxiosInterceptor();
@@ -42,6 +44,7 @@ export const useQ = <T>({
         .get(newUrl.href, config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
+    ...qConfig,
   });
 
   return q;
@@ -115,7 +118,7 @@ export const useMutate = <T, P = {}>({
   invalidateTags?: (v: {
     body?: T | undefined;
     formData?: boolean | undefined;
-    params?: Record<string, string | number> | undefined;
+    params?: Record<string, string | number> | P | undefined;
     config?: AxiosRequestConfig<any> | undefined;
   }) => QueryKey[];
 }) => {

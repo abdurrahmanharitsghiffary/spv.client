@@ -6,7 +6,7 @@ import { Divider } from "@nextui-org/divider";
 import { Input, Textarea } from "@nextui-org/input";
 import { useIsSSR } from "@react-aria/ssr";
 import React, { useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { BiSend } from "react-icons/bi";
 import { z } from "zod";
 import Recorder from "../recorder";
@@ -20,6 +20,7 @@ import clsx from "clsx";
 import { CommentEditSchema, commentEditSchema } from "@/lib/zod-schema/comment";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useGetComment } from "@/lib/api/comments/query";
+import { TextareaWithControl } from "./input/input-with-control";
 
 export default function CommentEditForm({ className }: { className?: string }) {
   const isOpen = useCommentEditStore((state) => state.isOpen);
@@ -27,12 +28,14 @@ export default function CommentEditForm({ className }: { className?: string }) {
   const { updateCommentAsync } = useUpdateComment();
   const selectedComment = useGetSelectedEditComment();
   const { comment } = useGetComment(selectedComment?.id ?? -1);
+  console.log(comment?.data.comment, "Comment");
   const isSSR = useIsSSR();
   const {
     setValue,
     handleSubmit,
     register,
     watch,
+    control,
     reset,
     formState: {
       errors: { comment: commentErrors },
@@ -97,12 +100,14 @@ export default function CommentEditForm({ className }: { className?: string }) {
             as="form"
             onSubmit={handleSubmit(onSubmit)}
           >
+            {/* WE CAN DO IT BY USING CONTROLLER */}
+
             <div className="w-full relative">
               {isSSR ? (
                 <Input type="text" placeholder="Write your comment..." />
               ) : (
                 <div className="w-full relative flex items-center justify-start">
-                  <Textarea
+                  <TextareaWithControl
                     className="h-fit"
                     autoFocus
                     classNames={{
@@ -117,8 +122,10 @@ export default function CommentEditForm({ className }: { className?: string }) {
                     errorMessage={
                       fieldIsError ? commentErrors?.message ?? "" : ""
                     }
+                    control={control}
+                    name="comment"
                     placeholder="Write your comment..."
-                    {...register("comment")}
+                    // {...register("comment")}
                   />
                   {currentComment ? (
                     <Button

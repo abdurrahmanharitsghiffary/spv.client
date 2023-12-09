@@ -8,11 +8,38 @@ import ModalLayout from "../layout";
 import { useCreateChatRoom } from "@/lib/api/chats/mutation";
 import { toast } from "react-toastify";
 import UserAutocomplete from "@/components/user/user-autocomplete";
+import { useCallback } from "react";
+import { UserAccountPublic } from "@/types/user";
 
 export default function CreateRoomModal() {
   const isOpen = useCreateRoomModalIsOpen();
   const { onClose } = useCreateRoomActions();
   const { createChatRoomAsync } = useCreateChatRoom();
+
+  const handleOnItemClick = useCallback(async (item: UserAccountPublic) => {
+    try {
+      await toast.promise(
+        createChatRoomAsync({
+          body: {
+            participantId: item.id,
+          },
+        })
+          .then((res) => res)
+          .catch((err) => Promise.reject(err)),
+        {
+          error: {
+            render({ data }) {
+              return (data as any)?.message ?? "Something went wrong!";
+            },
+          },
+          pending: "Creating chat room...",
+        }
+      );
+    } catch (err) {
+    } finally {
+      onClose();
+    }
+  }, []);
 
   return (
     <ModalLayout
@@ -36,34 +63,11 @@ export default function CreateRoomModal() {
       >
         <UserAutocomplete
           inputProps={{
+            classNames: { label: "text-center" },
             label: "Search users",
             variant: "faded",
-            radius: "full",
           }}
-          onItemClick={async (item) => {
-            try {
-              await toast.promise(
-                createChatRoomAsync({
-                  body: {
-                    participantId: item.id,
-                  },
-                })
-                  .then((res) => res)
-                  .catch((err) => Promise.reject(err)),
-                {
-                  error: {
-                    render({ data }) {
-                      return (data as any)?.message ?? "Something went wrong!";
-                    },
-                  },
-                  pending: "Creating chat room...",
-                }
-              );
-            } catch (err) {
-            } finally {
-              onClose();
-            }
-          }}
+          onItemClick={handleOnItemClick}
         />
       </div>
     </ModalLayout>

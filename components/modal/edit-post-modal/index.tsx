@@ -19,6 +19,10 @@ import { BiChevronLeft } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
 import { UpdatePostSchema, updatePostSchema } from "@/lib/zod-schema/post";
 import InputFile from "@/components/input/file";
+import {
+  InputWithControl,
+  TextareaWithControl,
+} from "@/components/form/input/input-with-control";
 
 function EditPostModal() {
   const postId = useGetSelectedPostId();
@@ -96,22 +100,26 @@ function EditPostModal() {
         id="edit-post-form"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <Input
+        <InputWithControl
           label="Title"
-          isInvalid={title?.message ? true : false}
-          errorMessage={title?.message}
-          color={title?.message ? "danger" : "default"}
           placeholder="Enter your new title..."
-          {...register("title")}
+          control={control}
+          name="title"
+          // isInvalid={title?.message ? true : false}
+          // errorMessage={title?.message}
+          // color={title?.message ? "danger" : "default"}
+          // {...register("title")}
         />
-        <Textarea
-          isInvalid={content?.message ? true : false}
-          color={content?.message ? "danger" : "default"}
-          errorMessage={content?.message}
+        <TextareaWithControl
           minRows={4}
           maxRows={5}
           placeholder="Write your new thought..."
-          {...register("content")}
+          control={control}
+          name="content"
+          // isInvalid={content?.message ? true : false}
+          // color={content?.message ? "danger" : "default"}
+          // errorMessage={content?.message}
+          // {...register("content")}
         />
         {imagesErrors?.message && (
           <TypographyMuted className="text-danger !text-[0.75rem]">

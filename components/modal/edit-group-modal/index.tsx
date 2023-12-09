@@ -1,10 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ModalLayoutV2 from "../layoutV2";
-import {
-  useCreateGroupActions,
-  useCreateGroupIsOpen,
-} from "@/stores/create-group-store";
 import { UserAccountPublic } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
 import { removeDuplicates } from "@/lib";
@@ -18,49 +14,67 @@ import { Input, Textarea } from "@nextui-org/input";
 import ValidationErrorText from "@/components/validation-error-text";
 import { Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FiPlus } from "react-icons/fi";
+import { FiEdit, FiPlus } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
-import { useCreateGroupChat } from "@/lib/api/chats/mutation";
+import { useUpdateGroupChat } from "@/lib/api/chats/mutation";
+import {
+  useEditGroupActions,
+  useEditGroupIsOpen,
+} from "@/stores/edit-group-store";
+import {
+  InputWithControl,
+  TextareaWithControl,
+} from "@/components/form/input/input-with-control";
+import { useGetChatRoomById } from "@/lib/api/chats/query";
+import { useParams } from "next/navigation";
 
-const createGroupSchema = z.object({
+const editGroupSchema = z.object({
   participants: z
     .number()
     .array()
-    .min(2, { message: "Must be at least 2 participant" }),
+    .min(2, { message: "Must be at least 2 participant" })
+    .optional(),
   title: z
     .string()
     .max(125, { message: "Title must be at least 125 characters or fewer" })
     .optional(),
+  admin: z.number().array().optional(),
   description: z.string().optional(),
   image: zImage.optional(),
 });
 
-type CreateGroupSchema = z.infer<typeof createGroupSchema>;
+type EditGroupSchema = z.infer<typeof editGroupSchema>;
 
-export default function CreateGroupModal() {
-  const { createGroupChatAsync } = useCreateGroupChat();
-  const {
-    register,
-    formState: { isSubmitSuccessful, errors },
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    reset,
-  } = useForm<CreateGroupSchema>({
-    resolver: zodResolver(createGroupSchema),
-  });
-  const isOpen = useCreateGroupIsOpen();
-  const { onClose } = useCreateGroupActions();
-
+export default function EditGroupModal() {
+  const { groupId } = useParams();
+  const { chatRoom } = useGetChatRoomById(Number(groupId));
+  const { updateGroupChatAsync } = useUpdateGroupChat();
   const [selectedUsers, setSelectedUsers] = useState<UserAccountPublic[]>([]);
 
   const selectedUserIds = useMemo(
     () => selectedUsers.map((user) => user.id),
     [selectedUsers]
   );
+
+  const {
+    formState: { isSubmitSuccessful, errors },
+    handleSubmit,
+    control,
+    watch,
+    reset,
+  } = useForm<EditGroupSchema>({
+    resolver: zodResolver(editGroupSchema),
+    values: {
+      participants: selectedUserIds,
+      description: chatRoom?.data?.description ?? undefined,
+      title: chatRoom?.data?.title ?? undefined,
+    },
+  });
+  const isOpen = useEditGroupIsOpen();
+  const { onClose } = useEditGroupActions();
+
   const handleReset = useCallback(() => {
     setSelectedUsers([]);
     reset();
@@ -75,18 +89,14 @@ export default function CreateGroupModal() {
     if (isSubmitSuccessful) handleClose();
   }, [isSubmitSuccessful]);
 
-  useEffect(() => {
-    setValue("participants", selectedUserIds);
-  }, [selectedUserIds]);
-
   const handleItemClick = useCallback((item: UserAccountPublic) => {
     setSelectedUsers((v) => removeDuplicates([...v, item]).slice());
   }, []);
 
-  const onSubmit: SubmitHandler<CreateGroupSchema> = async (data) => {
+  const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
     console.log(data);
     await toast.promise(
-      createGroupChatAsync({
+      updateGroupChatAsync({
         body: {
           image: data?.image,
           participants: data.participants,
@@ -98,8 +108,8 @@ export default function CreateGroupModal() {
         .then((res) => res)
         .catch((err) => Promise.reject(err)),
       {
-        success: "Group chat successfully created.",
-        pending: "Creating group chat...",
+        success: "Group chat successfully updated.",
+        pending: "Updating group chat...",
         error: {
           render({ data }) {
             return (data as any)?.message ?? "Something went wrong!";
@@ -160,7 +170,7 @@ export default function CreateGroupModal() {
             className="w-[120px] h-[120px] aspect-square"
           />
 
-          <Button color="secondary" className="w-fit" startContent={<FiPlus />}>
+          <Button color="secondary" className="w-fit" startContent={<FiEdit />}>
             Add picture
             <Controller
               name="image"
@@ -180,21 +190,17 @@ export default function CreateGroupModal() {
             </ValidationErrorText>
           )}
         </div>
-        <Input
-          label="Group title (optional)"
-          placeholder="Enter your group title"
-          isInvalid={errors?.title?.message !== undefined}
-          errorMessage={errors?.title?.message}
-          color={errors?.title?.message ? "danger" : "default"}
-          {...register("title")}
+        <InputWithControl
+          label="Group title"
+          placeholder="Enter new group title"
+          control={control}
+          name="title"
         />
-        <Textarea
-          label="Group description (optional)"
-          placeholder="Enter your group description"
-          isInvalid={errors?.description?.message !== undefined}
-          errorMessage={errors?.description?.message}
-          color={errors?.description?.message ? "danger" : "default"}
-          {...register("description")}
+        <TextareaWithControl
+          label="Group description"
+          placeholder="Enter new group description"
+          control={control}
+          name="description"
         />
       </form>
     </ModalLayoutV2>

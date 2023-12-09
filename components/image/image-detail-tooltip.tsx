@@ -16,7 +16,7 @@ export default function ImageDetailTooltip({
       classNames={{ base: "rounded-md h-auto fixed" }}
       key={image.name}
       content={
-        <div className="p-1 flex flex-col gap-2">
+        <div className="p-1 flex flex-col gap-2 max-w-[250px] sm:max-w-sm">
           <TypographyLarge className="font-semibold text-sm">
             {image.name}
           </TypographyLarge>

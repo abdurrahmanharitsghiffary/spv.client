@@ -13,7 +13,7 @@ export function useNotFoundRedirect(
     if (
       isError &&
       (errorMessage.includes("not found") ||
-        (error as any)?.data?.name === "ZodError")
+        (error as any)?.name === "ZodError")
     )
       router.push("/");
   }, [errorMessage, isError, error]);

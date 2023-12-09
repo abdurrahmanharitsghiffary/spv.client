@@ -2,13 +2,14 @@
 
 import { keys } from "@/lib/queryKey";
 import { useInfinite, useQ } from "../hooks";
-import { chatById } from "@/lib/endpoints";
+import { baseChatRoutes, chatById } from "@/lib/endpoints";
 import { Chat, ChatRoom, ChatRoomParticipant } from "@/types/chat";
 
-export const useGetChatRoomById = (roomId: number) => {
+export const useGetChatRoomById = (roomId: number, enabled: boolean = true) => {
   const { data: chatRoom, ...rest } = useQ<ChatRoom>({
     url: chatById(roomId.toString()),
     queryKey: keys.chatByRoomId(roomId),
+    qConfig: { enabled: roomId > -1 && !isNaN(roomId) && enabled },
   });
 
   return { chatRoom, ...rest };
@@ -38,4 +39,18 @@ export const useGetMessagesByRoomId = (
   });
 
   return { messages, ...rest };
+};
+
+export const useGetChatRoomParticipant = (
+  roomId: number,
+  participantId: number
+) => {
+  const { data: participant, ...rest } = useQ<ChatRoomParticipant>({
+    url: baseChatRoutes + `/${roomId}/participants/${participantId}`,
+    queryKey: keys.participantByRoomAndParticipantId(roomId, participantId),
+    qConfig: {
+      enabled: participantId !== -1,
+    },
+  });
+  return { participant, ...rest };
 };

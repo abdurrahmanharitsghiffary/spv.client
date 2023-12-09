@@ -30,7 +30,12 @@ export default function SearchTabs() {
   return (
     <>
       <div className="fixed top-[13px] right-3 z-[41] left-3">
-        <InputSearch radius="full" onChange={handleInputChange} />
+        <InputSearch
+          onClear={() => setSearchInput("")}
+          radius="full"
+          value={searchInput}
+          onChange={handleInputChange}
+        />
       </div>
       <Tabs
         selectedKey={selectedTab}

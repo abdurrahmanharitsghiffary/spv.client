@@ -3,25 +3,28 @@
 import React, { useState } from "react";
 import { TypographyP } from "../ui/typography";
 import { Link } from "@nextui-org/link";
+import { useLimitText } from "@/hooks/use-limit-text";
 
 export default function PostContent({
   content,
 }: {
   content: string | undefined;
 }) {
-  const [isShowMore, setIsShowMore] = useState(false);
+  const { textContent, isExceedLimit, isShowMore, onToggleShowMore } =
+    useLimitText({ text: content ?? "" });
+  // const [isShowMore, setIsShowMore] = useState(false);
 
-  const isExceedLimit = (content ?? "").length > 300;
+  // const isExceedLimit = (content ?? "").length > 300;
 
-  let postContent = content ?? "";
+  // let postContent = content ?? "";
 
-  if (isExceedLimit && !isShowMore)
-    postContent = (content ?? "").slice(0, 270).trimEnd() + "...";
+  // if (isExceedLimit && !isShowMore)
+  //   postContent = (content ?? "").slice(0, 270).trimEnd() + "...";
 
   return (
     <>
       <TypographyP className="max-w-full break-words whitespace-normal !mt-0">
-        {postContent}
+        {textContent}
       </TypographyP>
       {isExceedLimit && (
         <Link
@@ -31,7 +34,7 @@ export default function PostContent({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setIsShowMore((c) => !c);
+            onToggleShowMore();
           }}
         >
           {isShowMore ? "Show less" : " Show more"}

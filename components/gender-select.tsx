@@ -1,16 +1,18 @@
 "use client";
 import React from "react";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Select, SelectItem, SelectProps } from "@nextui-org/select";
 import { BsGenderFemale, BsGenderMale, BsQuestion } from "react-icons/bs";
 import { Gender } from "@/types";
 
 export default function GenderSelect({
   message,
   value,
+  variant,
   onChange,
 }: {
   message?: string;
   value: Gender;
+  variant?: SelectProps["variant"];
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
   return (
@@ -24,7 +26,7 @@ export default function GenderSelect({
           <BsQuestion />
         )
       }
-      variant="bordered"
+      variant={variant ?? "bordered"}
       color={message ? "danger" : "default"}
       isInvalid={message ? true : false}
       errorMessage={message}

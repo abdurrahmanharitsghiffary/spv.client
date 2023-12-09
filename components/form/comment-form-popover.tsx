@@ -31,7 +31,6 @@ export default function CommentFormPopover({
       <Popover
         isOpen={isOpen}
         onOpenChange={(open) => setIsOpen(open)}
-        showArrow
         shouldBlockScroll
         placement="top"
         classNames={{ base: "px-0" }}

@@ -18,8 +18,10 @@ import { UserSimplified } from "./user";
 
 export type Chat = {
   id: number;
+  readedBy: (UserSimplified & { readedAt: Date })[] | null;
   message: string | null;
-  attachments: Image;
+  attachments: Image[];
+  isGroupChat: boolean;
   author: UserSimplified;
   roomId: number;
   createdAt: Date;
@@ -36,6 +38,7 @@ type UndreadMessage = {
 
 type ChatRoomParticipant = UserSimplified & {
   role: ParticipantRole;
+  roomId: number;
   joinedAt: Date;
 };
 
@@ -55,4 +58,5 @@ type ChatRoom = {
 enum ParticipantRole {
   "admin",
   "user",
+  "creator",
 }

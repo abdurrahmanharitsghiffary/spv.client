@@ -88,7 +88,7 @@ export interface CreateCommentData {
 export interface CreateMessageData {
   chatRoomId: number;
   message?: string;
-  image?: File;
+  image?: File[];
 }
 export type Key = string | number;
 export type OffsetPaging = { limit?: number; offset?: number } | undefined;
@@ -112,3 +112,5 @@ export type SearchAllData = {
 };
 
 export type Gender = "male" | "female" | "not_say" | null;
+
+export type ParticipantsField = { role: "user" | "admin"; id: number };

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useEditProfileControls } from "@/hooks/use-edit-profile";
 import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
@@ -24,12 +24,18 @@ import {
 import ValidationErrorText from "@/components/validation-error-text";
 import GenderSelect from "@/components/gender-select";
 import InputFile from "@/components/input/file";
+import {
+  InputWithControl,
+  TextareaWithControl,
+} from "@/components/form/input/input-with-control";
 
 export default function EditProfileModal() {
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { updateAccountAsync } = useUpdateMyAccountInfo();
-  const { myAccountInfo } = useGetMyAccountInfo();
+  const { myAccountInfo, isSuccess } = useGetMyAccountInfo();
+
+  console.log(myAccountInfo, "My acc info");
   const {
     handleSubmit,
     register,
@@ -51,14 +57,18 @@ export default function EditProfileModal() {
   } = useForm<EditProfileValidationSchema>({
     resolver: zodResolver(editProfileValidationSchema),
     values: {
+      // profileImage: myAccountInfo?.data?.profile?.avatarImage?.src,
+      // coverImage: myAccountInfo?.data?.profile?.coverImage?.src,
       firstName: myAccountInfo?.data?.firstName,
       lastName: myAccountInfo?.data?.lastName,
       username: myAccountInfo?.data?.username,
-      bio: myAccountInfo?.data?.profile?.description ?? "",
-      gender: myAccountInfo?.data?.profile?.gender ?? "not_say",
+      bio: myAccountInfo?.data?.profile?.description ?? undefined,
+      gender: myAccountInfo?.data?.profile?.gender ?? undefined,
     },
   });
-
+  useEffect(() => {
+    if (isSuccess) reset();
+  }, [isSuccess]);
   const profileImage = watch("profileImage");
   const coverImage = watch("coverImage");
 
@@ -104,6 +114,14 @@ export default function EditProfileModal() {
     }
   }, [isSubmitSuccessful]);
 
+  const profileImageSource = profileImage
+    ? URL.createObjectURL(profileImage)
+    : myAccountInfo?.data?.profile?.avatarImage?.src;
+
+  const coverImageSource = coverImage
+    ? URL.createObjectURL(coverImage)
+    : myAccountInfo?.data?.profile?.coverImage?.src ?? "";
+
   return (
     <ModalLayoutV2
       isOpen={disclosure.isOpen}
@@ -130,11 +148,7 @@ export default function EditProfileModal() {
             <TypographyH4>Profile picture</TypographyH4>
             <Avatar
               name={myAccountInfo?.data?.username}
-              src={
-                profileImage
-                  ? URL.createObjectURL(profileImage)
-                  : myAccountInfo?.data?.profile?.avatarImage?.src
-              }
+              src={profileImageSource}
               className="w-32 h-32"
             />
             {pIErr?.message && (
@@ -166,11 +180,7 @@ export default function EditProfileModal() {
             <TypographyH4>Cover image</TypographyH4>
             <CoverImage
               className="max-w-lg rounded-medium"
-              src={
-                coverImage
-                  ? URL.createObjectURL(coverImage)
-                  : myAccountInfo?.data?.profile?.coverImage?.src ?? ""
-              }
+              src={coverImageSource}
             />
             {cIErr?.message && (
               <ValidationErrorText>
@@ -197,34 +207,37 @@ export default function EditProfileModal() {
             </Button>
           </div>
         </div>
-        <Input
+        <InputWithControl
           label="Username"
           type="text"
-          variant="bordered"
-          isInvalid={username?.message !== undefined}
-          errorMessage={username?.message}
-          color={username?.message ? "danger" : "default"}
-          {...register("username")}
+          control={control}
+          name="username"
+          // isInvalid={username?.message !== undefined}
+          // errorMessage={username?.message}
+          // color={username?.message ? "danger" : "default"}
+          // {...register("username")}
           placeholder="Enter your new username"
         />
-        <Input
-          variant="bordered"
+        <InputWithControl
           label="Firstname"
           type="text"
-          isInvalid={firstName?.message !== undefined}
-          errorMessage={firstName?.message}
-          color={firstName?.message ? "danger" : "default"}
-          {...register("firstName")}
+          control={control}
+          name="firstName"
+          // isInvalid={firstName?.message !== undefined}
+          // errorMessage={firstName?.message}
+          // color={firstName?.message ? "danger" : "default"}
+          // {...register("firstName")}
           placeholder="Enter your new firstname"
         />
-        <Input
-          variant="bordered"
+        <InputWithControl
           label="Lastname"
           type="text"
-          isInvalid={lastName?.message !== undefined}
-          errorMessage={lastName?.message}
-          color={lastName?.message ? "danger" : "default"}
-          {...register("lastName")}
+          control={control}
+          name="lastName"
+          // isInvalid={lastName?.message !== undefined}
+          // errorMessage={lastName?.message}
+          // color={lastName?.message ? "danger" : "default"}
+          // {...register("lastName")}
           placeholder="Enter your new lastname"
         />
         <Controller
@@ -232,21 +245,23 @@ export default function EditProfileModal() {
           name="gender"
           render={({ field: { onChange, value } }) => (
             <GenderSelect
+              variant="flat"
               onChange={(e) => onChange(e.target.value)}
               value={value ?? "not_say"}
               message={gender?.message}
             />
           )}
         />
-        <Textarea
-          variant="bordered"
+        <TextareaWithControl
           maxRows={4}
           minRows={2}
           label="Bio"
-          isInvalid={bio?.message !== undefined}
-          errorMessage={bio?.message}
-          color={bio?.message ? "danger" : "default"}
-          {...register("bio")}
+          control={control}
+          name="bio"
+          // isInvalid={bio?.message !== undefined}
+          // errorMessage={bio?.message}
+          // color={bio?.message ? "danger" : "default"}
+          // {...register("bio")}
           placeholder="Enter your new bio"
         />
       </form>

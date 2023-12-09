@@ -17,7 +17,7 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   return (
     <Link
       href={`/chats/${chat?.id}`}
-      className="flex gap-1 w-full px-4 justify-between items-center last:border-none border-b-1 border-divider py-2"
+      className="flex gap-1 w-full px-4 justify-between items-center last:border-none border-b-1 border-divider py-2 max-h-[57px]"
     >
       {chat.isGroupChat ? (
         <UserAvatar
@@ -33,14 +33,18 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
       )}
       <div className="flex gap-2 w-[80%] justify-between items-center">
         <div className="flex flex-col max-w-[80%] w-[80%] truncate">
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center max-h-full">
             <TypographyLarge className="!text-base !font-semibold truncate">
               {chat.isGroupChat
                 ? chat.title || "Group chat #" + chat.id
                 : user?.fullName}
             </TypographyLarge>
             {chat.unreadMessages.total > 0 ? (
-              <Chip className="text-[0.625rem]" color="danger" size="sm">
+              <Chip
+                className="text-[0.625rem] w-fit h-fit p-1"
+                color="danger"
+                size="sm"
+              >
                 {chat.unreadMessages.total}
               </Chip>
             ) : null}

@@ -1,14 +1,8 @@
 import ChatPage from "@/components/page/chat-page";
-import ChatForm from "@/components/form/chat-form";
 import React from "react";
 
-export default function Chat({ params }: { params: { chatId: string } }) {
-  return (
-    <>
-      <ChatPage />
-      <ChatForm />
-    </>
-  );
+export default function Chat() {
+  return <ChatPage />;
 }
 /* <div
         className="pt-5 flex flex-col gap-5 px-4 w-full pb-20"

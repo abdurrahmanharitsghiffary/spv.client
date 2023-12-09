@@ -94,7 +94,7 @@ export default function SpeedDial({
       >
         {items.map((item) => (
           <motion.li key={item.key} variants={itemVariants} initial={false}>
-            <Tooltip content={item.content} placement="left" showArrow>
+            <Tooltip content={item.content} placement="left">
               <Button
                 isIconOnly
                 radius="full"

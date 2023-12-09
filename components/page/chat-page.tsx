@@ -5,13 +5,10 @@ import { keys } from "@/lib/queryKey";
 import { Socket_Event } from "@/lib/socket-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import ChatBubble from "../chat/chat-bubble";
 import { useSession } from "@/stores/auth-store";
-import {
-  useGetChatRoomById,
-  useGetMessagesByRoomId,
-} from "@/lib/api/chats/query";
+import { useGetMessagesByRoomId } from "@/lib/api/chats/query";
 
 export default function ChatPage() {
   const { chatId } = useParams();
@@ -43,6 +40,28 @@ export default function ChatPage() {
       document.body.scrollIntoView(false);
     }
   }, [isFetchedAfterMount]);
+  const readMessageAfterMount = useCallback(() => {
+    messages.data?.forEach((message) => {
+      const readedMessage = message.readedBy?.filter(
+        (r) => r.id === session?.id
+      );
+      console.log(readedMessage);
+      if ((readedMessage?.length ?? 0) > 0 || !socket) return null;
+      socket.emit(Socket_Event.READ_MESSAGE, {
+        userId: session?.id,
+        chatId: message.id,
+      });
+    });
+  }, [messages.data, session?.id, socket]);
+  useEffect(() => {
+    readMessageAfterMount();
+  }, [readMessageAfterMount]);
+
+  const onReadMessage = async (data: { chatId: number; roomId: number }) => {
+    queryClient.invalidateQueries({
+      queryKey: keys.chatByRoomId(Number(data.roomId)),
+    });
+  };
 
   const onReceiveMessage = async (createdMessage: any) => {
     console.log(createdMessage, "REceived message");
@@ -87,10 +106,12 @@ export default function ChatPage() {
   useEffect(() => {
     if (!socket) return;
 
+    socket.on(Socket_Event.READED_MESSAGE, onReadMessage);
     socket.on(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
     socket.on(Socket_Event.DELETE_MESSAGE, onDeleteMessage);
     socket.on(Socket_Event.UPDATE_MESSAGE, onUpdateMessage);
     return () => {
+      socket.off(Socket_Event.READED_MESSAGE, onReadMessage);
       socket.off(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
       socket.off(Socket_Event.DELETE_MESSAGE, onDeleteMessage);
       socket.off(Socket_Event.UPDATE_MESSAGE, onUpdateMessage);
@@ -98,14 +119,7 @@ export default function ChatPage() {
   }, [socket]);
 
   return (
-    <div
-      className="pt-5 flex flex-col gap-5 px-4 w-full pb-20"
-      // style={{
-      //   backgroundSize: "100%",
-      //   backgroundImage:
-      //     "url('https://images.unsplash.com/photo-1695606392987-9635caaf7f74?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')",
-      // }}
-    >
+    <>
       {(messages?.data ?? [])
         .slice()
         .reverse()
@@ -118,6 +132,6 @@ export default function ChatPage() {
             isRecipient={chat?.author?.id !== session?.id}
           />
         ))}
-    </div>
+    </>
   );
 }
