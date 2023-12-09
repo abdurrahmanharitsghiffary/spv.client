@@ -49,7 +49,7 @@ export const useGetChatRoomParticipant = (
     url: baseChatRoutes + `/${roomId}/participants/${participantId}`,
     queryKey: keys.participantByRoomAndParticipantId(roomId, participantId),
     qConfig: {
-      enabled: participantId !== -1,
+      enabled: participantId !== -1 && roomId !== -1,
     },
   });
   return { participant, ...rest };

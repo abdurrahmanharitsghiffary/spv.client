@@ -55,8 +55,4 @@ type ChatRoom = {
   updatedAt: Date;
 };
 
-enum ParticipantRole {
-  "admin",
-  "user",
-  "creator",
-}
+export type ParticipantRole = "admin" | "user" | "creator";

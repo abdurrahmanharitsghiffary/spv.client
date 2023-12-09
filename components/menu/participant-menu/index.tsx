@@ -8,7 +8,10 @@ import {
   useParticipantMenuIsOpen,
 } from "@/stores/participant-menu-store";
 import { BiTrash, BiUser, BiUserMinus, BiUserPlus } from "react-icons/bi";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "@/stores/auth-store";
+import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
+import { ParticipantRole } from "@/types/chat";
 
 export default function ParticipantMenu() {
   const participantId = useParticipantMenuId();
@@ -16,6 +19,19 @@ export default function ParticipantMenu() {
   const isOpen = useParticipantMenuIsOpen();
   const { onClose } = useParticipantMenuActions();
   const router = useRouter();
+  const { groupId } = useParams();
+  const session = useSession();
+  const { participant } = useGetChatRoomParticipant(
+    Number(groupId),
+    session?.id ?? -1
+  );
+  const { participant: selectedParticipant } = useGetChatRoomParticipant(
+    Number(groupId),
+    participantId
+  );
+  const currentUserRole = participant?.data.role ?? "user";
+  const selectedParticipantRole: ParticipantRole =
+    selectedParticipant?.data.role ?? "user";
 
   const handleMenuActions = (key: React.Key) => {
     switch (key) {
@@ -30,17 +46,49 @@ export default function ParticipantMenu() {
   ];
 
   const adminItems = [
-    { key: "kick", label: "Remove from group", icon: <BiTrash /> },
-    { key: "grant", label: "Make group admin", icon: <BiUserPlus /> },
-    { key: "dismiss", label: "Dissmiss as admin", icon: <BiUserMinus /> },
+    ...menuItems,
+    { key: "kick-delete", label: "Remove from group", icon: <BiTrash /> },
   ];
+
+  const isAdminUpdatingAdmin =
+    selectedParticipantRole === "admin" && currentUserRole === "admin";
+
+  if (selectedParticipantRole === "user")
+    adminItems.push({
+      key: "grant",
+      label: "Promote to admin",
+      icon: <BiUserPlus />,
+    });
+
+  if (selectedParticipantRole === "admin")
+    adminItems.push({
+      key: "dismiss-delete",
+      label: "Dissmiss as admin",
+      icon: <BiUserMinus />,
+    });
+
+  adminItems.sort((a, b) => {
+    if (a.key.includes("delete")) return 1;
+    if (b.key.includes("delete")) return -1;
+    return 1;
+  });
+
+  const selectedItems =
+    currentUserRole === "user" ||
+    isAdminUpdatingAdmin ||
+    selectedParticipantRole === "creator"
+      ? menuItems
+      : adminItems;
 
   return (
     <MenuLayout
+      avatar={selectedParticipant?.data?.avatarImage?.src ?? ""}
+      title={selectedParticipant?.data?.fullName ?? ""}
+      description={selectedParticipant?.data?.username}
       isOpen={isOpen}
       onClose={onClose}
       onAction={handleMenuActions}
-      items={menuItems}
+      items={selectedItems}
     />
   );
 }

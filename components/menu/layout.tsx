@@ -4,8 +4,10 @@ import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { useIsMd } from "@/hooks/use-media-query";
-import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
+import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
+import { TypographyLarge, TypographyMuted } from "../ui/typography";
+import { Avatar } from "@nextui-org/react";
 
 function IconWrapper({
   children,
@@ -27,6 +29,9 @@ export default function MenuLayout({
   isOpen,
   items,
   onAction,
+  title,
+  description,
+  avatar,
 }: {
   items?: {
     key: string;
@@ -34,10 +39,12 @@ export default function MenuLayout({
     action?: React.JSX.Element;
     icon?: React.JSX.Element;
   }[];
-
+  title?: string;
+  description?: string;
   onAction: (key: React.Key) => void;
   onClose: () => void;
   isOpen: boolean;
+  avatar?: string;
 }) {
   const isMd = useIsMd();
 
@@ -95,6 +102,27 @@ export default function MenuLayout({
             ) : (
               <div className="w-12 h-1 bg-divider my-2 mx-auto rounded-xl"></div>
             )}
+            <div className="flex items-center gap-3 px-4 py-2">
+              {avatar !== undefined && (
+                <Avatar
+                  src={avatar ?? ""}
+                  name={description ?? ""}
+                  showFallback
+                />
+              )}
+              <div className="flex flex-col gap-1 justify-center items-start">
+                {title && (
+                  <TypographyLarge className="!text-base">
+                    {title}
+                  </TypographyLarge>
+                )}
+                {description && (
+                  <TypographyMuted className="!text-sm">
+                    {description}
+                  </TypographyMuted>
+                )}
+              </div>
+            </div>
             <Listbox
               aria-label="menu"
               items={items}

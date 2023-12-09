@@ -21,9 +21,8 @@ const useParticipantMenuStore = create<State & { actions: Action }>((set) => ({
   },
 }));
 
-export const useParticipantMenuId = () => {
+export const useParticipantMenuId = () =>
   useParticipantMenuStore((state) => state.participantId);
-};
 
 export const useParticipantMenuActions = () =>
   useParticipantMenuStore((state) => state.actions);

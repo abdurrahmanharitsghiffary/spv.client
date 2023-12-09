@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Chip } from "@nextui-org/chip";
 import { ChatRoom } from "@/types/chat";
 import { useSession } from "@/stores/auth-store";
+import { RiGroupFill } from "react-icons/ri";
 
 export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   const session = useSession();
@@ -17,23 +18,20 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   return (
     <Link
       href={`/chats/${chat?.id}`}
-      className="flex gap-1 w-full px-4 justify-between items-center last:border-none border-b-1 border-divider py-2 max-h-[57px]"
+      className="flex gap-1 w-full px-4 justify-between last:border-none border-b-1 border-divider py-2 max-h-[57px]"
     >
-      {chat.isGroupChat ? (
-        <UserAvatar
-          name={chat.title || "Group chat #" + chat.id}
-          src={chat.picture?.src}
-        />
-      ) : (
-        <UserAvatar
-          name={user?.fullName ?? ""}
-          src={user?.avatarImage?.src}
-          isOnline={user?.isOnline}
-        />
-      )}
-      <div className="flex gap-2 w-[80%] justify-between items-center">
+      <UserAvatar
+        name={
+          chat.isGroupChat
+            ? chat.title || "Group chat #" + chat.id
+            : user?.fullName ?? ""
+        }
+        src={chat.isGroupChat ? chat.picture?.src : user?.avatarImage?.src}
+        isOnline={chat.isGroupChat ? false : user?.isOnline}
+      />
+      <div className="flex gap-2 w-[80%] justify-between">
         <div className="flex flex-col max-w-[80%] w-[80%] truncate">
-          <div className="flex gap-3 items-center max-h-full">
+          <div className="flex gap-3 items-start max-h-full">
             <TypographyLarge className="!text-base !font-semibold truncate">
               {chat.isGroupChat
                 ? chat.title || "Group chat #" + chat.id
@@ -49,13 +47,13 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
               </Chip>
             ) : null}
           </div>
-          <TypographyMuted className="!text-xs truncate">
-            {chat?.messages?.[0]?.message}
+          <TypographyMuted className="!text-[0.625rem] truncate">
+            {chat?.messages?.[0]?.message ?? "..."}
           </TypographyMuted>
         </div>
         <Time
           date={chat?.messages?.[0]?.createdAt ?? chat?.createdAt}
-          className="w-[20%] !text-[0.75rem] self-start text-right"
+          className="!text-[0.625rem] text-right h-full"
         />
       </div>
     </Link>

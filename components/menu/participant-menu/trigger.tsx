@@ -1,0 +1,21 @@
+"use client";
+
+import IconButton from "@/components/button/icon-button";
+import { useParticipantMenuActions } from "@/stores/participant-menu-store";
+import { ButtonProps } from "@nextui-org/button";
+import React from "react";
+import { FiMoreVertical } from "react-icons/fi";
+
+export default function ParticipantMenuTrigger({
+  participantId,
+  onClick,
+  ...rest
+}: { participantId: number } & ButtonProps) {
+  const { onOpen } = useParticipantMenuActions();
+
+  return (
+    <IconButton onClick={() => onOpen(participantId)} {...rest}>
+      <FiMoreVertical />
+    </IconButton>
+  );
+}
