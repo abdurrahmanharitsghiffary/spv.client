@@ -26,7 +26,7 @@ const ModalLayoutV2 = forwardRef(
         ref={ref}
         header={<Divider className="w-full" />}
         classNames={{
-          wrapper: clsx("h-full max-h-none", classNames?.wrapper),
+          wrapper: clsx("h-full max-h-none bg-background", classNames?.wrapper),
           header: clsx("p-0 h-[64px] items-end", classNames?.header),
           footer: clsx("p-4", classNames?.footer),
           body: classNames?.body,

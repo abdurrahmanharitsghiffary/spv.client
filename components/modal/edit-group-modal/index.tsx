@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ModalLayoutV2 from "../layoutV2";

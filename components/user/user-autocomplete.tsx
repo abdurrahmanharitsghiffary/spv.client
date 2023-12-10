@@ -7,7 +7,7 @@ import { Input, InputProps } from "@nextui-org/input";
 import { ScrollShadow, Spinner } from "@nextui-org/react";
 import clsx from "clsx";
 import React, { useCallback, useRef, useState } from "react";
-import { FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import UserCard from "./user-card";
 import { TypographyMuted } from "../ui/typography";
 
@@ -43,10 +43,10 @@ export default function UserAutocomplete({
   const itemRef = useRef<HTMLLIElement | null>(null);
   const [currentFocus, setCurrentFocus] = useState(-1);
 
-  const handleUserSelection = useCallback((item: UserAccountPublic) => {
+  const handleUserSelection = (item: UserAccountPublic) => {
     onItemClick(item);
     setFilterText("");
-  }, []);
+  };
 
   const handleInputKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement> | KeyboardEvent) => {
@@ -75,19 +75,17 @@ export default function UserAutocomplete({
       <Input
         onKeyDown={handleInputKeyDown}
         value={filterText}
+        isClearable
+        onClear={() => setFilterText("")}
         onValueChange={setFilterText}
         labelPlacement={labelPlacement ?? "outside"}
         startContent={<FiSearch size={20} />}
         endContent={
-          isLoading ? (
+          isLoading && (
             <Spinner size="sm" className=" text-[1.25rem]" color="default" />
-          ) : filterText ? (
-            <FiChevronDown size={20} />
-          ) : (
-            <FiChevronUp size={20} />
           )
         }
-        type={type ?? "search"}
+        type={type ?? "text"}
         label={label ?? "Search participants"}
         placeholder={placeholder ?? "Type users here"}
         {...rest}
@@ -111,7 +109,7 @@ export default function UserAutocomplete({
                       }
                     }}
                     className={clsx(
-                      "w-full hover:bg-content2 transition-all cursor-pointer",
+                      "w-full hover:bg-content2 cursor-pointer",
                       currentFocus === i ? "bg-content2" : ""
                     )}
                     onClick={() => handleUserSelection(item)}

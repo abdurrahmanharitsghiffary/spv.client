@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
-import "./post-card.css";
+import "./gallery.css";
 import ImageWithPreview from "../image/image-with-preview";
 import { useShowImageGallery } from "@/hooks/use-image-gallery";
 import { useIsSSR } from "@react-aria/ssr";
-import { PostExtended } from "@/types/post";
 
 const galleryStructures = [
   "'a'",
@@ -26,10 +25,10 @@ const getTemplateArea = (items: any[]) => {
   return galleryStructures[items.length - 1];
 };
 
-export default function PostGallery({
+export default function Gallery({
   images,
 }: {
-  images: PostExtended["images"];
+  images: { src: string }[] | null;
 }) {
   const showGallery = useShowImageGallery();
   const isSSR = useIsSSR();

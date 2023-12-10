@@ -63,6 +63,7 @@ export default function CreateRoomModal() {
       >
         <UserAutocomplete
           inputProps={{
+            radius: "full",
             classNames: { label: "text-center" },
             label: "Search users",
             variant: "faded",

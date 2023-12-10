@@ -15,6 +15,8 @@ export default function UserCard({
   classNames,
   cardClassNames,
   hideLink,
+  titleFontSize,
+  descriptionFontSize,
 }: {
   user: UserSimplified;
   className?: string;
@@ -22,6 +24,8 @@ export default function UserCard({
   classNames?: { body?: string };
   cardClassNames?: SlotsToClasses<"base" | "body" | "footer" | "header">;
   hideLink?: boolean;
+  titleFontSize?: number | string;
+  descriptionFontSize?: number | string;
 }) {
   const cl = clsx("w-full dark:bg-inherit", className);
   return (
@@ -46,7 +50,7 @@ export default function UserCard({
                 className="flex-shrink-0"
               />
               <div className="flex flex-col gap-1 truncate w-[75%]">
-                <TypographyLarge className="!text-base truncate">
+                <TypographyLarge className="!text-[0.875rem] truncate">
                   {user?.fullName ?? ""}
                 </TypographyLarge>
                 <TypographyMuted className="text-xs truncate">

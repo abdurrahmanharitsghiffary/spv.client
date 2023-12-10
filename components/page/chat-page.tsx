@@ -5,7 +5,7 @@ import { keys } from "@/lib/queryKey";
 import { Socket_Event } from "@/lib/socket-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import ChatBubble from "../chat/chat-bubble";
 import { useSession } from "@/stores/auth-store";
 import { useGetMessagesByRoomId } from "@/lib/api/chats/query";
@@ -128,7 +128,7 @@ export default function ChatPage() {
             date={chat?.createdAt}
             text={chat?.message ?? ""}
             key={chat?.id}
-            image={chat?.attachments?.src}
+            images={chat?.attachments as any}
             isRecipient={chat?.author?.id !== session?.id}
           />
         ))}

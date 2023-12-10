@@ -134,9 +134,9 @@ export const useMutate = <T, P = {}>({
     }) => {
       let newUrl = baseUrl;
       let body = v?.body;
-      const formData = v?.formData
-        ? getFormData((body as Record<string, string>) ?? {})
-        : null;
+      // const formData = v?.formData
+      //   ? getFormData((body as Record<string, string>) ?? {})
+      //   : null;
 
       for (let [key, value] of Object.entries(v?.params ?? {})) {
         console.log(key, value, " k v");
@@ -161,12 +161,12 @@ export const useMutate = <T, P = {}>({
       if (["delete"].includes(method)) {
         return request[method](newUrl, {
           ...config,
-          data: formData ? formData : { ...config.data, ...body },
+          data: { ...config.data, ...body },
         })
           .then((res) => res.data)
           .catch((err) => Promise.reject(err?.response?.data));
       }
-      return request[method](newUrl, formData ? formData : body, config)
+      return request[method](newUrl, body, config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },
@@ -218,9 +218,9 @@ export const useOptimistic = <T>({
       config?: AxiosRequestConfig;
     }) => {
       let body = v?.body;
-      const formData = v?.formData
-        ? getFormData((body as Record<string, string>) ?? {})
-        : null;
+      // const formData = v?.formData
+      //   ? getFormData((body as Record<string, string>) ?? {})
+      //   : null;
 
       const config: AxiosRequestConfig = {
         ...v?.config,
@@ -242,12 +242,12 @@ export const useOptimistic = <T>({
       if (["delete"].includes(method)) {
         return request[method](newUrl, {
           ...config,
-          data: formData ? formData : { ...config.data, ...body },
+          data: { ...config.data, ...body },
         })
           .then((res) => res.data)
           .catch((err) => Promise.reject(err?.response?.data));
       }
-      return request[method](newUrl, formData ? formData : body, config)
+      return request[method](newUrl, body, config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },

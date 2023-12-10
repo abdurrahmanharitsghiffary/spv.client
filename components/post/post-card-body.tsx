@@ -3,8 +3,8 @@ import React from "react";
 import { TypographyH4 } from "../ui/typography";
 import PostContent from "./post-content";
 import Link from "next/link";
-import PostGallery from "./post-gallery";
 import { PostExtended } from "@/types/post";
+import Gallery from "../image/gallery";
 
 export default function PostCardBody({
   isPostPage,
@@ -34,7 +34,7 @@ export default function PostCardBody({
           <PostContent content={content} />
         </Link>
       )}
-      <PostGallery images={postImages} />
+      <Gallery images={postImages} />
     </CardBody>
   );
 }

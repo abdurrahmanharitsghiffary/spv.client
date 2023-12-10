@@ -2,15 +2,16 @@ import clsx from "clsx";
 import React from "react";
 import { TypographyP } from "../ui/typography";
 import Timestamp from "../timestamp";
-import ImageWithPreview from "../image/image-with-preview";
+import Gallery from "../image/gallery";
+import { Image } from "@/types/profile";
 
 export default function ChatBubble({
   text,
   isRecipient,
-  image,
+  images,
   date,
 }: {
-  image?: string;
+  images?: { src: string }[] | null;
   text: string;
   isRecipient?: boolean;
   date: Date;
@@ -30,17 +31,13 @@ export default function ChatBubble({
           isRecipient
             ? "bg-default-200 rounded-r-medium rounded-bl-medium self-start"
             : "bg-default-100 rounded-l-medium rounded-br-medium self-end",
-          image ? "pb-4" : ""
+          images ? "pb-4" : ""
         )}
       >
         <TypographyP className="!text-[1rem]">{text}</TypographyP>
-        {image && (
-          <ImageWithPreview
-            radius="sm"
-            className="w-[140px] aspect-square h-[140px] object-cover"
-            src={image}
-          />
-        )}
+        {images && (images ?? []).length > 0 ? (
+          <Gallery images={images} />
+        ) : null}
       </div>
       <Timestamp
         className={clsx(
