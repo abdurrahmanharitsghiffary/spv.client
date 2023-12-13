@@ -3,15 +3,14 @@ import React from "react";
 import { TypographyP } from "../ui/typography";
 import Timestamp from "../timestamp";
 import Gallery from "../image/gallery";
-import { Image } from "@/types/profile";
 
 export default function ChatBubble({
   text,
   isRecipient,
-  images,
+  images = [],
   date,
 }: {
-  images?: { src: string }[] | null;
+  images?: { src: string }[];
   text: string;
   isRecipient?: boolean;
   date: Date;
@@ -31,13 +30,11 @@ export default function ChatBubble({
           isRecipient
             ? "bg-default-200 rounded-r-medium rounded-bl-medium self-start"
             : "bg-default-100 rounded-l-medium rounded-br-medium self-end",
-          images ? "pb-4" : ""
+          images.length > 0 ? "pb-4" : ""
         )}
       >
         <TypographyP className="!text-[1rem]">{text}</TypographyP>
-        {images && (images ?? []).length > 0 ? (
-          <Gallery images={images} />
-        ) : null}
+        {images && images.length > 0 ? <Gallery images={images} /> : null}
       </div>
       <Timestamp
         className={clsx(

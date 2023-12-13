@@ -7,7 +7,7 @@ import { Input, InputProps } from "@nextui-org/input";
 import { ScrollShadow, Spinner } from "@nextui-org/react";
 import clsx from "clsx";
 import React, { useCallback, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
 import UserCard from "./user-card";
 import { TypographyMuted } from "../ui/typography";
 
@@ -33,7 +33,7 @@ export default function UserAutocomplete({
     ...rest
   } = inputProps;
   const [filterText, setFilterText] = useState("");
-  const { isLoading, searchResult, isError, isSuccess } = useGetSearchResult({
+  const { isLoading, searchResult, isSuccess } = useGetSearchResult({
     q: filterText,
     type: "user",
   });
@@ -75,26 +75,29 @@ export default function UserAutocomplete({
       <Input
         onKeyDown={handleInputKeyDown}
         value={filterText}
-        isClearable
-        onClear={() => setFilterText("")}
         onValueChange={setFilterText}
         labelPlacement={labelPlacement ?? "outside"}
-        startContent={<FiSearch size={20} />}
+        startContent={<FiSearch size={18} />}
+        classNames={{ clearButton: "mt-[50%] -translate-y-1/2" }}
         endContent={
-          isLoading && (
-            <Spinner size="sm" className=" text-[1.25rem]" color="default" />
+          isLoading && filterText ? (
+            <Spinner size="sm" className="text-[1.25rem" color="default" />
+          ) : filterText ? (
+            <FiChevronUp onClick={() => setFilterText("")} />
+          ) : (
+            <FiChevronDown />
           )
         }
         type={type ?? "text"}
-        label={label ?? "Search participants"}
-        placeholder={placeholder ?? "Type users here"}
+        label={label}
+        placeholder={placeholder ?? "Search users..."}
         {...rest}
       />
       {filterText && (
         <ScrollShadow
           hideScrollBar
           isEnabled={isScrollShadowEnabled}
-          className="bg-content1 rounded-large shadow-medium absolute left-1/2 mt-20 -translate-x-1/2 w-full z-20 max-h-[400px]"
+          className="bg-content1 rounded-large shadow-medium absolute mt-12 left-1/2 -translate-x-1/2 w-full z-20 max-h-[400px]"
         >
           <ul className="w-full grid grid-cols-1 ">
             {itemsLength > 0 ? (

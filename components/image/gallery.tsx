@@ -26,13 +26,13 @@ const getTemplateArea = (items: any[]) => {
 };
 
 export default function Gallery({
-  images,
+  images = [],
 }: {
-  images: { src: string }[] | null;
+  images: { src: string }[];
 }) {
   const showGallery = useShowImageGallery();
   const isSSR = useIsSSR();
-  if ((images ?? []).length === 0 || images === null) return null;
+  if (images.length === 0) return null;
 
   return (
     <div

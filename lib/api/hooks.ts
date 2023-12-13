@@ -183,23 +183,31 @@ export const useMutate = <T, P = {}>({
 };
 
 // UNSTABLE
-export const useOptimistic = <T>({
+export const useOptimistic = <T, P, TB = any>({
   method,
   baseUrl,
   optimisticUpdater,
   invalidateTags,
+  transformBody,
 }: {
   method: MutationMethod;
   baseUrl: string;
-  invalidateTags?: QueryKey[];
+  transformBody?: (body: T) => TB;
+  invalidateTags?: (v: {
+    body?: T;
+    formData?: boolean;
+    params?: Record<string, string | number> | P;
+    config?: AxiosRequestConfig;
+  }) => QueryKey[];
   optimisticUpdater: (v: {
     body?: T;
     formData?: boolean;
-    params?: Record<string, string | number>;
+    params?: Record<string, string | number> | P;
     config?: AxiosRequestConfig;
   }) => {
+    isInfiniteData?: boolean;
     queryKey: QueryKey;
-    updater: <S>(oldData: S) => S;
+    updater: (oldData: any) => any;
     options?: SetDataOptions | undefined;
   }[];
 }) => {
@@ -217,10 +225,7 @@ export const useOptimistic = <T>({
       params?: Record<string, string | number>;
       config?: AxiosRequestConfig;
     }) => {
-      let body = v?.body;
-      // const formData = v?.formData
-      //   ? getFormData((body as Record<string, string>) ?? {})
-      //   : null;
+      let body = transformBody ? transformBody(v?.body as T) : v?.body;
 
       const config: AxiosRequestConfig = {
         ...v?.config,
@@ -265,6 +270,14 @@ export const useOptimistic = <T>({
           key: opt.queryKey,
           data: queryClient.getQueryData(opt.queryKey),
         });
+        if (opt.isInfiniteData) {
+          return (
+            queryClient.setQueriesData(opt.queryKey, (old: unknown) =>
+              opt.updater(old)
+            ),
+            opt.options
+          );
+        }
         queryClient.setQueryData(
           opt.queryKey,
           (old: unknown) => opt.updater(old),
@@ -278,20 +291,18 @@ export const useOptimistic = <T>({
       context?.forEach((ctx) => {
         queryClient.setQueryData(ctx.key, ctx.data);
       });
-      //   queryClient.setQueryData([""], () => {});
-      //   queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-      //   queryClient.setQueryData(keys.posts, context?.posts);
+    },
+    onSuccess: (d, v) => {
+      if (invalidateTags) {
+        invalidateTags(v).forEach((tag) => {
+          queryClient.invalidateQueries({ queryKey: tag });
+        });
+      }
     },
     onSettled: (d, e, v) => {
       optimisticUpdater(v).forEach((opt) => {
         queryClient.invalidateQueries({ queryKey: opt.queryKey });
       });
-      invalidateTags?.forEach((tag) => {
-        queryClient.invalidateQueries({ queryKey: tag });
-      });
-      //   queryClient.invalidateQueries(keys.postById(v.postId));
-      //   queryClient.invalidateQueries(keys.posts);
-      //   queryClient.invalidateQueries(keys.mePosts());
     },
   });
 

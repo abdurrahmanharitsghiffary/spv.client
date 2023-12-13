@@ -1,9 +1,6 @@
 "use client";
 import ChatDisplay from "@/components/chat/chat-display";
-import { TypographyH4 } from "@/components/ui/typography";
-import { Input } from "@nextui-org/input";
-import React, { useEffect } from "react";
-import { FiSearch } from "react-icons/fi";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "@/hooks/use-socket";
 import { Socket_Event } from "@/lib/socket-event";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,10 +12,25 @@ import CreateGroupModal from "@/components/modal/create-group-modal";
 import UserCardSkeleton from "@/components/user/user-card-skeleton";
 import CreateRoomSpeedDial from "@/components/speed-dial/create-room";
 import InputSearch from "@/components/input/search";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
+import { Spinner } from "@nextui-org/spinner";
+import { Tab, Tabs } from "@nextui-org/tabs";
+import { Key } from "@/types";
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 export default function ChatsPage() {
-  const { chatRooms, isSuccess, isError, isLoading } =
-    useGetMyAssociatedChatRooms();
+  const [q, setQ] = useState("");
+  const [selectedKey, setSelectedKey] = useState<Key>("all");
+  console.log(selectedKey, "Sel Key");
+  const {
+    chatRooms,
+    isSuccess,
+    isFetchNextNotAvailable,
+    isFetching,
+    isLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useGetMyAssociatedChatRooms({ type: selectedKey as any, q });
   const socket = useSocket();
   const queryClient = useQueryClient();
 
@@ -27,6 +39,12 @@ export default function ChatsPage() {
       queryKey: keys.meChats(),
     });
   };
+
+  const { ref } = useFetchNextPageObserver({
+    isDisabled: isFetchNextNotAvailable,
+    isFetching,
+    fetchNextPage,
+  });
 
   useEffect(() => {
     if (!socket) return;
@@ -41,26 +59,47 @@ export default function ChatsPage() {
 
   return (
     <div className="w-full flex flex-col gap-1 pt-5 pb-16">
-      <div className="flex flex-col gap-2">
-        {/* <TypographyH4 className="!text-base">Active users</TypographyH4> */}
-        {/* <Slider classNames={{ body: "gap-5" }}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((u) => (
-            <ChatAvatar key={u} isOnline />
-          ))}
-        </Slider> */}
-      </div>
-      <InputSearch
-        placeholder="Search users..."
+      <div className="flex flex-col gap-2"></div>
+      <Tabs
+        selectedKey={selectedKey}
+        onSelectionChange={setSelectedKey}
         fullWidth
-        className="px-2"
+        variant="underlined"
+        className="pb-2"
+        disableAnimation
+      >
+        <Tab key="all" title="All"></Tab>
+        <Tab key="personal" title="Personal"></Tab>
+        <Tab key="group" title="Group"></Tab>
+      </Tabs>
+      <InputSearch
+        placeholder={
+          selectedKey === "all"
+            ? "Search users or groups..."
+            : selectedKey === "group"
+            ? "Search groups..."
+            : "Search users..."
+        }
+        onClear={() => setQ("")}
+        onValueChange={setQ}
+        value={q}
+        variant="faded"
+        fullWidth
+        className="px-4"
         radius="full"
         autoFocus={false}
       />
       <div className="flex flex-col w-full">
         {isSuccess && totalRooms === 0 && (
           <div className="w-full h-full flex justify-center items-center flex-col gap-2 absolute left-1/2 -translate-x-1/2 top-1/2 translate-y-1/2">
-            <IoChatbubbleEllipses size={25} />
-            No chat available
+            {q ? (
+              <span>No result found</span>
+            ) : (
+              <>
+                <IoChatbubbleEllipses size={25} />
+                No chat available
+              </>
+            )}
           </div>
         )}
         {isLoading
@@ -74,7 +113,11 @@ export default function ChatsPage() {
             (chatRooms?.data ?? []).map((chat) => (
               <ChatDisplay chat={chat} key={chat.id} />
             ))}
+        {isFetchingNextPage && (
+          <Spinner color="primary" className="my-4 mx-auto" />
+        )}
       </div>
+      <div id="next_ftcr" ref={ref}></div>
       <CreateRoomSpeedDial />
       <CreateGroupModal />
       <CreateRoomModal />

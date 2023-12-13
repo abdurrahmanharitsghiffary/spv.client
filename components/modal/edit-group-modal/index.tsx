@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ModalLayoutV2 from "../layoutV2";
@@ -12,11 +10,10 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { zImage } from "@/lib/zod-schema/image";
-import { Input, Textarea } from "@nextui-org/input";
 import ValidationErrorText from "@/components/validation-error-text";
 import { Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FiEdit, FiPlus } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
@@ -31,13 +28,11 @@ import {
 } from "@/components/form/input/input-with-control";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useParams } from "next/navigation";
+import UserGroupList from "@/components/user/user-group-list";
+import { TypographyLarge } from "@/components/ui/typography";
 
 const editGroupSchema = z.object({
-  participants: z
-    .number()
-    .array()
-    .min(2, { message: "Must be at least 2 participant" })
-    .optional(),
+  participants: z.any().array().optional(),
   title: z
     .string()
     .max(125, { message: "Title must be at least 125 characters or fewer" })
@@ -53,32 +48,26 @@ export default function EditGroupModal() {
   const { groupId } = useParams();
   const { chatRoom } = useGetChatRoomById(Number(groupId));
   const { updateGroupChatAsync } = useUpdateGroupChat();
-  const [selectedUsers, setSelectedUsers] = useState<UserAccountPublic[]>([]);
-
-  const selectedUserIds = useMemo(
-    () => selectedUsers.map((user) => user.id),
-    [selectedUsers]
-  );
-
   const {
     formState: { isSubmitSuccessful, errors },
     handleSubmit,
     control,
+    setValue,
     watch,
     reset,
   } = useForm<EditGroupSchema>({
     resolver: zodResolver(editGroupSchema),
     values: {
-      participants: selectedUserIds,
+      participants: [],
       description: chatRoom?.data?.description ?? undefined,
       title: chatRoom?.data?.title ?? undefined,
     },
   });
+  const selectedUsers = watch("participants");
   const isOpen = useEditGroupIsOpen();
   const { onClose } = useEditGroupActions();
 
   const handleReset = useCallback(() => {
-    setSelectedUsers([]);
     reset();
   }, []);
 
@@ -91,21 +80,39 @@ export default function EditGroupModal() {
     if (isSubmitSuccessful) handleClose();
   }, [isSubmitSuccessful]);
 
-  const handleItemClick = useCallback((item: UserAccountPublic) => {
-    setSelectedUsers((v) => removeDuplicates([...v, item]).slice());
-  }, []);
+  const handleItemClick = useCallback(
+    (item: UserAccountPublic) => {
+      setValue(
+        "participants",
+        removeDuplicates([
+          ...(selectedUsers ?? []),
+          { ...getUserSimplified(item), role: "user" },
+        ]).slice()
+      );
+    },
+    [selectedUsers]
+  );
 
   const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
     console.log(data);
+
+    const participants = (data?.participants ?? []).map((participant) => ({
+      role: participant.role,
+      id: participant.id,
+    }));
+
     await toast.promise(
       updateGroupChatAsync({
         body: {
           image: data?.image,
-          participants: data.participants,
+          participants: participants,
           title: data?.title,
           description: data?.description,
         },
         formData: true,
+        params: {
+          groupId: Number(groupId),
+        },
       })
         .then((res) => res)
         .catch((err) => Promise.reject(err)),
@@ -134,23 +141,6 @@ export default function EditGroupModal() {
         </Button>
       }
     >
-      <UserAutocomplete
-        isScrollShadowEnabled={false}
-        onItemClick={handleItemClick}
-      />
-      <div className="flex gap-2 w-full flex-wrap">
-        {selectedUsers?.map((user) => (
-          <UserChip
-            key={user?.id}
-            onCloseClick={() => {
-              setSelectedUsers((v) => v.filter((u) => u.id !== user.id));
-            }}
-            user={getUserSimplified(user)}
-          >
-            {user?.username}
-          </UserChip>
-        ))}
-      </div>
       {errors?.participants?.message && (
         <ValidationErrorText>
           {errors?.participants?.message}
@@ -162,6 +152,7 @@ export default function EditGroupModal() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="w-fit h-fit mx-auto flex flex-col gap-4 justify-center items-center">
+          <TypographyLarge>Group picture</TypographyLarge>
           <Avatar
             fallback={
               <div className="p-4 w-[80px] h-[80px] aspect-square">
@@ -191,6 +182,25 @@ export default function EditGroupModal() {
               {errors?.image?.message as any}
             </ValidationErrorText>
           )}
+        </div>
+        <div className="w-full flex flex-col gap-2">
+          <UserAutocomplete
+            isScrollShadowEnabled={false}
+            inputProps={{
+              form: "cvcvcvcv",
+            }}
+            onItemClick={handleItemClick}
+          />
+          <ul className="w-full max-w-full grid grid-cols-1 gap-2">
+            {(selectedUsers ?? []).map((user) => (
+              <UserGroupList
+                selectedUsers={selectedUsers}
+                key={user.id}
+                setValue={setValue}
+                user={user as any}
+              />
+            ))}
+          </ul>
         </div>
         <InputWithControl
           label="Group title"

@@ -10,19 +10,16 @@ import AvatarWithPreview from "../image/avatar-with-preview";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import Link from "next/link";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
+import { Skeleton } from "@nextui-org/skeleton";
 
 export default function GroupPage({ groupId }: { groupId: number }) {
   const { chatRoom, isLoading, isSuccess, error, isError } = useGetChatRoomById(
     Number(groupId)
   );
 
-  const isGroupChat = chatRoom?.data.isGroupChat ?? false;
+  const isGroupChat = chatRoom?.data?.isGroupChat ?? false;
 
-  useNotFoundRedirect(
-    error,
-    isError,
-    !chatRoom?.data?.isGroupChat && isSuccess
-  );
+  useNotFoundRedirect(error, isError, !isGroupChat && isSuccess);
 
   return (
     <>
@@ -37,13 +34,21 @@ export default function GroupPage({ groupId }: { groupId: number }) {
         />
       </div>
       <div className="w-full flex flex-col gap-2 px-4">
-        <TypographyH3 className="text-center">
-          {chatRoom?.data?.title}
-        </TypographyH3>
-        <TypographyMuted className="text-center">
-          Group {chatRoom?.data?.participants?.total ?? 0} member
-          {(chatRoom?.data?.participants?.total ?? 0) > 1 ? "s" : ""}
-        </TypographyMuted>
+        {isLoading ? (
+          <Skeleton className="h-[20px] rounded-full mx-auto w-[80px]" />
+        ) : (
+          <TypographyH3 className="text-center">
+            {chatRoom?.data?.title}
+          </TypographyH3>
+        )}
+        {isLoading ? (
+          <Skeleton className="h-[16px] rounded-full mx-auto w-[90px]" />
+        ) : (
+          <TypographyMuted className="text-center">
+            Group {chatRoom?.data?.participants?.total ?? 0} member
+            {(chatRoom?.data?.participants?.total ?? 0) > 1 ? "s" : ""}
+          </TypographyMuted>
+        )}
         <div className="flex gap-2 justify-between w-full py-2">
           <Button
             color="primary"

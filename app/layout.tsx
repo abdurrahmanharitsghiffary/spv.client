@@ -16,7 +16,7 @@ export default async function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased relative flex flex-col",
+          "min-h-[100dvh] bg-background font-sans antialiased relative flex flex-col",
           fontSans.variable
         )}
       >
@@ -41,6 +41,7 @@ export default async function RootLayout({
           <ImageGallery />
           <ImagePreview />
         </Providers>
+        <div id="modal_portal"></div>
       </body>
     </html>
   );

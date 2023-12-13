@@ -34,7 +34,7 @@ export default function PostCardBody({
           <PostContent content={content} />
         </Link>
       )}
-      <Gallery images={postImages} />
+      <Gallery images={postImages ?? []} />
     </CardBody>
   );
 }

@@ -22,7 +22,7 @@ import { z } from "zod";
 import { zImage } from "@/lib/zod-schema/image";
 import { Input, Textarea } from "@nextui-org/input";
 import ValidationErrorText from "@/components/validation-error-text";
-import { Avatar, Checkbox } from "@nextui-org/react";
+import { Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FiCheck, FiPlus, FiTrash, FiX } from "react-icons/fi";
 import InputFile from "@/components/input/file";
@@ -33,6 +33,7 @@ import UserCard from "@/components/user/user-card";
 import IconButton from "@/components/button/icon-button";
 import { TypographyLarge } from "@/components/ui/typography";
 import clsx from "clsx";
+import UserGroupList from "@/components/user/user-group-list";
 
 const createGroupSchema = z.object({
   participants: z
@@ -179,22 +180,20 @@ export default function CreateGroupModal() {
           <UserAutocomplete
             isScrollShadowEnabled={false}
             inputProps={{
-              labelPlacement: "outside",
-              variant: "faded",
               form: "cvcvcvcv",
             }}
             onItemClick={handleItemClick}
           />
-          <div className="w-full max-w-full grid grid-cols-1 gap-2">
+          <ul className="w-full max-w-full grid grid-cols-1 gap-2">
             {selectedUsers.map((user) => (
-              <UserWithCheckbox
+              <UserGroupList
                 selectedUsers={selectedUsers}
                 key={user.id}
                 setValue={setValue}
                 user={user as any}
               />
             ))}
-          </div>
+          </ul>
         </div>
 
         {errors?.participants?.message && (
@@ -203,7 +202,6 @@ export default function CreateGroupModal() {
           </ValidationErrorText>
         )}
         <Input
-          variant="faded"
           label="Group title (optional)"
           placeholder="Enter your group title"
           isInvalid={errors?.title?.message !== undefined}
@@ -212,7 +210,6 @@ export default function CreateGroupModal() {
           {...register("title")}
         />
         <Textarea
-          variant="faded"
           label="Group description (optional)"
           placeholder="Enter your group description"
           isInvalid={errors?.description?.message !== undefined}
@@ -222,72 +219,5 @@ export default function CreateGroupModal() {
         />
       </form>
     </ModalLayoutV2>
-  );
-}
-
-function UserWithCheckbox({
-  user,
-  setValue,
-  selectedUsers,
-}: {
-  user: UserSimplified & { role: "admin" | "user" };
-  setValue: UseFormSetValue<{
-    participants: any[];
-  }>;
-  selectedUsers: any;
-}) {
-  const handleRoleChange = () => {
-    setValue(
-      "participants",
-      selectedUsers.map((item: UserSimplified & { role: "admin" | "user" }) => {
-        if (item.id === user.id) {
-          return { ...item, role: item.role === "user" ? "admin" : "user" };
-        }
-        return item;
-      })
-    );
-  };
-
-  const handleCloseClick = () => {
-    setValue(
-      "participants",
-      selectedUsers.filter((item: any) => item.id !== user.id)
-    );
-  };
-
-  return (
-    <div className="flex gap-2 justify-between items-center pl-2">
-      <UserCard
-        user={user}
-        hideLink
-        withFollowButton={false}
-        className="shadow-none rounded-none px-0"
-        cardClassNames={{ body: "!px-0" }}
-      />
-      <Button
-        variant={user.role === "admin" ? "flat" : "faded"}
-        color={user.role === "user" ? "default" : "success"}
-        size="sm"
-        endContent={
-          user.role === "admin" && (
-            <div className="text-[0.875rem]">
-              <FiCheck />
-            </div>
-          )
-        }
-        onClick={handleRoleChange}
-        className={clsx("capitalize", user.role === "admin" && "px-6")}
-      >
-        Admin
-      </Button>
-      <IconButton
-        size="sm"
-        color="danger"
-        variant="flat"
-        onClick={handleCloseClick}
-      >
-        <FiTrash size={16} />
-      </IconButton>
-    </div>
   );
 }

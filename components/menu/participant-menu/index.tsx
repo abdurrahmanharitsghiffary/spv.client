@@ -12,32 +12,94 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "@/stores/auth-store";
 import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
 import { ParticipantRole } from "@/types/chat";
+import { useConfirm } from "@/stores/confirm-store";
+import {
+  useAddGroupParticipants,
+  useAddGroupParticipantsOptimistic,
+  useRemoveParticipants,
+  useRemoveParticipantsOptimistic,
+} from "@/lib/api/chats/mutation";
+import { toast } from "react-toastify";
 
 export default function ParticipantMenu() {
   const participantId = useParticipantMenuId();
-
   const isOpen = useParticipantMenuIsOpen();
   const { onClose } = useParticipantMenuActions();
   const router = useRouter();
   const { groupId } = useParams();
+  const gId = Number(groupId);
   const session = useSession();
-  const { participant } = useGetChatRoomParticipant(
-    Number(groupId),
-    session?.id ?? -1
-  );
+  const { participant } = useGetChatRoomParticipant(gId, session?.id ?? -1);
   const { participant: selectedParticipant } = useGetChatRoomParticipant(
-    Number(groupId),
+    gId,
     participantId
   );
-  const currentUserRole = participant?.data.role ?? "user";
+  const confirm = useConfirm();
+  const { removeParticipantsAsync } = useRemoveParticipantsOptimistic();
+  const { addGroupParticipantsAsync } = useAddGroupParticipantsOptimistic();
+  const currentUserRole = participant?.data?.role ?? "user";
   const selectedParticipantRole: ParticipantRole =
-    selectedParticipant?.data.role ?? "user";
+    selectedParticipant?.data?.role ?? "user";
 
-  const handleMenuActions = (key: React.Key) => {
-    switch (key) {
-      case "profile": {
-        router.push(`/users/${participantId}`);
+  const handleMenuActions = async (key: React.Key) => {
+    try {
+      switch (key) {
+        case "profile": {
+          router.push(`/users/${participantId}`);
+          return;
+        }
+        case "delete-z": {
+          await confirm({
+            confirmColor: "danger",
+            confirmLabel: "Remove",
+            body: "Are you sure remove this user from group?",
+            title: "Remove user",
+          });
+
+          await removeParticipantsAsync({
+            body: {
+              ids: [participantId],
+            },
+            params: {
+              roomId: gId,
+            },
+          });
+          return;
+        }
+        case "grant": {
+          if (!selectedParticipant) return;
+          await addGroupParticipantsAsync({
+            body: {
+              participants: [{ ...selectedParticipant?.data, role: "admin" }],
+            },
+            params: {
+              roomId: gId,
+            },
+          });
+          return;
+        }
+        case "dismiss-delete": {
+          if (!selectedParticipant) return;
+          await confirm({
+            body: "Demote this user from admin?",
+            title: "Demote",
+            confirmLabel: "Demote",
+          });
+          await addGroupParticipantsAsync({
+            body: {
+              participants: [{ ...selectedParticipant?.data, role: "user" }],
+            },
+            params: {
+              roomId: gId,
+            },
+          });
+          return;
+        }
       }
+    } catch (err: any) {
+      if (err?.message) toast.error(err?.message);
+    } finally {
+      onClose();
     }
   };
 
@@ -47,7 +109,7 @@ export default function ParticipantMenu() {
 
   const adminItems = [
     ...menuItems,
-    { key: "kick-delete", label: "Remove from group", icon: <BiTrash /> },
+    { key: "delete-z", label: "Remove from group", icon: <BiTrash /> },
   ];
 
   const isAdminUpdatingAdmin =
@@ -92,3 +154,5 @@ export default function ParticipantMenu() {
     />
   );
 }
+
+// HOW DO WE DISPLAY ROLE OF EACH GROUP PARTICIPANTS??

@@ -17,7 +17,8 @@ const useParticipantMenuStore = create<State & { actions: Action }>((set) => ({
   actions: {
     onOpen: (participantId) =>
       set((state) => ({ ...state, isOpen: true, participantId })),
-    onClose: () => set((state) => ({ ...state, isOpen: false })),
+    onClose: () =>
+      set((state) => ({ ...state, isOpen: false, participantId: -1 })),
   },
 }));
 

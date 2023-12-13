@@ -4,7 +4,7 @@ import IconButton from "@/components/button/icon-button";
 import { useParticipantMenuActions } from "@/stores/participant-menu-store";
 import { ButtonProps } from "@nextui-org/button";
 import React from "react";
-import { FiMoreVertical } from "react-icons/fi";
+import { FiMoreHorizontal } from "react-icons/fi";
 
 export default function ParticipantMenuTrigger({
   participantId,
@@ -15,7 +15,7 @@ export default function ParticipantMenuTrigger({
 
   return (
     <IconButton onClick={() => onOpen(participantId)} {...rest}>
-      <FiMoreVertical />
+      <FiMoreHorizontal />
     </IconButton>
   );
 }

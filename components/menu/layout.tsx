@@ -86,7 +86,7 @@ export default function MenuLayout({
                   }
             }
             className="w-full
-             shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed md:min-h-screen md:overflow-y-auto md:hide-scrollbar md:rounded-t-none md:max-w-sm"
+             shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed md:min-h-[100dvh] md:overflow-y-auto md:hide-scrollbar md:rounded-t-none md:max-w-sm"
             style={
               isMd
                 ? { zIndex: 201, insetBlock: 0, right: 0 }

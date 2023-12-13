@@ -276,7 +276,7 @@ export default function EditProfileModal() {
 //       }}
 //       header={<Divider className="w-full" />}
 //       classNames={{
-//         wrapper: "min-h-screen",
+//         wrapper: "min-h-[100dvh]",
 //         header: "p-0 h-[100px] items-end ",
 //         footer: "p-4",
 //       }}

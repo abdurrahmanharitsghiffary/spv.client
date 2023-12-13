@@ -1,5 +1,4 @@
-import { Avatar } from "@nextui-org/avatar";
-import { Badge } from "@nextui-org/badge";
+"use client";
 import React from "react";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import Time from "../time";
@@ -7,7 +6,7 @@ import Link from "next/link";
 import { Chip } from "@nextui-org/chip";
 import { ChatRoom } from "@/types/chat";
 import { useSession } from "@/stores/auth-store";
-import { RiGroupFill } from "react-icons/ri";
+import UserAvatar from "../user/user-avatar";
 
 export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   const session = useSession();
@@ -18,19 +17,21 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   return (
     <Link
       href={`/chats/${chat?.id}`}
-      className="flex gap-1 w-full px-4 justify-between last:border-none border-b-1 border-divider py-2 max-h-[57px]"
+      className="flex gap-1 w-full px-4 justify-between last:border-none border-b-1 border-divider py-2 max-h-[65px]"
     >
-      <UserAvatar
-        name={
-          chat.isGroupChat
-            ? chat.title || "Group chat #" + chat.id
-            : user?.fullName ?? ""
-        }
-        src={chat.isGroupChat ? chat.picture?.src : user?.avatarImage?.src}
-        isOnline={chat.isGroupChat ? false : user?.isOnline}
-      />
+      <div className="flex justify-center items-center w-fit flex-shrink-0">
+        <UserAvatar
+          name={
+            chat.isGroupChat
+              ? chat.title || "Group chat #" + chat.id
+              : user?.fullName ?? ""
+          }
+          src={chat.isGroupChat ? chat.picture?.src : user?.avatarImage?.src}
+          isOnline={chat.isGroupChat ? false : user?.isOnline}
+        />
+      </div>
       <div className="flex gap-2 w-[80%] justify-between">
-        <div className="flex flex-col max-w-[80%] w-[80%] truncate">
+        <div className="flex flex-col max-w-[80%] w-[80%] truncate justify-center">
           <div className="flex gap-3 items-start max-h-full">
             <TypographyLarge className="!text-base !font-semibold truncate">
               {chat.isGroupChat
@@ -47,46 +48,22 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
               </Chip>
             ) : null}
           </div>
-          <TypographyMuted className="!text-[0.625rem] truncate">
-            {chat?.messages?.[0]?.message ?? "..."}
+          <TypographyMuted className="!text-xs truncate">
+            {chat?.messages?.[0]?.message ?? "Start conversation"}
           </TypographyMuted>
         </div>
-        <Time
-          date={chat?.messages?.[0]?.createdAt ?? chat?.createdAt}
-          className="!text-[0.625rem] text-right h-full"
-        />
+        <div className="flex flex-col gap-1 justify-center items-end">
+          {chat.isGroupChat && (
+            <span className="text-tiny rounded-sm py-[1px] bg-secondary/80 text-secondary-foreground px-2 text-center">
+              Group
+            </span>
+          )}
+          <Time
+            date={chat?.messages?.[0]?.createdAt ?? chat?.createdAt}
+            className="!text-xs text-right h-full"
+          />
+        </div>
       </div>
     </Link>
-  );
-}
-
-function UserAvatar({
-  name,
-  isOnline,
-  src,
-}: {
-  name: string;
-  isOnline?: boolean;
-  src?: string;
-}) {
-  if (isOnline)
-    return (
-      <Badge content="" color="success" shape="circle" placement="bottom-right">
-        <Avatar
-          size="md"
-          name={name ?? ""}
-          src={src ?? ""}
-          className="flex-shrink-0"
-        />
-      </Badge>
-    );
-
-  return (
-    <Avatar
-      size="md"
-      name={name ?? ""}
-      src={src ?? ""}
-      className="flex-shrink-0"
-    />
   );
 }

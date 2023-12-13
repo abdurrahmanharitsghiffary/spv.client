@@ -59,14 +59,14 @@ export default function SpeedDial({
   const containerVariants: Variants = {
     hidden: {
       transition: {
-        staggerChildren: 0.07,
-        delayChildren: 0.08,
+        staggerChildren: 0.03,
+        delayChildren: 0.05,
       },
     },
     open: {
       transition: {
-        staggerChildren: 0.07,
-        delayChildren: 0.08,
+        staggerChildren: 0.03,
+        delayChildren: 0.05,
         staggerDirection: -1,
       },
     },
@@ -85,12 +85,13 @@ export default function SpeedDial({
     <motion.div
       className={clsx("w-fit flex flex-col gap-2 items-center", className)}
       animate={isOpen ? "open" : "hidden"}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      // onMouseEnter={() => setIsOpen(true)}
+      // onMouseLeave={() => setIsOpen(false)}
     >
       <motion.ul
         variants={containerVariants}
         className="flex flex-col gap-1 w-fit justify-center items-center"
+        initial={false}
       >
         {items.map((item) => (
           <motion.li key={item.key} variants={itemVariants} initial={false}>
@@ -115,16 +116,21 @@ export default function SpeedDial({
       </motion.ul>
       <Button
         size={size}
-        as={motion.button}
         isIconOnly={isIconOnly}
         radius={radius}
         color={color}
         fullWidth={fullWidth}
-        onMouseEnter={(e) => e.stopPropagation()}
-        onMouseLeave={(e) => e.stopPropagation()}
+        variant="shadow"
+        // onMouseEnter={(e) => e.stopPropagation()}
+        // onMouseLeave={(e) => e.stopPropagation()}
         onClick={() => setIsOpen((c) => !c)}
       >
-        <motion.span variants={iconVariants}>
+        <motion.span
+          variants={iconVariants}
+          initial={false}
+          // onMouseEnter={(e) => e.stopPropagation()}
+          // onMouseLeave={(e) => e.stopPropagation()}
+        >
           <FiPlus size={20} />
         </motion.span>
       </Button>

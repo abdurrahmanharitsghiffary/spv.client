@@ -7,7 +7,7 @@ export default function LoginLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Layout className="my-auto flex justify-center items-center h-full w-full px-4 min-h-screen">
+    <Layout className="my-auto flex justify-center items-center h-full w-full px-4 min-h-[100dvh]">
       {children}
     </Layout>
   );
