@@ -15,9 +15,8 @@ import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
 import { PostExtended, PostLikeResponse } from "@/types/post";
 import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
-import { useMemo } from "react";
 import { useInfinite } from "../hooks";
 
 export const useGetPosts = (
@@ -67,30 +66,6 @@ export const useGetPostByUserId = (
     url: userPost(userId.toString()),
     config,
   });
-
-  // const request = useAxiosInterceptor();
-
-  // const { data, ...rest } = useInfiniteQuery<ApiPagingObjectResponse<PostExtended[]>>({
-  //   queryKey: [...keys.posts, userId, query, "users"],
-  //   queryFn: ({ pageParam }) =>
-  //     pageParam === null
-  //       ? Promise.resolve(undefined)
-  //       : request
-  //           .get(pageParam ? pageParam : userPost(userId.toString()), config)
-  //           .then((res) => res.data)
-  //           .catch((err) => Promise.reject(err?.response?.data)),
-  //   getNextPageParam: (res) => res?.pagination?.next ?? null,
-  //   getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
-  // });
-  // const posts = useMemo(
-  //   () => ({
-  //     ...data?.pages?.[0],
-  //     data: data?.pages
-  //       ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-  //       .flat(),
-  //   }),
-  //   [data]
-  // );
 
   return { posts, ...rest };
 };
@@ -160,34 +135,19 @@ export const useGetMySavedPosts = (
     | undefined,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data, ...rest } = useInfiniteQuery<
-    ApiPagingObjectResponse<(PostExtended & { assignedAt: Date })[]>
+  const { data: mySavedPosts, ...rest } = useInfinite<
+    PostExtended & { assignedAt: Date }
   >({
+    url: mySavedPostsRoute(query),
+    query: {
+      limit: query?.limit?.toString(),
+      offset: query?.offset?.toString(),
+    },
+    config,
     queryKey: [...keys.posts, "saved", query],
-    queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(pageParam ? pageParam : mySavedPostsRoute(query), config)
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
-    getNextPageParam: (res) => res?.pagination?.next ?? null,
-    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
   });
 
-  const mySavedPosts = useMemo(
-    () => ({
-      ...data?.pages?.[0],
-      data: data?.pages
-        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-        .flat(),
-    }),
-    [data]
-  );
-
-  return { mySavedPosts, data, ...rest };
+  return { mySavedPosts, ...rest };
 };
 
 export const useGetPostIsSaved = (

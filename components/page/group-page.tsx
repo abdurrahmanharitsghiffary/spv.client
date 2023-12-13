@@ -7,16 +7,25 @@ import EditGroupTrigger from "../modal/edit-group-modal/edit-group-trigger";
 import GroupDescription from "../group/group-description";
 import GroupMembers from "../group/group-members";
 import AvatarWithPreview from "../image/avatar-with-preview";
-import { useGetChatRoomById } from "@/lib/api/chats/query";
+import {
+  useGetChatRoomById,
+  useGetChatRoomParticipant,
+} from "@/lib/api/chats/query";
 import Link from "next/link";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { Skeleton } from "@nextui-org/skeleton";
+import { useSession } from "@/stores/auth-store";
 
 export default function GroupPage({ groupId }: { groupId: number }) {
   const { chatRoom, isLoading, isSuccess, error, isError } = useGetChatRoomById(
     Number(groupId)
   );
+  const session = useSession();
 
+  const { participant, isSuccess: isSuccessGCRP } = useGetChatRoomParticipant(
+    Number(groupId),
+    session?.id ?? -1
+  );
   const isGroupChat = chatRoom?.data?.isGroupChat ?? false;
 
   useNotFoundRedirect(error, isError, !isGroupChat && isSuccess);
@@ -58,7 +67,9 @@ export default function GroupPage({ groupId }: { groupId: number }) {
           >
             Message
           </Button>
-          <EditGroupTrigger className="flex-1" />
+          {isSuccessGCRP && participant?.data.role !== "user" && (
+            <EditGroupTrigger className="flex-1" />
+          )}
         </div>
         <GroupDescription description={chatRoom?.data?.description ?? ""} />
       </div>

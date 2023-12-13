@@ -7,6 +7,7 @@ import { CreateMessageData, ParticipantsField } from "@/types";
 import { ChatRoom, ChatRoomParticipant } from "@/types/chat";
 import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
 import { getParticipants, updateParticipantsData } from "./utils";
+import { useSession } from "@/stores/auth-store";
 
 export const useCreateMessage = () => {
   const {
@@ -38,6 +39,22 @@ export const useCreateChatRoom = () => {
 
   return { createChatRoom, createChatRoomAsync, ...rest };
 };
+
+// export const useCreateChatRoomOptimistic = () => {
+//   const {} = useOptimistic<{user:UserSimplified}>({baseUrl:baseChatRoutes, method:"post", optimisticUpdater(v) {
+//     return [{
+//       queryKey:keys.meChats(),
+//       isInfiniteData:true,
+//       updater<OD extends InfiniteData<ApiPagingObjectResponse<ChatRoom[]>>>(oldData:OD):OD {
+//         if(!oldData) return oldData
+//         return {...oldData, pages:oldData.pages.map(page => {
+//           page.
+//         })}
+//       },
+//     }]
+//   },})
+
+// }
 
 export const useCreateGroupChat = () => {
   const {
@@ -116,6 +133,64 @@ export const useJoinGroupChat = () => {
   return { joinGroupChat, joinGroupChatAsync, ...rest };
 };
 
+export const useJoinGroupChatOptimistic = () => {
+  const {
+    optimistic: joinGroup,
+    optimisticAsync: joinGroupAsync,
+    ...rest
+  } = useOptimistic<
+    { user: ChatRoomParticipant },
+    { groupId: string | number },
+    undefined
+  >({
+    baseUrl: baseChatRoutes + "/group/:groupId/join",
+    transformBody: () => undefined,
+    method: "post",
+    invalidateTags: (v) => [keys.meChats()],
+    optimisticUpdater(v) {
+      const user = v.body?.user;
+      return [
+        {
+          queryKey: keys.chatByRoomId(Number(v.params?.groupId)),
+          updater<OD extends ApiResponseT<ChatRoom>>(oldData: OD): OD {
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                participants: {
+                  users: [user, ...oldData?.data?.participants?.users],
+                  total: oldData.data.participants.total + 1,
+                },
+              },
+            };
+          },
+        },
+        {
+          isInfiniteData: true,
+          queryKey: keys.participantByRoomId(Number(v?.params?.groupId)),
+          updater<OD extends InfiniteParticipantsData>(oldData: OD): OD {
+            if (!oldData) return undefined as any;
+            const pages = (oldData?.pages ?? []).filter((p) => p !== undefined);
+            const pg = pages.map((p) => p.data).flat();
+            const newPages = pages.slice(-1).map((p) => ({
+              ...p,
+              data: [user, ...pg],
+              pagination: {
+                ...p?.pagination,
+                result_count: p?.pagination?.result_count + 1,
+                total_records: p?.pagination?.total_records + 1,
+              },
+            }));
+            return { ...oldData, pages: newPages };
+          },
+        },
+      ];
+    },
+  });
+
+  return { joinGroup, joinGroupAsync, ...rest };
+};
+
 export const useLeaveGroupChat = () => {
   const {
     mutate: leaveGroupChat,
@@ -133,6 +208,60 @@ export const useLeaveGroupChat = () => {
 
   return { leaveGroupChat, leaveGroupChatAsync, ...rest };
 };
+
+export const useLeaveGroupChatOptimistic = () => {
+  const {} = useOptimistic<
+    { userId: number },
+    { groupId: number | string },
+    undefined
+  >({
+    baseUrl: baseChatRoutes + "/group/:groupId/leave",
+    method: "delete",
+    transformBody: () => undefined,
+    invalidateTags: (v) => [keys.meChats()],
+    optimisticUpdater(v) {
+      const gId = Number(v?.params?.groupId);
+      return [
+        {
+          queryKey: keys.chatByRoomId(gId),
+          updater<OD extends ApiResponseT<ChatRoom>>(oldData: OD): OD {
+            return {
+              ...oldData,
+              data: {
+                ...oldData?.data,
+                participants: {
+                  users: oldData?.data?.participants?.users?.filter(
+                    (user) => user.id !== v.body?.userId
+                  ),
+                  total: oldData?.data?.participants?.total - 1,
+                },
+              },
+            };
+          },
+        },
+        {
+          queryKey: keys.participantByRoomId(gId),
+          updater<OD extends InfiniteParticipantsData>(oldData: OD): OD {
+            const id = v?.body?.userId;
+            return {
+              ...oldData,
+              pages: (oldData?.pages ?? []).map((page) => ({
+                ...page,
+                data: (page?.data ?? []).filter((item) => id !== item.id),
+                pagination: {
+                  ...page?.pagination,
+                  total_records: (page?.pagination?.total_records ?? 0) - 1,
+                },
+              })),
+            };
+          },
+          isInfiniteData: true,
+        },
+      ];
+    },
+  });
+};
+
 type AddParticipantsOptions = { participants: ParticipantsField[] };
 type AddParticipantsParams = { roomId: string | number };
 export const useAddGroupParticipants = () => {
@@ -197,35 +326,6 @@ export const useAddGroupParticipantsOptimistic = () => {
       })),
     }),
     optimisticUpdater: (v) => [
-      // {
-      //   queryKey: keys.meChats(),
-      //   updater<OD extends InfiniteData<Array<ChatRoom>>>(oldData: OD): OD {
-      //     console.log(oldData, "Old Data");
-      //     return {
-      //       ...oldData,
-      //       pages: oldData.pages.map((page) =>
-      //         page.map((room) => {
-      //           if (room.id === Number(v.params?.roomId)) {
-      //             const { newParticipants, updatedParticipants } =
-      //               getParticipants(
-      //                 room.participants.users,
-      //                 v?.body?.participants ?? []
-      //               );
-
-      //             return {
-      //               ...room,
-      //               participants: {
-      //                 users: [...newParticipants, ...updatedParticipants],
-      //                 total: room.participants.total + newParticipants.length,
-      //               },
-      //             };
-      //           }
-      //           return room;
-      //         })
-      //       ),
-      //     };
-      //   },
-      // },
       {
         queryKey: keys.chatByRoomId(Number(v.params?.roomId)),
         updater<OD extends ApiResponseT<ChatRoom>>(oldData: OD): OD {
@@ -264,7 +364,6 @@ export const useAddGroupParticipantsOptimistic = () => {
     ...rest,
   };
 };
-
 export const useRemoveParticipantsOptimistic = () => {
   const {
     optimistic: removeParticipants,
@@ -286,6 +385,11 @@ export const useRemoveParticipantsOptimistic = () => {
               data: (page?.data ?? []).filter(
                 (item) => !ids.some((id) => id === item.id)
               ),
+              pagination: {
+                ...page?.pagination,
+                total_records:
+                  (page?.pagination?.total_records ?? 0) - ids.length,
+              },
             })),
           };
         },

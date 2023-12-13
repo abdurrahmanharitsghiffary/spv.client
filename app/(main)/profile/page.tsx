@@ -23,18 +23,17 @@ export default function ProfilePage() {
   const { myAccountInfo, isLoading, isSuccess } = useGetMyAccountInfo();
   const {
     myPosts,
-    data,
     isLoading: isPostLoading,
     isSuccess: isPostSuccess,
     isFetching,
+    isFetchNextNotAvailable,
     fetchNextPage,
     isFetchingNextPage,
   } = useGetMyPosts();
-  const isDisabled =
-    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
+
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
-    isDisabled,
+    isDisabled: isFetchNextNotAvailable,
     isFetching,
   });
 

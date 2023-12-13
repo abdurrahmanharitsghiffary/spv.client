@@ -9,7 +9,7 @@ export default function ChatLayout({
   return (
     <>
       <div
-        className="pt-5 flex flex-col gap-5 px-4 w-full pb-20"
+        className="pt-5 flex flex-col gap-5 px-4 w-full max-w-sm pb-20"
         // style={{
         //   backgroundSize: "100%",
         //   backgroundImage:

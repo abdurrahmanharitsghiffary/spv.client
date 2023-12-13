@@ -1,9 +1,9 @@
 "use client";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
+import { ApiResponseT } from "@/types/response";
 import { UserAccount } from "@/types/user";
 import { AxiosRequestConfig } from "axios";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   myAccount as myAccountEp,
   myChats as myChatsEp,
@@ -15,7 +15,6 @@ import {
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
 import { PostExtended } from "@/types/post";
-import { useMemo } from "react";
 import { useInfinite } from "../hooks";
 import { ChatRoom } from "@/types/chat";
 
@@ -59,36 +58,17 @@ export const useGetMyPosts = (
   query?: OffsetPaging,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data, ...rest } = useInfiniteQuery<
-    ApiPagingObjectResponse<PostExtended[]>
-  >({
+  const { data: myPosts, ...rest } = useInfinite<PostExtended>({
+    query: {
+      limit: query?.limit?.toString(),
+      offset: query?.offset?.toString(),
+    },
+    url: myPostsEp(query),
     queryKey: [...keys.mePosts(), query],
-    queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(pageParam ? pageParam : myPostsEp(query), config)
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
-    getNextPageParam: (res) => res?.pagination?.next ?? null,
-    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+    config,
   });
 
-  const myPosts = useMemo(
-    () => ({
-      ...data?.pages?.[0],
-      data: data?.pages
-        ?.map((page) =>
-          (page?.data ?? [])?.filter((data) => data !== undefined)
-        )
-        .flat(),
-    }),
-    [data]
-  );
-
-  return { myPosts, data, ...rest };
+  return { myPosts, ...rest };
 };
 
 export const useGetMyFollowers = (config?: AxiosRequestConfig) => {

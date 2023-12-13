@@ -29,17 +29,14 @@ import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useCreateGroupChat } from "@/lib/api/chats/mutation";
-import UserCard from "@/components/user/user-card";
-import IconButton from "@/components/button/icon-button";
 import { TypographyLarge } from "@/components/ui/typography";
-import clsx from "clsx";
 import UserGroupList from "@/components/user/user-group-list";
 
 const createGroupSchema = z.object({
   participants: z
-    .any()
+    .any({ required_error: "Participants must not be empty" })
     .array()
-    .min(2, { message: "Must be at least 2 participant" }),
+    .min(2, { message: "Must be at least 2 participants" }),
   title: z
     .string()
     .max(125, { message: "Title must be at least 125 characters or fewer" })

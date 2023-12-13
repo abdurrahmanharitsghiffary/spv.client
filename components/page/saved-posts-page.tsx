@@ -10,7 +10,7 @@ import { TypographyH3 } from "../ui/typography";
 
 export default function SavedPostsPage() {
   const {
-    data,
+    isFetchNextNotAvailable,
     mySavedPosts,
     isLoading,
     isFetchingNextPage,
@@ -19,13 +19,10 @@ export default function SavedPostsPage() {
     fetchNextPage,
   } = useGetMySavedPosts();
 
-  const isDisabled =
-    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
-
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
     isFetching,
-    isDisabled,
+    isDisabled: isFetchNextNotAvailable,
   });
 
   return (

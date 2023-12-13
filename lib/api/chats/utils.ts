@@ -56,26 +56,34 @@ export const updateParticipantsData = <OD extends InfiniteParticipantsData>(
   oldData: OD,
   participants: ChatRoomParticipant[]
 ): OD => {
-  const newPages = (oldData?.pages ?? []).map((page, i) => {
-    if (!page) return;
-    const currParticipants = page?.data;
+  const pages = oldData?.pages ?? [];
+  const p = pages
+    .filter((page) => page !== undefined)
+    .map((page) => page?.data)
+    .flat();
+  console.log(p, "P");
+  const newPages = pages
+    .filter((p) => p !== undefined)
+    .slice(-1)
+    .map((page, i) => {
+      if (!page) return;
 
-    const { newParticipants, updatedParticipants } = getParticipants(
-      currParticipants,
-      participants
-    );
+      const { newParticipants, updatedParticipants } = getParticipants(
+        p,
+        participants
+      );
 
-    return {
-      ...page,
-      data: [...newParticipants, ...updatedParticipants],
-      pagination: {
-        ...page.pagination,
-        result_count: page.pagination.result_count + newParticipants.length,
-        total_records: page.pagination.total_records + newParticipants.length,
-      },
-    };
-  });
-
+      return {
+        ...page,
+        data: [...newParticipants, ...updatedParticipants],
+        pagination: {
+          ...page.pagination,
+          result_count: page.pagination.result_count + newParticipants.length,
+          total_records: page.pagination.total_records + newParticipants.length,
+        },
+      };
+    });
+  console.log(newPages, "New pages");
   return {
     ...oldData,
     pages: newPages,

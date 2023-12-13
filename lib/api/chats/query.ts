@@ -17,7 +17,7 @@ export const useGetChatRoomById = (roomId: number, enabled: boolean = true) => {
 
 export const useGetParticipantsByRoomId = (
   roomId: number,
-  query: { limit?: string; offset?: string } = { limit: "20", offset: "0" }
+  query: { limit?: string; offset?: string } = { limit: "5", offset: "0" }
 ) => {
   const { data: participants, ...rest } = useInfinite<ChatRoomParticipant>({
     query,

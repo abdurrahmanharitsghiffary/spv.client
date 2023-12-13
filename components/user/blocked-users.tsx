@@ -3,7 +3,6 @@
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { useGetBlockedUsers } from "@/lib/api/users/query";
 import React from "react";
-import UserCard from "./user-card";
 import { Spinner } from "@nextui-org/react";
 import UserCardSkeleton from "./user-card-skeleton";
 import BlockedUserCard from "./blocked-user-card";
@@ -11,19 +10,18 @@ import { TypographyH4 } from "../ui/typography";
 
 export default function BlockedUsers() {
   const {
-    data,
     isLoading,
     isSuccess,
+    isFetchNextNotAvailable,
     isFetchingNextPage,
     isFetching,
     fetchNextPage,
     blockedUsers,
   } = useGetBlockedUsers();
-  const isDisabled =
-    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
+
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
-    isDisabled,
+    isDisabled: isFetchNextNotAvailable,
     isFetching,
   });
   return (

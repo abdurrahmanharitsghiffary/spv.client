@@ -21,7 +21,7 @@ export default function UserAutocomplete({
   onItemClick: (item: UserAccountPublic) => void;
 }) {
   const {
-    labelPlacement,
+    labelPlacement = "outside",
     label,
     type,
     placeholder,
@@ -70,13 +70,18 @@ export default function UserAutocomplete({
     [itemRef, itemsLength, currentFocus]
   );
 
+  const handleValueChange = (value: string) => {
+    setCurrentFocus(-1);
+    setFilterText(value);
+  };
+
   return (
     <div className="w-full flex flex-col relative">
       <Input
         onKeyDown={handleInputKeyDown}
         value={filterText}
-        onValueChange={setFilterText}
-        labelPlacement={labelPlacement ?? "outside"}
+        onValueChange={handleValueChange}
+        labelPlacement={labelPlacement}
         startContent={<FiSearch size={18} />}
         classNames={{ clearButton: "mt-[50%] -translate-y-1/2" }}
         endContent={
@@ -97,7 +102,10 @@ export default function UserAutocomplete({
         <ScrollShadow
           hideScrollBar
           isEnabled={isScrollShadowEnabled}
-          className="bg-content1 rounded-large shadow-medium absolute mt-12 left-1/2 -translate-x-1/2 w-full z-20 max-h-[400px]"
+          className={clsx(
+            "bg-content1 rounded-large shadow-medium absolute left-1/2 -translate-x-1/2 w-full z-20 max-h-[400px]",
+            labelPlacement === "outside" ? "mt-20" : "mt-12"
+          )}
         >
           <ul className="w-full grid grid-cols-1 ">
             {itemsLength > 0 ? (

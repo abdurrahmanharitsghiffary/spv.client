@@ -18,9 +18,9 @@ import {
   UserFollowerResponse,
   UserFollowingResponse,
 } from "@/types/user";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
-import { useMemo } from "react";
+import { useInfinite } from "../hooks";
 
 export const useGetUsers = (
   options?: OffsetPaging,
@@ -121,31 +121,15 @@ export const useGetBlockedUsers = (
   query?: { offset?: number; limit?: number },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data, ...rest } = useInfiniteQuery<
-    ApiPagingObjectResponse<UserAccountPublic[]>
-  >({
+  const { data: blockedUsers, ...rest } = useInfinite<UserAccountPublic>({
+    query: {
+      offset: query?.offset?.toString(),
+      limit: query?.limit?.toString(),
+    },
+    url: blockedUserRoute(query),
     queryKey: [...keys.blockedUsers(), query],
-    queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(pageParam ? pageParam : blockedUserRoute(query), config)
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
-    getNextPageParam: (res) => res?.pagination?.next ?? null,
-    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+    config,
   });
-  const blockedUsers = useMemo(
-    () => ({
-      ...data?.pages?.[0],
-      data: data?.pages
-        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-        .flat(),
-    }),
-    [data]
-  );
 
-  return { data, blockedUsers, ...rest };
+  return { blockedUsers, ...rest };
 };

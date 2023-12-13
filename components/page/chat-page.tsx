@@ -125,11 +125,9 @@ export default function ChatPage() {
         .reverse()
         .map((chat) => (
           <ChatBubble
-            date={chat?.createdAt}
-            text={chat?.message ?? ""}
             key={chat?.id}
-            images={chat?.attachments as any}
-            isRecipient={chat?.author?.id !== session?.id}
+            chat={chat}
+            isRecipient={chat.author.id !== session?.id}
           />
         ))}
     </>

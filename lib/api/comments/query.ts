@@ -10,48 +10,28 @@ import {
 import { keys } from "@/lib/queryKey";
 import { OffsetPagingwithOrder } from "@/types";
 import { Comment, CommentLikeResponse } from "@/types/comment";
-import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { ApiResponseT } from "@/types/response";
+import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
-import { useMemo } from "react";
+import { useInfinite } from "../hooks";
 
 export const useGetCommentByPostId = (
   postId: number,
   options?: OffsetPagingwithOrder,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-  const { data, ...rest } = useInfiniteQuery<
-    ApiPagingObjectResponse<Comment[]>
-  >({
-    getNextPageParam: (res) => res?.pagination?.next,
-    getPreviousPageParam: (res) => res?.pagination?.previous,
+  const { data: postComments, ...rest } = useInfinite<Comment>({
+    query: {
+      limit: options?.limit?.toString(),
+      offset: options?.offset?.toString(),
+      order_by: options?.order_by,
+    },
+    config,
+    url: postCommentsByPostId(postId.toString(), options),
     queryKey: keys.postComments(postId),
-    queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(
-              pageParam
-                ? pageParam
-                : postCommentsByPostId(postId.toString(), options),
-              config
-            )
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
   });
 
-  const postComments = useMemo(
-    () => ({
-      ...data?.pages?.[0],
-      data: data?.pages
-        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-        .flat(),
-    }),
-    [data]
-  );
-
-  return { postComments, data, ...rest };
+  return { postComments, ...rest };
 };
 
 export const useGetComment = (

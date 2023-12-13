@@ -1,18 +1,29 @@
 "use client";
 import React from "react";
 import { TypographyH4 } from "../ui/typography";
-import UserCard from "../user/user-card";
 import { useGetParticipantsByRoomId } from "@/lib/api/chats/query";
 import UserCardSkeleton from "../user/user-card-skeleton";
-import { ChatRoomParticipant } from "@/types/chat";
-import ParticipantMenuTrigger from "../menu/participant-menu/trigger";
-import { Button } from "@nextui-org/button";
 import { Skeleton } from "@nextui-org/skeleton";
 import ChatParticipant from "../chat/chat-participant";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
+import { Spinner } from "@nextui-org/react";
 
 export default function GroupMembers({ groupId }: { groupId: number }) {
-  const { participants, isLoading, isSuccess } =
-    useGetParticipantsByRoomId(groupId);
+  const {
+    participants,
+    isLoading,
+    isSuccess,
+    isFetching,
+    isFetchNextNotAvailable,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useGetParticipantsByRoomId(groupId);
+
+  const { ref } = useFetchNextPageObserver({
+    fetchNextPage,
+    isFetching,
+    isDisabled: isFetchNextNotAvailable,
+  });
 
   return (
     <div className="flex flex-col">
@@ -34,6 +45,8 @@ export default function GroupMembers({ groupId }: { groupId: number }) {
           (participants?.data ?? []).map((user) => (
             <ChatParticipant participant={user} key={user.id} />
           ))}
+      {isFetchingNextPage && <Spinner className="my-4" />}
+      <div ref={ref}></div>
     </div>
   );
 }

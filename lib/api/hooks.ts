@@ -11,7 +11,6 @@ import {
 } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
-import { getFormData } from "../getFormData";
 
 type MutationMethod = "post" | "patch" | "delete" | "put";
 
@@ -98,7 +97,7 @@ export const useInfinite = <T>({
   const data = useMemo(
     () => ({
       ...infiniteData?.pages?.[0],
-      infiniteData: infiniteData?.pages
+      data: infiniteData?.pages
         ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
         .flat(),
     }),

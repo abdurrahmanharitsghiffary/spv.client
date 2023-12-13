@@ -16,18 +16,17 @@ export default function PostPage({ postId }: { postId: string }) {
     useGetPostById(Number(postId));
   const {
     postComments,
-    data,
     isFetching,
+    isFetchNextNotAvailable,
     isFetchingNextPage,
     fetchNextPage,
     isSuccess: isCommentSuccess,
     isLoading: isCommentLoading,
   } = useGetCommentByPostId(Number(postId));
-  const isDisabled =
-    !isSuccess || (data?.pageParams ?? []).some((params) => params === null);
+
   const { ref } = useFetchNextPageObserver({
     fetchNextPage,
-    isDisabled,
+    isDisabled: isFetchNextNotAvailable,
     isFetching,
   });
 
