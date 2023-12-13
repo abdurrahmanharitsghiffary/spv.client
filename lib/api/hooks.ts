@@ -183,7 +183,7 @@ export const useMutate = <T, P = {}>({
 };
 
 // UNSTABLE
-export const useOptimistic = <T, P, TB = any>({
+export const useOptimistic = <T, P = any, TB = any>({
   method,
   baseUrl,
   optimisticUpdater,
