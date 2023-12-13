@@ -1,10 +1,9 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import ModalLayoutV2 from "../layoutV2";
 import { UserAccountPublic } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
 import { removeDuplicates } from "@/lib";
-import UserChip from "@/components/user/user-chip";
 import { getUserSimplified } from "@/lib/getUserSimplified";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +16,7 @@ import { FiEdit } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
-import { useUpdateGroupChat } from "@/lib/api/chats/mutation";
+import { useUpdateGroupChatOptimistic } from "@/lib/api/chats/mutation";
 import {
   useEditGroupActions,
   useEditGroupIsOpen,
@@ -47,7 +46,7 @@ type EditGroupSchema = z.infer<typeof editGroupSchema>;
 export default function EditGroupModal() {
   const { groupId } = useParams();
   const { chatRoom } = useGetChatRoomById(Number(groupId));
-  const { updateGroupChatAsync } = useUpdateGroupChat();
+  const { updateGroupChatAsync } = useUpdateGroupChatOptimistic();
   const {
     formState: { isSubmitSuccessful, errors },
     handleSubmit,
@@ -96,16 +95,11 @@ export default function EditGroupModal() {
   const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
     console.log(data);
 
-    const participants = (data?.participants ?? []).map((participant) => ({
-      role: participant.role,
-      id: participant.id,
-    }));
-
     await toast.promise(
       updateGroupChatAsync({
         body: {
           image: data?.image,
-          participants: participants,
+          participants: data?.participants ?? [],
           title: data?.title,
           description: data?.description,
         },

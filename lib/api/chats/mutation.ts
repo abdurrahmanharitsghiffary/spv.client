@@ -6,6 +6,7 @@ import { keys } from "@/lib/queryKey";
 import { CreateMessageData, ParticipantsField } from "@/types";
 import { ChatRoom, ChatRoomParticipant } from "@/types/chat";
 import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
+import { getParticipants, updateParticipantsData } from "./utils";
 
 export const useCreateMessage = () => {
   const {
@@ -56,21 +57,20 @@ export const useCreateGroupChat = () => {
 
   return { createGroupChat, createGroupChatAsync, ...rest };
 };
+type UpdateGroupOptions = {
+  participants?: ParticipantsField[];
+  title?: string;
+  description?: string;
+  image?: File;
+};
 
+type UpdateGroupParams = { groupId: number };
 export const useUpdateGroupChat = () => {
   const {
     mutate: updateGroupChat,
     mutateAsync: updateGroupChatAsync,
     ...rest
-  } = useMutate<
-    {
-      participants?: ParticipantsField[];
-      title?: string;
-      description?: string;
-      image?: File;
-    },
-    { groupId: number }
-  >({
+  } = useMutate<UpdateGroupOptions, UpdateGroupParams>({
     baseUrl: baseChatRoutes + "/group/:groupId",
     method: "patch",
     invalidateTags: (v) => [
@@ -251,29 +251,7 @@ export const useAddGroupParticipantsOptimistic = () => {
         queryKey: keys.participantByRoomId(Number(v?.params?.roomId)),
         updater<OD extends InfiniteParticipantsData>(oldData: OD): OD {
           if (!oldData) return undefined as any;
-          console.log(oldData, "Participant old Data");
-          const participants = v?.body?.participants ?? [];
-          console.log(participants, "Parti in body");
-          const newPages = (oldData?.pages ?? []).map((page, i) => {
-            console.log(page, "Page ", i);
-            if (!page) return;
-            const currParticipants = page?.data;
-
-            const { newParticipants, updatedParticipants } = getParticipants(
-              currParticipants,
-              participants
-            );
-
-            return {
-              ...page,
-              data: [...newParticipants, ...updatedParticipants],
-            };
-          });
-          console.log(newPages, "New Pages");
-          return {
-            ...oldData,
-            pages: newPages,
-          };
+          return updateParticipantsData(oldData, v?.body?.participants ?? []);
         },
       },
     ],
@@ -284,51 +262,6 @@ export const useAddGroupParticipantsOptimistic = () => {
     addGroupParticipants,
     addGroupParticipantsAsync,
     ...rest,
-  };
-};
-
-const getParticipants = (
-  oldParticipants: ChatRoomParticipant[],
-  newParticipants: ChatRoomParticipant[]
-): {
-  newParticipants: ChatRoomParticipant[];
-  updatedParticipants: ChatRoomParticipant[];
-} => {
-  const updatedUserIds: number[] = [];
-
-  const participants = oldParticipants.map((user) => {
-    let role: "user" | "admin" = "user";
-    const currentParticipant = newParticipants.find(
-      (participant) => participant.id === user.id
-    );
-
-    const isPromotingUserToAdmin =
-      user.role === "user" && currentParticipant?.role === "admin";
-    const isDemotingAdminToUser =
-      user.role === "admin" && currentParticipant?.role === "user";
-    const isUserExist = user.role === currentParticipant?.role;
-
-    if (isPromotingUserToAdmin) role = "admin";
-    if (isDemotingAdminToUser) role = "user";
-    if (isDemotingAdminToUser || isPromotingUserToAdmin)
-      updatedUserIds.push(user.id);
-
-    if (currentParticipant && !isUserExist) {
-      return {
-        ...user,
-        role,
-      };
-    }
-    return user;
-  });
-
-  const newestParticipants = newParticipants.filter(
-    (user) => !updatedUserIds.some((id) => id === user.id)
-  );
-
-  return {
-    newParticipants: newestParticipants,
-    updatedParticipants: participants,
   };
 };
 
@@ -382,4 +315,71 @@ export const useRemoveParticipantsOptimistic = () => {
   });
 
   return { removeParticipants, removeParticipantsAsync, ...rest };
+};
+
+export const useUpdateGroupChatOptimistic = () => {
+  const {
+    optimistic: updateGroupChat,
+    optimisticAsync: updateGroupChatAsync,
+    ...rest
+  } = useOptimistic<
+    UpdateGroupOptions & { participants: ChatRoomParticipant[] },
+    UpdateGroupParams,
+    UpdateGroupOptions
+  >({
+    baseUrl: baseChatRoutes + "/group/:groupId",
+    method: "patch",
+    invalidateTags: (v) => [keys.meChats()],
+    optimisticUpdater: (v) => [
+      {
+        queryKey: keys.participantByRoomId(Number(v.params?.groupId)),
+        isInfiniteData: true,
+        updater<OD extends InfiniteParticipantsData>(oldData: OD): OD {
+          const participants = v.body?.participants ?? [];
+
+          if (participants.length === 0) return oldData;
+          return updateParticipantsData(oldData, participants);
+        },
+      },
+      {
+        queryKey: keys.chatByRoomId(Number(v?.params?.groupId)),
+        updater<OD extends ApiResponseT<ChatRoom>>(oldData: OD): OD {
+          const body = v?.body;
+          const participants = body?.participants ?? [];
+          const newData = oldData?.data;
+          if (body?.description) newData.description = body.description;
+          if (body?.title) newData.title = body.title;
+          if (body?.image)
+            newData.picture = { src: URL.createObjectURL(body.image) };
+          if (participants.length > 0) {
+            const { newParticipants, updatedParticipants } = getParticipants(
+              newData.participants.users,
+              participants
+            );
+
+            newData.participants = {
+              users: [...newParticipants, ...updatedParticipants],
+              total: oldData.data.participants.total + newParticipants.length,
+            };
+          }
+          return {
+            ...oldData,
+            data: {
+              ...oldData?.data,
+              ...newData,
+            },
+          };
+        },
+      },
+    ],
+    transformBody: (b) => ({
+      ...b,
+      participants: (b.participants ?? []).map((participant) => ({
+        id: participant.id,
+        role: participant.role,
+      })),
+    }),
+  });
+
+  return { updateGroupChat, updateGroupChatAsync, ...rest };
 };
