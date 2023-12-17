@@ -35,7 +35,6 @@ export default function EditProfileModal() {
   const { updateAccountAsync } = useUpdateMyAccountInfo();
   const { myAccountInfo, isSuccess } = useGetMyAccountInfo();
 
-  console.log(myAccountInfo, "My acc info");
   const {
     handleSubmit,
     register,

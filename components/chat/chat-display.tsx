@@ -13,7 +13,6 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   const user = chat.participants.users.filter(
     (user) => user.id !== session?.id
   )?.[0];
-  console.log(chat, "Chat");
   return (
     <Link
       href={`/chats/${chat?.id}`}

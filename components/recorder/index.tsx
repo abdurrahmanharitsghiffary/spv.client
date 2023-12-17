@@ -8,18 +8,24 @@ import { BsMicFill, BsMicMuteFill, BsStopFill } from "react-icons/bs";
 function Recorder({
   className,
   onSpeechSuccess,
+  isEnded,
   ...props
 }: {
   className?: string;
   onSpeechSuccess?: (result?: string | null) => void;
+  isEnded?: boolean;
 } & ButtonProps) {
   const { recognition, result, status, isSpeechStart, errors } = useSpeech();
   const handleSuccesSpeech = useCallback(
     (result: string | null | undefined) => {
       if (onSpeechSuccess) onSpeechSuccess(result);
     },
-    [onSpeechSuccess]
+    []
   );
+
+  useEffect(() => {
+    if (isEnded && recognition) recognition?.stop();
+  }, [isEnded, recognition]);
 
   useEffect(() => {
     if (result) handleSuccesSpeech(result);

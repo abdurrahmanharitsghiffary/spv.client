@@ -39,7 +39,6 @@ export default function CommentMenu() {
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
-  console.log(comment, "comment");
   const isAuthored = (comment?.authorId ?? -1) === (session?.id ?? -2);
   const baseItems = [
     {

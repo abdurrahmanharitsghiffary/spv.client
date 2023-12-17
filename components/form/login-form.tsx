@@ -30,7 +30,6 @@ export default function LoginForm() {
   });
   const { error, loginAsync } = useLogin();
   const googleLoginErrorMessage = searchParams.get("err_message");
-  console.log(googleLoginErrorMessage);
   const errorMessage: string = (error as any)?.message ?? null;
 
   const onSubmit: SubmitHandler<LoginValidationSchema> = async (data) => {
@@ -43,7 +42,7 @@ export default function LoginForm() {
       pending: "Login to account....",
       success: {
         render(props) {
-          return "Account successfully logged";
+          return "Login successful";
         },
       },
     });

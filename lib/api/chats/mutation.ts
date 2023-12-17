@@ -1,30 +1,12 @@
 "use client";
 import { InfiniteData } from "@tanstack/react-query";
-import { baseChatRoutes, baseMessageRoutes } from "@/lib/endpoints";
+import { baseChatRoutes } from "@/lib/endpoints";
 import { useMutate, useOptimistic } from "../hooks";
 import { keys } from "@/lib/queryKey";
-import { CreateMessageData, ParticipantsField } from "@/types";
+import { ParticipantsField } from "@/types";
 import { ChatRoom, ChatRoomParticipant } from "@/types/chat";
 import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
 import { getParticipants, updateParticipantsData } from "./utils";
-import { useSession } from "@/stores/auth-store";
-
-export const useCreateMessage = () => {
-  const {
-    mutate: createMessage,
-    mutateAsync: createMessageAsync,
-    ...rest
-  } = useMutate<CreateMessageData>({
-    baseUrl: baseMessageRoutes,
-    method: "post",
-    invalidateTags: (v) => [
-      keys.chatByRoomId(v.body?.chatRoomId ?? -1),
-      keys.meChats(),
-    ],
-  });
-
-  return { createMessage, createMessageAsync, ...rest };
-};
 
 export const useCreateChatRoom = () => {
   const {
@@ -34,7 +16,6 @@ export const useCreateChatRoom = () => {
   } = useMutate<{ participantId: number }>({
     baseUrl: baseChatRoutes,
     method: "post",
-    invalidateTags: (v) => [keys.meChats()],
   });
 
   return { createChatRoom, createChatRoomAsync, ...rest };
@@ -69,7 +50,6 @@ export const useCreateGroupChat = () => {
   }>({
     baseUrl: baseChatRoutes + "/group",
     method: "post",
-    invalidateTags: (v) => [keys.meChats()],
   });
 
   return { createGroupChat, createGroupChatAsync, ...rest };
@@ -210,7 +190,11 @@ export const useLeaveGroupChat = () => {
 };
 
 export const useLeaveGroupChatOptimistic = () => {
-  const {} = useOptimistic<
+  const {
+    optimistic: leaveGroup,
+    optimisticAsync: leaveGroupAsync,
+    ...rest
+  } = useOptimistic<
     { userId: number },
     { groupId: number | string },
     undefined
@@ -260,6 +244,8 @@ export const useLeaveGroupChatOptimistic = () => {
       ];
     },
   });
+
+  return { leaveGroup, leaveGroupAsync, ...rest };
 };
 
 type AddParticipantsOptions = { participants: ParticipantsField[] };
@@ -329,7 +315,6 @@ export const useAddGroupParticipantsOptimistic = () => {
       {
         queryKey: keys.chatByRoomId(Number(v.params?.roomId)),
         updater<OD extends ApiResponseT<ChatRoom>>(oldData: OD): OD {
-          console.log(oldData, "CBR OLD DATA");
           const { newParticipants, updatedParticipants } = getParticipants(
             oldData.data.participants.users,
             v?.body?.participants ?? []

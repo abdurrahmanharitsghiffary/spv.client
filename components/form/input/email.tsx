@@ -13,7 +13,7 @@ const InputEmail = React.forwardRef<HTMLInputElement, Omit<InputProps, "ref">>(
         ref={ref}
         name="email"
         {...props}
-        type="text"
+        type="email"
         label="Email"
         placeholder="Enter your email"
         className={style}

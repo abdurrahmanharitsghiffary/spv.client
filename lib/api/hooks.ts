@@ -84,7 +84,7 @@ export const useInfinite = <T>({
         : request
             .get(pageParam ? pageParam : reqUrl.href, config)
             .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.infiniteData)),
+            .catch((err) => Promise.reject(err?.response?.data)),
     getNextPageParam: (res) => res?.pagination?.next ?? null,
     getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
     ...queryConfig,
@@ -138,7 +138,6 @@ export const useMutate = <T, P = {}>({
       //   : null;
 
       for (let [key, value] of Object.entries(v?.params ?? {})) {
-        console.log(key, value, " k v");
         newUrl = newUrl.replaceAll(`:${key}`, value.toString());
       }
 
@@ -235,7 +234,6 @@ export const useOptimistic = <T, P = any, TB = any>({
 
       let newUrl = baseUrl;
       for (let [key, value] of Object.entries(v?.params ?? {})) {
-        console.log(key, value, " k v");
         newUrl = newUrl.replaceAll(`:${key}`, value.toString());
       }
 

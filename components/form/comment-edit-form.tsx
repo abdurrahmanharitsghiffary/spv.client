@@ -28,7 +28,6 @@ export default function CommentEditForm({ className }: { className?: string }) {
   const { updateCommentAsync } = useUpdateComment();
   const selectedComment = useGetSelectedEditComment();
   const { comment } = useGetComment(selectedComment?.id ?? -1);
-  console.log(comment?.data.comment, "Comment");
   const isSSR = useIsSSR();
   const {
     setValue,

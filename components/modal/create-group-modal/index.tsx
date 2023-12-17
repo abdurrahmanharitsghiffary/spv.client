@@ -63,7 +63,6 @@ export default function CreateGroupModal() {
   const { onClose } = useCreateGroupActions();
   const watch = useWatch({ control, defaultValue: { participants: [] } });
   const selectedUsers = watch.participants ?? [];
-  console.log(selectedUsers, "selu");
 
   const handleReset = useCallback(() => {
     reset();
@@ -80,25 +79,20 @@ export default function CreateGroupModal() {
 
   const handleItemClick = useCallback(
     (item: UserAccountPublic) => {
-      console.log(item, "ITEM");
-
       const values = removeDuplicates([
         ...(selectedUsers ?? []),
         { ...getUserSimplified(item), role: "user" },
       ]);
-      console.log(values, "Values");
       setValue("participants", values.slice());
     },
     [selectedUsers]
   );
 
   const onSubmit: SubmitHandler<CreateGroupSchema> = async (data) => {
-    console.log("IS SUBMITTEd");
     const participants = data.participants.map((participant) => ({
       id: participant.id,
       role: participant.role,
     }));
-    console.log(participants, "parti");
     await toast.promise(
       createGroupChatAsync({
         body: {

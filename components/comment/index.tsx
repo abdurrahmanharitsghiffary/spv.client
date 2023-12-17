@@ -38,7 +38,6 @@ function Comment({
   };
 
   // const onSuccessLoad = useCallback((isSuccess: boolean) => {
-  //   console.log(isSuccess, "isSucessAll");
   // }, []);
 
   return (
@@ -119,7 +118,6 @@ export function CommentReplies({
 }) {
   const [limit, setLimit] = useState(10);
   // const [isSuccessAll, setIsSuccessAll] = useState<boolean[]>([]);
-  // console.log(isSuccessAll, "all");
   // const isSuccess =
   //   isSuccessAll.every((val) => val === true) && isSuccessAll.length === limit;
 

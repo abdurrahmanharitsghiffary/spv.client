@@ -61,7 +61,6 @@ export const updateParticipantsData = <OD extends InfiniteParticipantsData>(
     .filter((page) => page !== undefined)
     .map((page) => page?.data)
     .flat();
-  console.log(p, "P");
   const newPages = pages
     .filter((p) => p !== undefined)
     .slice(-1)
@@ -83,7 +82,6 @@ export const updateParticipantsData = <OD extends InfiniteParticipantsData>(
         },
       };
     });
-  console.log(newPages, "New pages");
   return {
     ...oldData,
     pages: newPages,

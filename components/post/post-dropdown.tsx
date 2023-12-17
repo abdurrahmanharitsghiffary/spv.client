@@ -99,7 +99,6 @@ function PostPublicDropdown({ postId }: { postId: number }) {
   const { likePostAsync } = useLikePost();
   const { unlikePostAsync } = useUnlikePost();
   const { isSaved } = useGetPostIsSaved(postId);
-  console.log(isSaved);
   return (
     <DropdownBase
       items={publicItems(isLiked?.data, isSaved?.data)}

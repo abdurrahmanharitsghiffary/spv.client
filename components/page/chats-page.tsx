@@ -3,7 +3,7 @@ import ChatDisplay from "@/components/chat/chat-display";
 import React, { useEffect, useState } from "react";
 import { useSocket } from "@/hooks/use-socket";
 import { Socket_Event } from "@/lib/socket-event";
-import { useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { keys } from "@/lib/queryKey";
 import { useGetMyAssociatedChatRooms } from "@/lib/api/account/query";
 import CreateRoomModal from "@/components/modal/create-room-modal";
@@ -16,11 +16,14 @@ import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 import { Tab, Tabs } from "@nextui-org/tabs";
 import { Key } from "@/types";
+import { Chat, ChatRoom } from "@/types/chat";
+import { ApiPagingObjectResponse } from "@/types/response";
+
+type InfiniteRoomPaging = InfiniteData<ApiPagingObjectResponse<ChatRoom[]>>;
 
 export default function ChatsPage() {
   const [q, setQ] = useState("");
   const [selectedKey, setSelectedKey] = useState<Key>("all");
-  console.log(selectedKey, "Sel Key");
   const {
     chatRooms,
     isSuccess,
@@ -32,11 +35,61 @@ export default function ChatsPage() {
   } = useGetMyAssociatedChatRooms({ type: selectedKey as any, q });
   const socket = useSocket();
   const queryClient = useQueryClient();
-  console.log(chatRooms, "ChatRooms");
-  const onReceiveMessage = async (createdMessage: any) => {
-    queryClient.invalidateQueries({
-      queryKey: keys.meChats(),
-    });
+
+  const onJoinChatRoom = async (joinedRoom: ChatRoom) => {
+    queryClient.setQueriesData<InfiniteRoomPaging>(
+      keys.meChats(),
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages
+            .filter((p) => p !== undefined)
+            .map((p, i) => {
+              if (i === 0) {
+                return {
+                  ...p,
+                  data: [joinedRoom, ...p.data],
+                  pagination: {
+                    ...p.pagination,
+                    result_count: (p.pagination.result_count += 1),
+                    total_records: (p.pagination.total_records += 1),
+                  },
+                };
+              }
+              return p;
+            }),
+        };
+      }
+    );
+  };
+
+  const onReceiveMessage = async (createdMessage: Chat) => {
+    queryClient.setQueriesData<InfiniteRoomPaging>(
+      keys.meChats(),
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((p, i) => {
+            if (!p) return p;
+            return {
+              ...p,
+              data: p.data.map((c) => {
+                if (c.id === createdMessage.roomId) {
+                  return {
+                    ...c,
+                    messages: [createdMessage, ...c.messages],
+                    unreadMessages: { total: (c.unreadMessages.total += 1) },
+                  };
+                }
+                return c;
+              }),
+            };
+          }),
+        };
+      }
+    );
   };
 
   const { ref } = useFetchNextPageObserver({
@@ -47,10 +100,11 @@ export default function ChatsPage() {
 
   useEffect(() => {
     if (!socket) return;
-
+    socket.on(Socket_Event.JOIN_ROOM, onJoinChatRoom);
     socket.on(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
     return () => {
       socket.off(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
+      socket.off(Socket_Event.JOIN_ROOM, onJoinChatRoom);
     };
   }, [socket]);
 

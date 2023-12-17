@@ -215,7 +215,6 @@ export default function MenuPage() {
     }
   }
 
-  console.log(myAccountInfo);
   return (
     <>
       <Link

@@ -14,7 +14,6 @@ export default function BlockedUserCard({
   className?: string;
   user: UserSimplified | undefined;
 }) {
-  console.log(user, "User simpl");
   const cl = clsx("w-full dark:bg-inherit", className);
   return (
     <Card className={cl}>

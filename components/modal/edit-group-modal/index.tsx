@@ -93,8 +93,6 @@ export default function EditGroupModal() {
   );
 
   const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
-    console.log(data);
-
     await toast.promise(
       updateGroupChatAsync({
         body: {
@@ -124,7 +122,6 @@ export default function EditGroupModal() {
 
   const file = watch("image");
   const groupPictureSrc = file ? URL.createObjectURL(file) : "";
-  console.log(file, "File");
   return (
     <ModalLayoutV2
       isOpen={isOpen}

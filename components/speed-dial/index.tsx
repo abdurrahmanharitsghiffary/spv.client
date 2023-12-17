@@ -41,7 +41,6 @@ export default function SpeedDial({
     ...rest
   } = buttonTriggerProps;
   const [isOpen, setIsOpen] = useState(false);
-  console.log(isOpen, "isOpen");
 
   const itemVariants: Variants = {
     hidden: {

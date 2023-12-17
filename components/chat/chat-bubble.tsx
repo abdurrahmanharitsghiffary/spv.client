@@ -1,22 +1,23 @@
 import clsx from "clsx";
-import React from "react";
+import React, { forwardRef } from "react";
 import { TypographyMuted, TypographyP } from "../ui/typography";
 import Timestamp from "../timestamp";
 import Gallery from "../image/gallery";
 import { Chat } from "@/types/chat";
 import { Avatar } from "@nextui-org/avatar";
 
-export default function ChatBubble({
-  chat,
-  isRecipient,
-}: {
-  isRecipient?: boolean;
-  chat: Chat | undefined;
-}) {
+const ChatBubble = forwardRef<
+  HTMLDivElement,
+  {
+    isRecipient?: boolean;
+    chat: Chat | undefined;
+  }
+>(({ chat, isRecipient }, ref) => {
   const images = chat?.attachments ?? [];
 
   return (
     <div
+      ref={ref}
       className="flex w-full gap-4"
       style={{ flexDirection: !isRecipient ? "row-reverse" : "row" }}
     >
@@ -67,4 +68,8 @@ export default function ChatBubble({
       </div>
     </div>
   );
-}
+});
+
+ChatBubble.displayName = "ChatBubble";
+
+export default ChatBubble;

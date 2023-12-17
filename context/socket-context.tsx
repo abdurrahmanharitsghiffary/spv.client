@@ -18,7 +18,6 @@ export default function SocketProvider({
   const [socket, setSocket] = useState<Socket | null>(null);
   const queryClient = useQueryClient();
   const session = useSession();
-  console.log(session, " session");
   const getSocket = useCallback(() => {
     const socket = io(base, {
       auth: {
@@ -26,7 +25,7 @@ export default function SocketProvider({
       },
     });
     return socket;
-  }, [session?.accessToken]);
+  }, [session]);
 
   const onOnline = async (userId: string) => {
     queryClient.invalidateQueries({ queryKey: keys.user });

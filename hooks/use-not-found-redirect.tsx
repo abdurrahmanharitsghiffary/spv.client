@@ -4,7 +4,8 @@ import { useEffect } from "react";
 export function useNotFoundRedirect(
   error: unknown,
   isError: boolean,
-  customCondition?: boolean
+  customCondition?: boolean,
+  href?: string
 ) {
   const router = useRouter();
   const errorMessage = (error as any)?.message ?? "";
@@ -15,10 +16,10 @@ export function useNotFoundRedirect(
       (errorMessage.includes("not found") ||
         (error as any)?.name === "ZodError")
     )
-      router.push("/");
+      router.push(href ?? "/");
   }, [errorMessage, isError, error]);
 
   useEffect(() => {
-    if (customCondition) router.push("/");
+    if (customCondition) router.push(href ?? "/");
   }, [customCondition]);
 }

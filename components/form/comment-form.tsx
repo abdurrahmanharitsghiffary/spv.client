@@ -84,7 +84,6 @@ export default function CommentForm({
 
   const fieldIsError = errors.comment?.message ? true : false;
 
-  console.log(replyId);
   const onSubmit: SubmitHandler<CreateCommentSchema> = (data) => {
     // toast.promise(
     replyId || commentId

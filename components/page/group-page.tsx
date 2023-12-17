@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useSession } from "@/stores/auth-store";
+import JoinButton from "../button/join-button";
 
 export default function GroupPage({ groupId }: { groupId: number }) {
   const { chatRoom, isLoading, isSuccess, error, isError } = useGetChatRoomById(
@@ -70,6 +71,7 @@ export default function GroupPage({ groupId }: { groupId: number }) {
           {isSuccessGCRP && participant?.data.role !== "user" && (
             <EditGroupTrigger className="flex-1" />
           )}
+          <JoinButton className="flex-1" />
         </div>
         <GroupDescription description={chatRoom?.data?.description ?? ""} />
       </div>

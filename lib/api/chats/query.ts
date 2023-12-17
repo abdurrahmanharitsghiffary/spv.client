@@ -3,7 +3,7 @@
 import { keys } from "@/lib/queryKey";
 import { useInfinite, useQ } from "../hooks";
 import { baseChatRoutes, chatById } from "@/lib/endpoints";
-import { Chat, ChatRoom, ChatRoomParticipant } from "@/types/chat";
+import { ChatRoom, ChatRoomParticipant } from "@/types/chat";
 
 export const useGetChatRoomById = (roomId: number, enabled: boolean = true) => {
   const { data: chatRoom, ...rest } = useQ<ChatRoom>({
@@ -26,19 +26,6 @@ export const useGetParticipantsByRoomId = (
   });
 
   return { participants, ...rest };
-};
-
-export const useGetMessagesByRoomId = (
-  roomId: number,
-  query: { limit?: string; offset?: string } = { limit: "20", offset: "0" }
-) => {
-  const { data: messages, ...rest } = useInfinite<Chat>({
-    query,
-    url: chatById(roomId.toString()) + "/messages",
-    queryKey: [...keys.messagebyRoomId(roomId), query],
-  });
-
-  return { messages, ...rest };
 };
 
 export const useGetChatRoomParticipant = (
