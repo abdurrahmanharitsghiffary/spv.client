@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { items } from "./barItems";
+import { items } from "./bar-items";
 import { useIsSSR } from "@react-aria/ssr";
 // fix layout in search bar items
 export default function BottomBar() {

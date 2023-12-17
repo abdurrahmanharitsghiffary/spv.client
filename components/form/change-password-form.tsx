@@ -2,10 +2,9 @@
 import React from "react";
 import FormLayout from "./layout";
 import { Button } from "@nextui-org/button";
-import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputPassword from "./input/password";
+import InputPassword from "../input/password";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { constructUrl, urlBase } from "@/lib/endpoints";
@@ -16,15 +15,12 @@ import {
 } from "@/lib/zod-schema/auth";
 
 export default function ChangePasswordForm({ token }: { token: string }) {
-  const {
-    handleSubmit,
-    register,
-    formState: {
-      errors: { password, confirmPassword },
-    },
-    reset,
-  } = useForm<PasswordValidationSchema>({
+  const { handleSubmit, control } = useForm<PasswordValidationSchema>({
     resolver: zodResolver(passwordValidationSchema),
+    defaultValues: {
+      confirmPassword: "",
+      password: "",
+    },
   });
   const router = useRouter();
 
@@ -62,19 +58,15 @@ export default function ChangePasswordForm({ token }: { token: string }) {
     >
       <InputPassword
         variant="bordered"
-        {...register("password")}
-        color={password?.message ? "danger" : "default"}
-        isInvalid={password?.message ? true : false}
-        errorMessage={password?.message}
+        control={control}
+        name="password"
         label="Password"
         placeholder="Enter your new password..."
       />
       <InputPassword
         variant="bordered"
-        {...register("confirmPassword")}
-        color={confirmPassword?.message ? "danger" : "default"}
-        isInvalid={confirmPassword?.message ? true : false}
-        errorMessage={confirmPassword?.message}
+        control={control}
+        name="confirmPassword"
         label="Confirm"
         placeholder="Enter again your password"
       />

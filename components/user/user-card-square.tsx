@@ -1,5 +1,5 @@
 import { UserAccountPublic } from "@/types/user";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody, CardFooter } from "@nextui-org/card";
 import { Avatar } from "@nextui-org/avatar";
 import clsx from "clsx";
 import React from "react";
@@ -16,7 +16,7 @@ export default function UserCardSquare({
   const cl = clsx("w-[130px] bg-transparent h-auto p-2", className);
   return (
     <Card className={cl} shadow="none" radius="md">
-      <CardBody className="flex flex-col gap-2 p-0 w-full items-center">
+      <CardBody className="flex flex-col gap-1 p-0 w-full items-center">
         <Avatar
           src={user.profile?.avatarImage?.src}
           alt={user?.username}
@@ -25,8 +25,10 @@ export default function UserCardSquare({
         <TypographyLarge className="!text-small truncate">
           {user?.username}
         </TypographyLarge>
-        <FollowButton size="sm" className="w-full" userId={user?.id} />
       </CardBody>
+      <CardFooter>
+        <FollowButton size="sm" className="w-full" userId={user?.id} />
+      </CardFooter>
     </Card>
   );
 }

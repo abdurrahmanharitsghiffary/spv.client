@@ -1,20 +1,19 @@
 "use client";
 import React from "react";
-import { Input, InputProps } from "@nextui-org/react";
+import { InputProps } from "@nextui-org/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { InputWithControl } from "./input-with-control";
+import { FieldValues, UseControllerProps } from "react-hook-form";
 
-const InputPassword = React.forwardRef<
-  HTMLInputElement,
-  Omit<InputProps, "ref">
->((props: InputProps, ref) => {
+export default function InputPassword<T extends FieldValues>(
+  props: UseControllerProps<T> & InputProps
+) {
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
-    <Input
-      {...props}
-      ref={ref}
+    <InputWithControl
       label={props.label ?? "Password"}
       placeholder={props.placeholder ?? "Enter your password"}
       endContent={
@@ -32,9 +31,7 @@ const InputPassword = React.forwardRef<
       }
       type={isVisible ? "text" : "password"}
       className="max-w-md w-full"
+      {...props}
     />
   );
-});
-
-InputPassword.displayName = "InputPassword";
-export default InputPassword;
+}

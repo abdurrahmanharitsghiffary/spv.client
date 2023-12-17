@@ -3,12 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
-import { Input, Textarea } from "@nextui-org/input";
+import { Input } from "@nextui-org/input";
 import { useIsSSR } from "@react-aria/ssr";
 import React, { useEffect } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { BiSend } from "react-icons/bi";
-import { z } from "zod";
 import Recorder from "../recorder";
 import { useUpdateComment } from "@/lib/api/comments/mutation";
 import {
@@ -20,7 +19,7 @@ import clsx from "clsx";
 import { CommentEditSchema, commentEditSchema } from "@/lib/zod-schema/comment";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useGetComment } from "@/lib/api/comments/query";
-import { TextareaWithControl } from "./input/input-with-control";
+import { TextareaWithControl } from "../input/input-with-control";
 
 export default function CommentEditForm({ className }: { className?: string }) {
   const isOpen = useCommentEditStore((state) => state.isOpen);
@@ -32,7 +31,6 @@ export default function CommentEditForm({ className }: { className?: string }) {
   const {
     setValue,
     handleSubmit,
-    register,
     watch,
     control,
     reset,
@@ -42,6 +40,7 @@ export default function CommentEditForm({ className }: { className?: string }) {
     },
   } = useForm<CommentEditSchema>({
     resolver: zodResolver(commentEditSchema),
+    defaultValues: { comment: "" },
     values: { comment: comment?.data?.comment ?? "" },
   });
 

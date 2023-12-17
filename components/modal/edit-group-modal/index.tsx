@@ -24,7 +24,7 @@ import {
 import {
   InputWithControl,
   TextareaWithControl,
-} from "@/components/form/input/input-with-control";
+} from "@/components/input/input-with-control";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useParams } from "next/navigation";
 import UserGroupList from "@/components/user/user-group-list";
@@ -36,7 +36,6 @@ const editGroupSchema = z.object({
     .string()
     .max(125, { message: "Title must be at least 125 characters or fewer" })
     .optional(),
-  admin: z.number().array().optional(),
   description: z.string().optional(),
   image: zImage.optional(),
 });
@@ -56,10 +55,16 @@ export default function EditGroupModal() {
     reset,
   } = useForm<EditGroupSchema>({
     resolver: zodResolver(editGroupSchema),
+    defaultValues: {
+      description: "",
+      image: null,
+      participants: [],
+      title: "",
+    },
     values: {
       participants: [],
-      description: chatRoom?.data?.description ?? undefined,
-      title: chatRoom?.data?.title ?? undefined,
+      description: chatRoom?.data?.description ?? "",
+      title: chatRoom?.data?.title ?? "",
     },
   });
   const selectedUsers = watch("participants");

@@ -5,6 +5,7 @@ import Timestamp from "../timestamp";
 import Gallery from "../image/gallery";
 import { Chat } from "@/types/chat";
 import { Avatar } from "@nextui-org/avatar";
+import { Badge } from "@nextui-org/badge";
 
 const ChatBubble = forwardRef<
   HTMLDivElement,
@@ -22,11 +23,21 @@ const ChatBubble = forwardRef<
       style={{ flexDirection: !isRecipient ? "row-reverse" : "row" }}
     >
       {chat?.isGroupChat && (
-        <Avatar
-          size="sm"
-          src={chat?.author.avatarImage?.src ?? ""}
-          className="aspect-square min-w-[24px] min-h-[24px] max-w-[15%]"
-        />
+        <div className="aspect-square min-w-[24px] min-h-[24px] max-w-[15%]">
+          <Badge
+            isInvisible={!chat?.author?.isOnline}
+            color="success"
+            size="sm"
+            className="w-3 h-3 aspect-square"
+            placement="bottom-right"
+          >
+            <Avatar
+              size="sm"
+              src={chat?.author.avatarImage?.src ?? ""}
+              className=""
+            />
+          </Badge>
+        </div>
       )}
       <div
         className={clsx(

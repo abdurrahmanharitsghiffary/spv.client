@@ -5,7 +5,6 @@ import {
   useGetSelectedPostId,
   useShowEditPostDisclosure,
 } from "@/hooks/use-edit-post";
-import { Input, Textarea } from "@nextui-org/input";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
@@ -22,24 +21,24 @@ import InputFile from "@/components/input/file";
 import {
   InputWithControl,
   TextareaWithControl,
-} from "@/components/form/input/input-with-control";
+} from "@/components/input/input-with-control";
 
 function EditPostModal() {
   const postId = useGetSelectedPostId();
   const { post } = useGetPostById(postId);
   const {
     watch,
-    register,
     handleSubmit,
     control,
     setValue,
     reset,
     formState: {
-      errors: { content, images: imagesErrors, title },
+      errors: { images: imagesErrors },
       isSubmitSuccessful,
     },
   } = useForm<UpdatePostSchema>({
     resolver: zodResolver(updatePostSchema),
+    defaultValues: { content: "", images: [], title: "" },
     values: {
       content: post?.data?.content ?? "",
       title: post?.data?.title ?? "",

@@ -1,7 +1,6 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useEditProfileControls } from "@/hooks/use-edit-profile";
-import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +26,7 @@ import InputFile from "@/components/input/file";
 import {
   InputWithControl,
   TextareaWithControl,
-} from "@/components/form/input/input-with-control";
+} from "@/components/input/input-with-control";
 
 export default function EditProfileModal() {
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
@@ -37,32 +36,30 @@ export default function EditProfileModal() {
 
   const {
     handleSubmit,
-    register,
     reset,
     watch,
     control,
     formState: {
       isSubmitSuccessful,
-      errors: {
-        bio,
-        lastName,
-        firstName,
-        gender,
-        username,
-        profileImage: pIErr,
-        coverImage: cIErr,
-      },
+      errors: { gender, profileImage: pIErr, coverImage: cIErr },
     },
   } = useForm<EditProfileValidationSchema>({
     resolver: zodResolver(editProfileValidationSchema),
+    defaultValues: {
+      bio: "",
+      coverImage: null,
+      firstName: "",
+      gender: "not_say",
+      lastName: "",
+      profileImage: null,
+      username: "",
+    },
     values: {
-      // profileImage: myAccountInfo?.data?.profile?.avatarImage?.src,
-      // coverImage: myAccountInfo?.data?.profile?.coverImage?.src,
-      firstName: myAccountInfo?.data?.firstName,
-      lastName: myAccountInfo?.data?.lastName,
-      username: myAccountInfo?.data?.username,
-      bio: myAccountInfo?.data?.profile?.description ?? undefined,
-      gender: myAccountInfo?.data?.profile?.gender ?? undefined,
+      firstName: myAccountInfo?.data?.firstName ?? "",
+      lastName: myAccountInfo?.data?.lastName ?? "",
+      username: myAccountInfo?.data?.username ?? "",
+      bio: myAccountInfo?.data?.profile?.description ?? "",
+      gender: myAccountInfo?.data?.profile?.gender ?? "not_say",
     },
   });
   useEffect(() => {
@@ -211,10 +208,6 @@ export default function EditProfileModal() {
           type="text"
           control={control}
           name="username"
-          // isInvalid={username?.message !== undefined}
-          // errorMessage={username?.message}
-          // color={username?.message ? "danger" : "default"}
-          // {...register("username")}
           placeholder="Enter your new username"
         />
         <InputWithControl
@@ -222,10 +215,6 @@ export default function EditProfileModal() {
           type="text"
           control={control}
           name="firstName"
-          // isInvalid={firstName?.message !== undefined}
-          // errorMessage={firstName?.message}
-          // color={firstName?.message ? "danger" : "default"}
-          // {...register("firstName")}
           placeholder="Enter your new firstname"
         />
         <InputWithControl
@@ -233,10 +222,6 @@ export default function EditProfileModal() {
           type="text"
           control={control}
           name="lastName"
-          // isInvalid={lastName?.message !== undefined}
-          // errorMessage={lastName?.message}
-          // color={lastName?.message ? "danger" : "default"}
-          // {...register("lastName")}
           placeholder="Enter your new lastname"
         />
         <Controller
@@ -267,134 +252,3 @@ export default function EditProfileModal() {
     </ModalLayoutV2>
   );
 }
-// <ModalLayout
-//       scrollBehavior="inside"
-//       onClose={() => {
-//         disclosure.onClose();
-//         reset();
-//       }}
-//       header={<Divider className="w-full" />}
-//       classNames={{
-//         wrapper: "min-h-[100dvh]",
-//         header: "p-0 h-[100px] items-end ",
-//         footer: "p-4",
-//       }}
-//       wrapperClassNames={{
-//         wrapper: "z-[100]",
-//         closeButton: "left-2 top-[12px]",
-//       }}
-//       closeButton={
-//         <IconButton>
-//           <BiChevronLeft />
-//         </IconButton>
-//       }
-//       isOpen={disclosure.isOpen}
-//       placement="center"
-//       size="full"
-//       footer={
-//         <div className="flex gap-2 justify-center items-center">
-//           <Button onClick={() => reset()}>Cancel</Button>
-//           <Button color="primary" form="edit-profile-form" type="submit">
-//             Save changes
-//           </Button>
-//         </div>
-//       }
-//       //   header={<TypographyH4>Edit profile information</TypographyH4>}
-//     >
-//       <form
-//         className="p-4 px-0 flex flex-col gap-6 max-w-lg"
-//         id="edit-profile-form"
-//         onSubmit={handleSubmit(onSubmit)}
-//       >
-//         <div className="w-full flex flex-col gap-4">
-//           <div className="flex flex-col gap-2">
-//             <div className="w-full flex gap-2 items-center">
-//               <TypographyH4>Profile picture</TypographyH4>
-//               <IconButton className="relative">
-//                 <AiOutlineEdit />
-//                 <input
-//                   type="file"
-//                   accept="image/jpeg,image/jpg,image/png"
-//                   onChange={(e) => {
-//                     setProfileImage((c) => e.target?.files?.[0] ?? null);
-//                   }}
-//                   className="absolute inset-0 opacity-0"
-//                 />
-//               </IconButton>
-//             </div>
-
-//             <Avatar
-//               name={myAccountInfo?.data?.username}
-//               src={
-//                 profileImage
-//                   ? URL.createObjectURL(profileImage)
-//                   : myAccountInfo?.data?.profile?.image?.src
-//               }
-//               className="w-32 h-32"
-//             />
-//           </div>
-
-//           <div className="w-full flex flex-col gap-2">
-//             <div className="w-full flex gap-2 items-center">
-//               <TypographyH4>Cover image</TypographyH4>
-//               <IconButton className="relative">
-//                 <AiOutlineEdit />
-//                 <input
-//                   type="file"
-//                   accept="image/jpeg,image/jpg,image/png"
-//                   onChange={(e) => {
-//                     setCoverImage((c) => e.target?.files?.[0] ?? null);
-//                   }}
-//                   className="absolute inset-0 opacity-0"
-//                 />
-//               </IconButton>
-//             </div>
-//             <CoverImage
-//               className="max-w-lg"
-//               src={
-//                 coverImage
-//                   ? URL.createObjectURL(coverImage)
-//                   : myAccountInfo?.data?.profile?.coverImage?.src ?? ""
-//               }
-//             />
-//           </div>
-//         </div>
-//         <Input
-//           label="Username"
-//           type="text"
-//           isInvalid={username?.message !== undefined}
-//           errorMessage={username?.message}
-//           color={username?.message ? "danger" : "default"}
-//           {...register("username")}
-//           placeholder="Enter your new username"
-//         />
-//         <Input
-//           label="Firstname"
-//           type="text"
-//           isInvalid={firstName?.message !== undefined}
-//           errorMessage={firstName?.message}
-//           color={firstName?.message ? "danger" : "default"}
-//           {...register("firstName")}
-//           placeholder="Enter your new firstname"
-//         />
-//         <Input
-//           label="Lastname"
-//           type="text"
-//           isInvalid={lastName?.message !== undefined}
-//           errorMessage={lastName?.message}
-//           color={lastName?.message ? "danger" : "default"}
-//           {...register("lastName")}
-//           placeholder="Enter your new lastname"
-//         />
-//         <Textarea
-//           maxRows={4}
-//           minRows={2}
-//           label="Bio"
-//           isInvalid={bio?.message !== undefined}
-//           errorMessage={bio?.message}
-//           color={bio?.message ? "danger" : "default"}
-//           {...register("bio")}
-//           placeholder="Enter your new bio"
-//         />
-//       </form>
-//     </ModalLayout>

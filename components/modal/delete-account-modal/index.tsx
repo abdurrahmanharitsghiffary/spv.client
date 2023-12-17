@@ -1,74 +1,71 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useShowDeleteAccountModalControls } from "@/hooks/use-delete-account";
 import ModalLayout from "../layout";
-import { zPassword as passwordValidation } from "@/lib/zod-schema";
+import { zPassword } from "@/lib/zod-schema";
 import { toast } from "react-toastify";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
 import { useRouter } from "next/navigation";
 import { useSetSession } from "@/stores/auth-store";
-import InputPassword from "@/components/form/input/password";
+import InputPassword from "@/components/input/password";
 import { Button } from "@nextui-org/button";
-// FIX VALIDATE ERRORS
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const passwordValidation = z.object({
+  password: zPassword("Password"),
+});
+
+type PasswordValidationSchema = z.infer<typeof passwordValidation>;
+
 function DeleteAccountModal() {
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitSuccessful },
+    reset,
+  } = useForm<PasswordValidationSchema>({
+    resolver: zodResolver(passwordValidation),
+    defaultValues: {
+      password: "",
+    },
+  });
   const request = useAxiosInterceptor();
   const setSession = useSetSession();
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [password, setPassword] = useState<string>("");
   const { isOpen, onClose } = useShowDeleteAccountModalControls();
 
   useEffect(() => {
-    if (errorMessage) {
-      passwordValidation("Password")
-        .safeParseAsync(password)
-        .then((res) => {
-          if (!res.success) {
-            setErrorMessage(res.error.errors?.[0]?.message);
-          } else {
-            setErrorMessage(null);
-          }
-        })
-        .catch((err) => err);
-    }
-  }, [errorMessage, password]);
-
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const result = await passwordValidation("Password").safeParseAsync(
-      password
-    );
-    if (!result.success) {
-      console.error(result.error.errors);
-      setErrorMessage(result.error.errors?.[0]?.message);
-    } else {
-      await toast.promise(
-        request
-          .delete(urlBase("/me/account"), {
-            data: { currentPassword: result.data },
-          })
-          .then((res) => res.data)
-          .catch((err) => Promise.reject(err?.response?.data)),
-        {
-          error: {
-            render({ data }) {
-              return (data as any)?.message ?? "Something went wrong!";
-            },
-          },
-          pending: "Submitting...",
-          success: "Account successfully deleted",
-        }
-      );
-      setErrorMessage(null);
+    if (isSubmitSuccessful) {
+      reset();
       setSession(null);
       router.push("/login");
+      onClose();
     }
+  }, [isSubmitSuccessful]);
+
+  const onSubmit: SubmitHandler<PasswordValidationSchema> = async (data) => {
+    await toast.promise(
+      request
+        .delete(urlBase("/me/account"), {
+          data: { currentPassword: data.password },
+        })
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+      {
+        error: {
+          render({ data }) {
+            return (data as any)?.message ?? "Something went wrong!";
+          },
+        },
+        pending: "Submitting...",
+        success: "Account successfully deleted",
+      }
+    );
   };
+
   return (
     <ModalLayout
       placement="center"
@@ -87,13 +84,10 @@ function DeleteAccountModal() {
         </div>
       }
     >
-      <form onSubmit={handleSubmit} id="deleteaccountform">
+      <form onSubmit={handleSubmit(onSubmit)} id="deleteaccountform">
         <InputPassword
-          isInvalid={errorMessage ? true : false}
-          errorMessage={errorMessage}
-          color={errorMessage ? "danger" : "default"}
-          value={password}
-          onChange={handleInputChange}
+          control={control}
+          name="password"
           label="Current password"
           placeholder="Enter your current account password"
         />

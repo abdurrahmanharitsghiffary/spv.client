@@ -23,11 +23,12 @@ export function InputWithControl<T extends FieldValues>(
   const {
     field: { name, onBlur, onChange, ref, value, disabled },
     fieldState,
-    formState: { errors },
+    formState: { errors, defaultValues },
   } = useController(props);
 
   return (
     <Input
+      defaultValue={defaultValues?.[name]}
       isInvalid={errors[name]?.message !== undefined}
       errorMessage={errors[name]?.message?.toString()}
       color={errors[name]?.message ? "danger" : "default"}

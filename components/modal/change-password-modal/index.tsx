@@ -8,7 +8,7 @@ import {
   ChangePasswordValidationSchema,
   changePasswordValidationSchema,
 } from "@/lib/zod-schema/auth";
-import InputPassword from "@/components/form/input/password";
+import InputPassword from "@/components/input/password";
 import { Button } from "@nextui-org/button";
 import { useConfirm } from "@/stores/confirm-store";
 import { toast } from "react-toastify";
@@ -17,15 +17,13 @@ import { urlBase } from "@/lib/endpoints";
 
 function ChangePasswordModal() {
   const {
-    register,
+    control,
     handleSubmit,
     reset,
-    formState: {
-      isSubmitSuccessful,
-      errors: { confirmPassword, currentPassword, password },
-    },
+    formState: { isSubmitSuccessful },
   } = useForm<ChangePasswordValidationSchema>({
     resolver: zodResolver(changePasswordValidationSchema),
+    defaultValues: { confirmPassword: "", currentPassword: "", password: "" },
   });
   const request = useAxiosInterceptor();
   const confirm = useConfirm();
@@ -89,30 +87,24 @@ function ChangePasswordModal() {
       >
         <InputPassword
           variant="bordered"
-          {...register("currentPassword")}
           label="Current password"
           placeholder="your current password"
-          errorMessage={currentPassword?.message}
-          isInvalid={currentPassword?.message ? true : false}
-          color={currentPassword?.message ? "danger" : "default"}
+          control={control}
+          name="currentPassword"
         />
         <InputPassword
           variant="bordered"
-          {...register("password")}
           label="New password"
           placeholder="Enter your new password"
-          errorMessage={password?.message}
-          isInvalid={password?.message ? true : false}
-          color={password?.message ? "danger" : "default"}
+          control={control}
+          name="password"
         />
         <InputPassword
           variant="bordered"
-          {...register("confirmPassword")}
           label="Confirm"
           placeholder="Enter again your new password"
-          errorMessage={confirmPassword?.message}
-          isInvalid={confirmPassword?.message ? true : false}
-          color={confirmPassword?.message ? "danger" : "default"}
+          control={control}
+          name="confirmPassword"
         />
       </form>
     </ModalLayoutV2>

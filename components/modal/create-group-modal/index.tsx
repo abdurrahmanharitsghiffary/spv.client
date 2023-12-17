@@ -1,36 +1,32 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import ModalLayoutV2 from "../layoutV2";
 import {
   useCreateGroupActions,
   useCreateGroupIsOpen,
 } from "@/stores/create-group-store";
-import { UserAccountPublic, UserSimplified } from "@/types/user";
+import { UserAccountPublic } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
 import { removeDuplicates } from "@/lib";
-import UserChip from "@/components/user/user-chip";
 import { getUserSimplified } from "@/lib/getUserSimplified";
-import {
-  useForm,
-  SubmitHandler,
-  Controller,
-  UseFormSetValue,
-  useWatch,
-} from "react-hook-form";
+import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { zImage } from "@/lib/zod-schema/image";
-import { Input, Textarea } from "@nextui-org/input";
 import ValidationErrorText from "@/components/validation-error-text";
 import { Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { FiCheck, FiPlus, FiTrash, FiX } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useCreateGroupChat } from "@/lib/api/chats/mutation";
 import { TypographyLarge } from "@/components/ui/typography";
 import UserGroupList from "@/components/user/user-group-list";
+import {
+  InputWithControl,
+  TextareaWithControl,
+} from "@/components/input/input-with-control";
 
 const createGroupSchema = z.object({
   participants: z
@@ -50,7 +46,6 @@ type CreateGroupSchema = z.infer<typeof createGroupSchema>;
 export default function CreateGroupModal() {
   const { createGroupChatAsync } = useCreateGroupChat();
   const {
-    register,
     formState: { isSubmitSuccessful, errors },
     handleSubmit,
     control,
@@ -58,6 +53,12 @@ export default function CreateGroupModal() {
     reset,
   } = useForm<CreateGroupSchema>({
     resolver: zodResolver(createGroupSchema),
+    defaultValues: {
+      description: "",
+      image: null,
+      participants: [],
+      title: "",
+    },
   });
   const isOpen = useCreateGroupIsOpen();
   const { onClose } = useCreateGroupActions();
@@ -192,21 +193,17 @@ export default function CreateGroupModal() {
             {errors?.participants?.message}
           </ValidationErrorText>
         )}
-        <Input
+        <InputWithControl
           label="Group title (optional)"
           placeholder="Enter your group title"
-          isInvalid={errors?.title?.message !== undefined}
-          errorMessage={errors?.title?.message}
-          color={errors?.title?.message ? "danger" : "default"}
-          {...register("title")}
+          control={control}
+          name="title"
         />
-        <Textarea
+        <TextareaWithControl
           label="Group description (optional)"
           placeholder="Enter your group description"
-          isInvalid={errors?.description?.message !== undefined}
-          errorMessage={errors?.description?.message}
-          color={errors?.description?.message ? "danger" : "default"}
-          {...register("description")}
+          control={control}
+          name="description"
         />
       </form>
     </ModalLayoutV2>

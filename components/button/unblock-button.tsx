@@ -1,6 +1,5 @@
 "use client";
 import { useUnblockUser } from "@/lib/api/users/mutation";
-import { useGetUserById } from "@/lib/api/users/query";
 import { useConfirm } from "@/stores/confirm-store";
 import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";

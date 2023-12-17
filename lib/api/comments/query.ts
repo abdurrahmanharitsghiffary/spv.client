@@ -17,15 +17,18 @@ import { useInfinite } from "../hooks";
 
 export const useGetCommentByPostId = (
   postId: number,
-  options?: OffsetPagingwithOrder,
+  options: OffsetPagingwithOrder = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
+  const q: any = {
+    limit: options?.limit?.toString(),
+    offset: options?.offset?.toString(),
+  };
+
+  if (options.order_by) q.order_by = options.order_by;
+
   const { data: postComments, ...rest } = useInfinite<Comment>({
-    query: {
-      limit: options?.limit?.toString(),
-      offset: options?.offset?.toString(),
-      order_by: options?.order_by,
-    },
+    query: q,
     config,
     url: postCommentsByPostId(postId.toString(), options),
     queryKey: keys.postComments(postId),

@@ -23,7 +23,7 @@ export default function ImageChip({
       classNames={{ base: "rounded-md h-auto" }}
       key={image.name}
       content={
-        <div className="p-1 flex flex-col gap-2">
+        <div className="p-1 flex flex-col gap-2 max-w-[90%] sm:max-w-[350px]">
           <TypographyLarge className="font-semibold text-sm">
             {image.name}
           </TypographyLarge>

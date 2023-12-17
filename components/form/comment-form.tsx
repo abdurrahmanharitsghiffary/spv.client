@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
-import { Input, Textarea } from "@nextui-org/input";
+import { Input } from "@nextui-org/input";
 import { Divider } from "@nextui-org/divider";
 import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -28,6 +28,7 @@ import {
   useResetReplyValue,
   useGetSelectedCommentReplyUsername,
 } from "@/stores/comment-reply-store";
+import { TextareaWithControl } from "../input/input-with-control";
 
 export default function CommentForm({
   hideSpacer,
@@ -51,10 +52,9 @@ export default function CommentForm({
     control,
     reset,
     formState: { errors, isSubmitSuccessful },
-    register,
   } = useForm<CreateCommentSchema>({
     resolver: zodResolver(createCommentSchema),
-    defaultValues: { image: null },
+    defaultValues: { image: null, comment: "" },
   });
   const isSSR = useIsSSR();
 
@@ -155,7 +155,7 @@ export default function CommentForm({
                 <Input type="text" placeholder="Write your comment..." />
               ) : (
                 <div className="w-full relative flex items-center justify-start">
-                  <Textarea
+                  <TextareaWithControl
                     className="h-fit"
                     classNames={{
                       inputWrapper: currentComment || file ? "pr-[50px]" : "",
@@ -165,14 +165,9 @@ export default function CommentForm({
                     maxRows={4}
                     id="cm9ti2pt"
                     type="text"
-                    color={fieldIsError ? "danger" : "default"}
-                    isInvalid={fieldIsError}
-                    errorMessage={
-                      fieldIsError ? errors.comment?.message ?? "" : ""
-                    }
                     placeholder="Write your comment..."
-                    // onBlur={() => clearErrors(["comment"."image"])}
-                    {...register("comment")}
+                    control={control}
+                    name="comment"
                   />
                   {currentComment || file ? (
                     <Button

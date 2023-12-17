@@ -55,7 +55,7 @@ export const useGetMyAssociatedChatRooms = ({
 };
 
 export const useGetMyPosts = (
-  query?: OffsetPaging,
+  query: OffsetPaging = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
   const { data: myPosts, ...rest } = useInfinite<PostExtended>({

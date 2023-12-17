@@ -1,4 +1,4 @@
-import BottomBar from "@/components/bottombar";
+import BottomBar from "@/components/bottom-bar";
 import Giphy from "@/components/giphy";
 import Layout from "@/components/layout/layout";
 import ChatMenu from "@/components/menu/chat-menu";

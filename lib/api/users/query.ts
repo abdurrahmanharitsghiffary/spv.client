@@ -118,7 +118,7 @@ export const useGetUserIsFollowed = (
 };
 
 export const useGetBlockedUsers = (
-  query?: { offset?: number; limit?: number },
+  query: { offset?: number; limit?: number } = { limit: 0, offset: 20 },
   config?: AxiosRequestConfig
 ) => {
   const { data: blockedUsers, ...rest } = useInfinite<UserAccountPublic>({

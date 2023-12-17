@@ -57,7 +57,7 @@ export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
 
 export const useGetPostByUserId = (
   userId: number,
-  query?: { limit?: number; offset?: number },
+  query: { limit?: number; offset?: number } = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
   const { data: posts, ...rest } = useInfinite<PostExtended>({
@@ -130,9 +130,9 @@ export const useGetPostIsLiked = (
 };
 
 export const useGetMySavedPosts = (
-  query?:
+  query:
     | { limit?: number | undefined; offset?: number | undefined }
-    | undefined,
+    | undefined = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
   const { data: mySavedPosts, ...rest } = useInfinite<

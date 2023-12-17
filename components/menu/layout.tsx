@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimationFrame } from "framer-motion";
 import clsx from "clsx";
 import { useIsMd } from "@/hooks/use-media-query";
 import { BiChevronRight } from "react-icons/bi";
@@ -47,14 +47,17 @@ export default function MenuLayout({
   avatar?: string;
 }) {
   const isMd = useIsMd();
-
+  // const ref = useRef<HTMLDivElement | null>(null);
+  // console.log(ref.current., "CURRENT");
   return (
     <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            // ref={ref}
             drag={isMd ? "x" : "y"}
             dragElastic={0}
+            dragSnapToOrigin
             dragConstraints={
               isMd ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
             }
@@ -74,7 +77,17 @@ export default function MenuLayout({
                     y: 0,
                   }
             }
+            // onDrag={(e, info) => {
+            //   console.log(e, "Drag Event");
+            //   console.log(info, "Drag info");
+            // }}
+            // onPan={(e, info) => {
+            //   if (info.point.y > 600 && isOpen) onClose();
+            //   console.log(e, "Event Info");
+            //   console.log(info, "Pan Info");
+            // }}
             transition={{
+              // velocity: 100,
               duration: 0.1,
               ease: "easeIn",
             }}

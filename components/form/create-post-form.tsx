@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useMemo } from "react";
 import { TypographyH3, TypographyH4, TypographyMuted } from "../ui/typography";
-import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import PostCard from "../post/post-card";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -16,6 +15,10 @@ import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
 import FileButton from "../input/file-btn";
+import {
+  InputWithControl,
+  TextareaWithControl,
+} from "../input/input-with-control";
 
 export default function CreatePostForm({
   withPreview = true,
@@ -31,14 +34,13 @@ export default function CreatePostForm({
   const { createPostAsync } = useCreatePost();
   const {
     handleSubmit,
-    register,
     control,
     watch,
     setValue,
     reset,
     formState: { errors, isSubmitSuccessful },
   } = useForm<CreatePostValidationSchema>({
-    defaultValues: { images: [] },
+    defaultValues: { images: [], content: "", title: "" },
     resolver: zodResolver(createPostValidationSchema),
   });
 
@@ -96,20 +98,15 @@ export default function CreatePostForm({
         {!isNotPostPage && (
           <TypographyH3 className="!text-xl">Create a new post</TypographyH3>
         )}
-        <Input
+        <InputWithControl
           maxLength={40}
-          isInvalid={errors.title?.message !== undefined}
-          errorMessage={errors.title?.message}
-          color={errors.title?.message ? "danger" : "default"}
           placeholder="Write your post title"
           label="Title"
-          {...register("title")}
+          control={control}
+          name="title"
         />
         <div className="w-full relative pb-12">
-          <Textarea
-            isInvalid={errors.content?.message !== undefined}
-            errorMessage={errors.content?.message}
-            color={errors.content?.message ? "danger" : "default"}
+          <TextareaWithControl
             autoFocus={autoFocus}
             minRows={4}
             maxRows={5}
@@ -119,7 +116,8 @@ export default function CreatePostForm({
               helperWrapper: "pt-0",
               inputWrapper: "rounded-none !rounded-t-medium",
             }}
-            {...register("content")}
+            control={control}
+            name="content"
           />
           <ul className="absolute bg-default-100 border-t-1 border-divider bottom-1 rounded-b-medium flex inset-x-0 justify-end p-1 w-full">
             <li className="relative w-fit">

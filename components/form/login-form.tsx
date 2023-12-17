@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import InputPassword from "./input/password";
+import InputPassword from "../input/password";
 import FormLayout from "./layout";
 import { Button, Link } from "@nextui-org/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputEmail from "./input/email";
+import InputEmail from "../input/email";
 import NextLink from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { useLogin } from "@/lib/api/auth";
@@ -15,18 +15,18 @@ import {
   loginValidationSchema,
 } from "@/lib/zod-schema/auth";
 import ValidationErrorText from "../validation-error-text";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import TextDivider from "../text-divider";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const {
     handleSubmit,
-    register,
+    control,
     formState: { errors },
   } = useForm<LoginValidationSchema>({
     resolver: zodResolver(loginValidationSchema),
+    defaultValues: { confirmPassword: "", email: "", password: "" },
   });
   const { error, loginAsync } = useLogin();
   const googleLoginErrorMessage = searchParams.get("err_message");
@@ -86,28 +86,19 @@ export default function LoginForm() {
         </div>
       }
     >
-      <InputEmail
-        variant="bordered"
-        color={errors.email?.message ? "danger" : "default"}
-        isInvalid={errors.email?.message ? true : false}
-        errorMessage={errors.email?.message}
-        {...register("email")}
-      />
+      <InputEmail variant="bordered" control={control} name="email" />
       <InputPassword
         variant="bordered"
         color={errors.password?.message ? "danger" : "default"}
-        isInvalid={errors.password?.message ? true : false}
-        errorMessage={errors.password?.message}
-        {...register("password")}
+        control={control}
+        name="password"
       />
       <InputPassword
         variant="bordered"
         label="Confirm"
         placeholder="Enter again your password"
-        color={errors.confirmPassword?.message ? "danger" : "default"}
-        isInvalid={errors.confirmPassword?.message ? true : false}
-        errorMessage={errors.confirmPassword?.message}
-        {...register("confirmPassword")}
+        control={control}
+        name="confirmPassword"
       />
     </FormLayout>
   );
