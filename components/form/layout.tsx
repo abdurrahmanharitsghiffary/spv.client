@@ -29,7 +29,6 @@ export default function FormLayout({
       as="form"
       classNames={classNames}
       onSubmit={onSubmit}
-      radius="none"
     >
       <CardHeader className="p-5 justify-center">
         <TypographyH3>{title}</TypographyH3>
