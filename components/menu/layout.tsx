@@ -56,7 +56,7 @@ export default function MenuLayout({
 }) {
   const isMd = useIsMd();
 
-  const [dragInfo, setDragInfo] = useState<PanInfo>({} as PanInfo);
+  const [velocity, setVelocity] = useState<number>(0);
   const [offsetHeight, setOffsetHeight] = useState(0);
   console.log(offsetHeight, "Current offset height");
   const refCb = useCallback((node: HTMLDivElement) => {
@@ -73,7 +73,7 @@ export default function MenuLayout({
     if (info.offset.y > offsetHeight - dividedOffsetHeight) {
       onClose();
     }
-    setDragInfo({ ...info });
+    setVelocity(info.velocity.y);
   };
   // console.log(dragInfo, "Drag Info");
   return (
@@ -88,7 +88,7 @@ export default function MenuLayout({
             dragConstraints={
               isMd ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
             }
-            // onDragEnd={(e, info) => setDragInfo({} as any)}
+            onDragEnd={(e, info) => setVelocity(0)}
             key="menu-layout"
             initial={
               isMd
@@ -136,7 +136,7 @@ export default function MenuLayout({
                 <motion.span
                   style={{ scaleX: 1.052 }}
                   animate={{
-                    rotate: getOffset(dragInfo?.velocity?.y / 2, true),
+                    rotate: getOffset(velocity / 2, true),
                     borderBottomRightRadius: 12,
                     transition: {
                       duration: 0.1,
@@ -149,7 +149,7 @@ export default function MenuLayout({
                   style={{ scaleX: 1.052 }}
                   animate={{
                     borderBottomLeftRadius: 12,
-                    rotate: getOffset(-dragInfo?.velocity?.y / 2, true),
+                    rotate: getOffset(-velocity / 2, true),
                     transition: {
                       ease: "linear",
                       duration: 0.1,
