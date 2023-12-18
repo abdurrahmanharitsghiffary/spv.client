@@ -67,7 +67,7 @@ export default function MenuLayout({
     event: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo
   ) => {
-    const dividedOffsetHeight = offsetHeight / 8;
+    const dividedOffsetHeight = offsetHeight / 6;
     console.log(dividedOffsetHeight, "Divided OH");
     console.log("Offset Point", info.offset.y);
     if (info.offset.y > offsetHeight - dividedOffsetHeight) {
@@ -132,7 +132,7 @@ export default function MenuLayout({
                 </IconButton>
               </div>
             ) : (
-              <div className="w-12 h-1 my-3 mx-auto rounded-xl flex">
+              <div className="w-12 h-1 my-3 mx-auto rounded-xl flex cursor-grabbing">
                 <motion.span
                   style={{ scaleX: 1.052 }}
                   animate={{
