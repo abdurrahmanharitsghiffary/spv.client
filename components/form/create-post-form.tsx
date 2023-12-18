@@ -96,7 +96,7 @@ export default function CreatePostForm({
         encType="multipart/form-data"
       >
         {!isNotPostPage && (
-          <TypographyH3 className="!text-xl">Create a new post</TypographyH3>
+          <TypographyH3 className="!text-lg">Create a new post</TypographyH3>
         )}
         <InputWithControl
           maxLength={40}

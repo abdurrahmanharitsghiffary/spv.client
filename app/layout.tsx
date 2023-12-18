@@ -41,7 +41,6 @@ export default async function RootLayout({
           <ImageGallery />
           <ImagePreview />
         </Providers>
-        <div id="modal_portal"></div>
       </body>
     </html>
   );

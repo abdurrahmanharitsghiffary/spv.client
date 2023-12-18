@@ -12,7 +12,7 @@ export default function NotificationPage() {
   return (
     <>
       <div className="pt-4 flex flex-col gap-2 w-full px-2">
-        <TypographyH3 className="my-2">Notifications</TypographyH3>
+        <TypographyH3 className="my-2 !text-lg">Notifications</TypographyH3>
         <div className="w-full flex gap-2">
           <InputSearch autoFocus={false} />
           <Dropdown

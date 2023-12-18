@@ -1,13 +1,21 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { motion, AnimatePresence, useAnimationFrame } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import clsx from "clsx";
 import { useIsMd } from "@/hooks/use-media-query";
 import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import { Avatar } from "@nextui-org/react";
+
+const getOffset = (offset: number, minus?: boolean) => {
+  const MAX_OFFSET = 12;
+
+  if (minus && offset < -MAX_OFFSET) return -MAX_OFFSET;
+  if (offset > MAX_OFFSET) return MAX_OFFSET;
+  return offset;
+};
 
 function IconWrapper({
   children,
@@ -47,21 +55,40 @@ export default function MenuLayout({
   avatar?: string;
 }) {
   const isMd = useIsMd();
-  // const ref = useRef<HTMLDivElement | null>(null);
-  // console.log(ref.current., "CURRENT");
+
+  const [dragInfo, setDragInfo] = useState<PanInfo>({} as PanInfo);
+  const [offsetHeight, setOffsetHeight] = useState(0);
+  console.log(offsetHeight, "Current offset height");
+  const refCb = useCallback((node: HTMLDivElement) => {
+    if (node) setOffsetHeight(node.offsetHeight);
+  }, []);
+
+  const handleDrag = (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => {
+    const dividedOffsetHeight = offsetHeight / 8;
+    console.log(dividedOffsetHeight, "Divided OH");
+    console.log("Offset Point", info.offset.y);
+    if (info.offset.y > offsetHeight - dividedOffsetHeight) {
+      onClose();
+    }
+    setDragInfo({ ...info });
+  };
+  // console.log(dragInfo, "Drag Info");
   return (
     <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            // ref={ref}
+            ref={refCb}
             drag={isMd ? "x" : "y"}
             dragElastic={0}
             dragSnapToOrigin
             dragConstraints={
               isMd ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
             }
-            onDragEnd={() => onClose()}
+            // onDragEnd={(e, info) => setDragInfo({} as any)}
             key="menu-layout"
             initial={
               isMd
@@ -70,6 +97,7 @@ export default function MenuLayout({
                     y: 200,
                   }
             }
+            onDrag={handleDrag}
             animate={
               isMd
                 ? { x: 0 }
@@ -77,17 +105,8 @@ export default function MenuLayout({
                     y: 0,
                   }
             }
-            // onDrag={(e, info) => {
-            //   console.log(e, "Drag Event");
-            //   console.log(info, "Drag info");
-            // }}
-            // onPan={(e, info) => {
-            //   if (info.point.y > 600 && isOpen) onClose();
-            //   console.log(e, "Event Info");
-            //   console.log(info, "Pan Info");
-            // }}
             transition={{
-              // velocity: 100,
+              velocity: -100,
               duration: 0.1,
               ease: "easeIn",
             }}
@@ -113,7 +132,32 @@ export default function MenuLayout({
                 </IconButton>
               </div>
             ) : (
-              <div className="w-12 h-1 bg-divider my-2 mx-auto rounded-xl"></div>
+              <div className="w-12 h-1 my-3 mx-auto rounded-xl flex">
+                <motion.span
+                  style={{ scaleX: 1.052 }}
+                  animate={{
+                    rotate: getOffset(dragInfo?.velocity?.y / 2, true),
+                    borderBottomRightRadius: 12,
+                    transition: {
+                      duration: 0.1,
+                      ease: "linear",
+                    },
+                  }}
+                  className="origin-top-left w-[50%] block h-full bg-default rounded-l-xl"
+                ></motion.span>
+                <motion.span
+                  style={{ scaleX: 1.052 }}
+                  animate={{
+                    borderBottomLeftRadius: 12,
+                    rotate: getOffset(-dragInfo?.velocity?.y / 2, true),
+                    transition: {
+                      ease: "linear",
+                      duration: 0.1,
+                    },
+                  }}
+                  className="w-[50%] origin-top-right block h-full bg-default rounded-r-xl"
+                ></motion.span>
+              </div>
             )}
             <div className="flex items-center gap-3 px-4 py-2">
               {avatar !== undefined && (
@@ -177,12 +221,10 @@ export default function MenuLayout({
       </AnimatePresence>
 
       {isOpen && (
-        <motion.div
-          animate={{ opacity: 1 }}
-          initial={{ opacity: 0 }}
+        <div
           className="fixed inset-0 z-[200] bg-opacity-0"
           onClick={() => onClose()}
-        ></motion.div>
+        ></div>
       )}
     </>
   );
