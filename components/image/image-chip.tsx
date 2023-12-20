@@ -12,14 +12,16 @@ export default function ImageChip({
   onClose,
 }: {
   image: File;
-  onClose: (image: File) => null | undefined;
+  onClose?: (image: File) => void;
 }) {
   return (
     <Popover classNames={{ base: "rounded-md h-auto" }}>
       <PopoverTrigger>
         <Chip
           color={image.size > MAX_FILE_SIZE ? "danger" : "default"}
-          onClose={() => onClose(image)}
+          onClose={() => {
+            if (onClose) onClose(image);
+          }}
         >
           {image.name?.length > 10 ? image.name.slice(0, 10) : image.name}{" "}
           {image.name.length > 10 && "..."}

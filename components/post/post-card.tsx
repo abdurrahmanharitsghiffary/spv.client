@@ -1,5 +1,5 @@
 import { Card, CardProps } from "@nextui-org/card";
-import React from "react";
+import React, { memo } from "react";
 import { Divider } from "@nextui-org/divider";
 import { PostExtended } from "@/types/post";
 import PostCardHeader from "./post-card-header";
@@ -10,7 +10,7 @@ interface PostCardProps {
   post: PostExtended | undefined;
 }
 
-export default function PostCard(
+function PostCard(
   props: CardProps & {
     isPostPage?: boolean;
     isPreview?: boolean;
@@ -22,7 +22,7 @@ export default function PostCard(
   } rounded-none w-full dark:border-t-0 border-b-1 last:border-b-0 dark:border-b-0 border-divider shadow-none`;
   const title = post?.title ?? "";
   const content = post?.content ?? "";
-
+  console.log("Re rendered");
   // USE MEMO ??
   const images = post?.images ?? [];
   // USE MEMO ??
@@ -57,3 +57,5 @@ export default function PostCard(
     </Card>
   );
 }
+
+export default memo(PostCard);

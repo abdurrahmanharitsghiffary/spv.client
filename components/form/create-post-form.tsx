@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TypographyH3, TypographyH4, TypographyMuted } from "../ui/typography";
 import { Button } from "@nextui-org/button";
 import PostCard from "../post/post-card";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CreatePostValidationSchema,
@@ -19,6 +19,7 @@ import {
   InputWithControl,
   TextareaWithControl,
 } from "../input/input-with-control";
+import { Checkbox } from "@nextui-org/checkbox";
 
 export default function CreatePostForm({
   withPreview = true,
@@ -31,11 +32,11 @@ export default function CreatePostForm({
   isNotPostPage?: boolean;
   className?: string;
 }) {
+  const [isShowPreview, setIsShowPreview] = useState(true);
   const { createPostAsync } = useCreatePost();
   const {
     handleSubmit,
     control,
-    watch,
     setValue,
     reset,
     formState: { errors, isSubmitSuccessful },
@@ -44,10 +45,12 @@ export default function CreatePostForm({
     resolver: zodResolver(createPostValidationSchema),
   });
 
-  const images: FileList | null = watch("images");
-  const postsImages: { src: string }[] | null = useMemo(() => {
-    if (images === null) return null;
-    return (Array.from(images ?? []) ?? []).map((image) => ({
+  const images: File[] = useWatch({ control, name: "images" });
+  const title = useWatch({ control, name: "title" });
+  const content = useWatch({ control, name: "content" });
+  console.log(images, "Images");
+  const postsImages: { src: string }[] = useMemo(() => {
+    return images.map((image) => ({
       src: URL.createObjectURL(image),
     }));
   }, [images]);
@@ -76,8 +79,8 @@ export default function CreatePostForm({
 
   const post = useMemo(() => {
     return {
-      title: watch("title"),
-      content: watch("content"),
+      title,
+      content,
       author: {
         id: 99,
         image: null,
@@ -86,7 +89,21 @@ export default function CreatePostForm({
       createdAt: new Date("2023"),
       images: postsImages,
     };
-  }, [postsImages, watch("content"), watch("title")]);
+  }, [postsImages, title, content]);
+
+  const handleCloseClick = useCallback(
+    (image: File) => {
+      if (!images) return null;
+      const files = (images as File[]).filter(
+        (img) =>
+          !`${img.name}${img.size}${image.type}`.includes(
+            `${image.name}${image.size}${image.type}`
+          )
+      );
+      setValue("images", [...files]);
+    },
+    [images]
+  );
 
   return (
     <>
@@ -96,7 +113,7 @@ export default function CreatePostForm({
         encType="multipart/form-data"
       >
         {!isNotPostPage && (
-          <TypographyH3 className="!text-lg">Create a new post</TypographyH3>
+          <TypographyH3 className="!text-lg">Post your thought</TypographyH3>
         )}
         <InputWithControl
           disableAnimation
@@ -116,7 +133,8 @@ export default function CreatePostForm({
             classNames={{
               errorMessage: "absolute pl-2 z-[11]",
               helperWrapper: "pt-0",
-              inputWrapper: "rounded-none !rounded-t-medium",
+              inputWrapper:
+                "rounded-none !rounded-t-medium focus:rounded-medium",
             }}
             control={control}
             name="content"
@@ -135,6 +153,7 @@ export default function CreatePostForm({
                     inputClassName="opacity-0 z-[10] absolute inset-0"
                     onChange={(e) => {
                       onChange(Array.from(e?.target?.files ?? []));
+                      e.target.value = "";
                     }}
                     multiple={true}
                   />
@@ -149,7 +168,10 @@ export default function CreatePostForm({
             <TypographyMuted>
               {images?.length} Image{(images ?? []).length > 1 && "s"} choosen
             </TypographyMuted>
-            <CreatePostImageChip images={images} onCloseClick={setValue} />
+            <CreatePostImageChip
+              images={images}
+              onCloseClick={handleCloseClick}
+            />
             {errors.images?.message ? (
               <TypographyMuted className="text-danger text-tiny">
                 {errors.images.message as string}
@@ -160,9 +182,7 @@ export default function CreatePostForm({
           </div>
         )}
         <div className="flex gap-2 items-center w-full justify-end">
-          {(watch("title") ||
-            (images?.length ?? 0) > 0 ||
-            watch("content")) && (
+          {(title || (images?.length ?? 0) > 0 || content) && (
             <Button type="button" color="default" onClick={() => reset()}>
               Cancel
             </Button>
@@ -182,8 +202,14 @@ export default function CreatePostForm({
           </Button>
         )} */}
       </form>
-
-      {withPreview && (
+      <Checkbox
+        isSelected={isShowPreview}
+        onValueChange={setIsShowPreview}
+        className="self-start !pb-5 px-6"
+      >
+        {isShowPreview ? "Hide preview" : "Show preview"}
+      </Checkbox>
+      {isShowPreview && withPreview && (
         <div className="w-full flex flex-col gap-2 pb-16">
           <TypographyH4 className="px-4 !text-base">Preview</TypographyH4>
           <PostCard

@@ -1,53 +1,20 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { memo } from "react";
 import clsx from "clsx";
 import ImageChip from "../image/image-chip";
 
-export default function CreatePostImageChip({
+function CreatePostImageChip({
   images,
   onCloseClick,
   className,
   wrapperClassName,
 }: {
   images: FileList | File[] | null;
-  onCloseClick?: (
-    name: "images",
-    value: any,
-    options?:
-      | Partial<{
-          shouldValidate: boolean;
-          shouldDirty: boolean;
-          shouldTouch: boolean;
-        }>
-      | undefined
-  ) => void;
+  onCloseClick?: (image: File) => void;
   className?: string;
   wrapperClassName?: string;
 }) {
-  const handleClose = useCallback(
-    (image: File) => {
-      if (!onCloseClick || !images) return null;
-
-      const files = Array.from(images).filter(
-        (img) =>
-          !`${img.name}${img.size}${image.type}`.includes(
-            `${image.name}${image.size}${image.type}`
-          )
-      );
-      if (files instanceof Array && !(files instanceof FileList)) {
-        onCloseClick("images", [...files]);
-      } else if (files instanceof FileList) {
-        const fileList = new DataTransfer();
-
-        for (let file of files) {
-          fileList.items.add(file);
-        }
-
-        onCloseClick("images", fileList.files);
-      }
-    },
-    [images, onCloseClick]
-  );
+  console.log("Re Rendered");
 
   if (!images || (images?.length ?? 0) === 0) return null;
 
@@ -64,7 +31,7 @@ export default function CreatePostImageChip({
         {Array.from(images ?? []).map((image) => (
           <ImageChip
             image={image}
-            onClose={handleClose}
+            onClose={onCloseClick}
             key={image.name + image.size}
           />
         ))}
@@ -72,6 +39,8 @@ export default function CreatePostImageChip({
     </div>
   );
 }
+
+export default memo(CreatePostImageChip);
 // <Tooltip
 //   classNames={{ base: "rounded-md h-auto" }}
 //   key={image.name}
