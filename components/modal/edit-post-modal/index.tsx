@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import ModalLayout from "../layout";
 import {
   useGetSelectedPostId,
@@ -60,6 +60,20 @@ function EditPostModal() {
   const onSubmit: SubmitHandler<UpdatePostSchema> = async (data) => {
     await updatePostAsync({ postId, data });
   };
+
+  const handleCloseClick = useCallback(
+    (image: File) => {
+      if (!images) return null;
+      const files = (images as File[]).filter(
+        (img) =>
+          !`${img.name}${img.size}${image.type}`.includes(
+            `${image.name}${image.size}${image.type}`
+          )
+      );
+      setValue("images", [...files]);
+    },
+    [images]
+  );
 
   return (
     <ModalLayout
@@ -127,7 +141,7 @@ function EditPostModal() {
         )}
         <CreatePostImageChip
           images={images}
-          onCloseClick={setValue}
+          onCloseClick={handleCloseClick}
           className="!flex-wrap"
         />
         <Button
