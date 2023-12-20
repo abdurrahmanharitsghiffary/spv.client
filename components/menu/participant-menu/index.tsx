@@ -14,12 +14,9 @@ import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
 import { ParticipantRole } from "@/types/chat";
 import { useConfirm } from "@/stores/confirm-store";
 import {
-  useAddGroupParticipants,
   useAddGroupParticipantsOptimistic,
-  useRemoveParticipants,
   useRemoveParticipantsOptimistic,
 } from "@/lib/api/chats/mutation";
-import { toast } from "react-toastify";
 
 export default function ParticipantMenu() {
   const participantId = useParticipantMenuId();
@@ -30,10 +27,8 @@ export default function ParticipantMenu() {
   const gId = Number(groupId);
   const session = useSession();
   const { participant } = useGetChatRoomParticipant(gId, session?.id ?? -1);
-  const { participant: selectedParticipant } = useGetChatRoomParticipant(
-    gId,
-    participantId
-  );
+  const { participant: selectedParticipant, isLoading } =
+    useGetChatRoomParticipant(gId, participantId);
   const confirm = useConfirm();
   const { removeParticipantsAsync } = useRemoveParticipantsOptimistic();
   const { addGroupParticipantsAsync } = useAddGroupParticipantsOptimistic();
@@ -42,64 +37,58 @@ export default function ParticipantMenu() {
     selectedParticipant?.data?.role ?? "user";
 
   const handleMenuActions = async (key: React.Key) => {
-    try {
-      switch (key) {
-        case "profile": {
-          router.push(`/users/${participantId}`);
-          return;
-        }
-        case "delete-z": {
-          await confirm({
-            confirmColor: "danger",
-            confirmLabel: "Remove",
-            body: "Are you sure remove this user from group?",
-            title: "Remove user",
-          });
-
-          await removeParticipantsAsync({
-            body: {
-              ids: [participantId],
-            },
-            params: {
-              roomId: gId,
-            },
-          });
-          return;
-        }
-        case "grant": {
-          if (!selectedParticipant) return;
-          await addGroupParticipantsAsync({
-            body: {
-              participants: [{ ...selectedParticipant?.data, role: "admin" }],
-            },
-            params: {
-              roomId: gId,
-            },
-          });
-          return;
-        }
-        case "dismiss-delete": {
-          if (!selectedParticipant) return;
-          await confirm({
-            body: "Demote this user from admin?",
-            title: "Demote",
-            confirmLabel: "Demote",
-          });
-          await addGroupParticipantsAsync({
-            body: {
-              participants: [{ ...selectedParticipant?.data, role: "user" }],
-            },
-            params: {
-              roomId: gId,
-            },
-          });
-          return;
-        }
+    switch (key) {
+      case "profile": {
+        router.push(`/users/${participantId}`);
+        return;
       }
-    } catch (err: any) {
-      if (err?.message) toast.error(err?.message);
-    } finally {
-      onClose();
+      case "delete-z": {
+        await confirm({
+          confirmColor: "danger",
+          confirmLabel: "Remove",
+          body: "Are you sure remove this user from group?",
+          title: "Remove user",
+        });
+
+        await removeParticipantsAsync({
+          body: {
+            ids: [participantId],
+          },
+          params: {
+            roomId: gId,
+          },
+        });
+        return;
+      }
+      case "grant": {
+        if (!selectedParticipant) return;
+        await addGroupParticipantsAsync({
+          body: {
+            participants: [{ ...selectedParticipant?.data, role: "admin" }],
+          },
+          params: {
+            roomId: gId,
+          },
+        });
+        return;
+      }
+      case "dismiss-delete": {
+        if (!selectedParticipant) return;
+        await confirm({
+          body: "Demote this user from admin?",
+          title: "Demote",
+          confirmLabel: "Demote",
+        });
+        await addGroupParticipantsAsync({
+          body: {
+            participants: [{ ...selectedParticipant?.data, role: "user" }],
+          },
+          params: {
+            roomId: gId,
+          },
+        });
+        return;
+      }
     }
   };
 
@@ -144,6 +133,8 @@ export default function ParticipantMenu() {
 
   return (
     <MenuLayout
+      isLoading={isLoading}
+      shouldToastWhenActionError
       avatar={selectedParticipant?.data?.avatarImage?.src ?? ""}
       title={selectedParticipant?.data?.fullName ?? ""}
       description={selectedParticipant?.data?.username}

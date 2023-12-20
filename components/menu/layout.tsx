@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import clsx from "clsx";
@@ -8,6 +8,15 @@ import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import { Avatar } from "@nextui-org/react";
+import Progress from "../progress";
+import { toast } from "react-toastify";
+
+export type MenuItems = {
+  key: string;
+  label: string;
+  action?: React.JSX.Element;
+  icon?: React.JSX.Element;
+};
 
 const getOffset = (offset: number, minus?: boolean) => {
   const MAX_OFFSET = 12;
@@ -34,19 +43,18 @@ function IconWrapper({
 
 export default function MenuLayout({
   onClose,
+  isLoading = false,
   isOpen,
   items,
+  shouldToastWhenActionError = false,
   onAction,
   title,
   description,
   avatar,
 }: {
-  items?: {
-    key: string;
-    label: string;
-    action?: React.JSX.Element;
-    icon?: React.JSX.Element;
-  }[];
+  isLoading?: boolean;
+  shouldToastWhenActionError?: boolean;
+  items?: MenuItems[];
   title?: string;
   description?: string;
   onAction: (key: React.Key) => void;
@@ -57,10 +65,23 @@ export default function MenuLayout({
   const isMd = useIsMd();
 
   const [velocity, setVelocity] = useState<number>(0);
-  const [offsetHeight, setOffsetHeight] = useState(0);
-  console.log(offsetHeight, "Current offset height");
+  const [offsetHeight, setOffsetHeight] = useState<number>(0);
+
+  const handleActions = async (key: React.Key) => {
+    try {
+      await onAction(key);
+    } catch (err: any) {
+      if (shouldToastWhenActionError && err?.message) toast.error(err?.message);
+    } finally {
+      onClose();
+    }
+  };
+
   const refCb = useCallback((node: HTMLDivElement) => {
-    if (node) setOffsetHeight(node.offsetHeight);
+    if (node) {
+      if (isMd) return setOffsetHeight(node.offsetWidth);
+      return setOffsetHeight(node.offsetHeight);
+    }
   }, []);
 
   const handleDrag = (
@@ -68,14 +89,19 @@ export default function MenuLayout({
     info: PanInfo
   ) => {
     const dividedOffsetHeight = offsetHeight / 6;
-    console.log(dividedOffsetHeight, "Divided OH");
-    console.log("Offset Point", info.offset.y);
-    if (info.offset.y > offsetHeight - dividedOffsetHeight) {
-      onClose();
+    const dragLimit = offsetHeight - dividedOffsetHeight;
+
+    if (isMd && info.offset.x > dragLimit) {
+      return onClose();
     }
-    setVelocity(info.velocity.y);
+    if (!isMd && info.offset.y > dragLimit) {
+      return onClose();
+    }
+    if (!isMd) setVelocity(info.velocity.y);
   };
-  // console.log(dragInfo, "Drag Info");
+
+  if (isLoading && isOpen) return <Progress />;
+
   return (
     <>
       <AnimatePresence>
@@ -106,7 +132,7 @@ export default function MenuLayout({
                   }
             }
             transition={{
-              velocity: -100,
+              // velocity: -100,
               duration: 0.1,
               ease: "easeIn",
             }}
@@ -137,7 +163,6 @@ export default function MenuLayout({
                   style={{ scaleX: 1.052 }}
                   animate={{
                     rotate: getOffset(velocity / 2, true),
-                    borderBottomRightRadius: 12,
                     transition: {
                       duration: 0.1,
                       ease: "linear",
@@ -148,7 +173,6 @@ export default function MenuLayout({
                 <motion.span
                   style={{ scaleX: 1.052 }}
                   animate={{
-                    borderBottomLeftRadius: 12,
                     rotate: getOffset(-velocity / 2, true),
                     transition: {
                       ease: "linear",
@@ -185,9 +209,7 @@ export default function MenuLayout({
               items={items}
               className="w-full"
               variant="flat"
-              onAction={(key) => {
-                onAction(key);
-              }}
+              onAction={handleActions}
             >
               {(item) => (
                 <ListboxItem

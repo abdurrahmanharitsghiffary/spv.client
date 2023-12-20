@@ -65,7 +65,6 @@ export default function CreateRoomModal() {
           inputProps={{
             radius: "full",
             classNames: { label: "text-center" },
-            label: "Search users",
             variant: "faded",
           }}
           onItemClick={handleOnItemClick}

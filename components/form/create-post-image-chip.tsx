@@ -64,7 +64,7 @@ export default function CreatePostImageChip({
         {Array.from(images ?? []).map((image) => (
           <ImageChip
             image={image}
-            handleClose={handleClose}
+            onClose={handleClose}
             key={image.name + image.size}
           />
         ))}

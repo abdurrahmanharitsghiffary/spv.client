@@ -1,29 +1,27 @@
 "use client";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@nextui-org/input";
-import { useIsSSR } from "@react-aria/ssr";
-import { Button } from "@nextui-org/react";
-import { BiSend } from "react-icons/bi";
-import CommentFormImage from "./comment-form-image";
-import clsx from "clsx";
-import Recorder from "../recorder";
+import CommentFormImage from "../comment-form-image";
+import Recorder from "../../recorder";
 import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
-import FileButton from "../input/file-btn";
+import FileButton from "../../input/file-btn";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { useCreateMessage } from "@/lib/api/messages/mutation";
-import { TextareaWithControl } from "../input/input-with-control";
 import { useSocket } from "@/hooks/use-socket";
 import { Socket_Event } from "@/lib/socket-event";
 import { useSession } from "@/stores/auth-store";
+import ChatFormLayout from "./layout";
+import ChatFormBody from "./body";
+import SendTextarea from "../../input/send-textarea";
+import Slider from "@/components/slider";
+import ImageChip from "../image-chip";
 
 export default function ChatForm() {
   const socket = useSocket();
   const { createMessageAsync } = useCreateMessage();
   const timeRef = useRef<NodeJS.Timeout | undefined>();
-  const isSSR = useIsSSR();
   const { chatId } = useParams();
   const session = useSession();
   const {
@@ -35,7 +33,7 @@ export default function ChatForm() {
     setValue,
   } = useForm<CreateChatSchema>({
     resolver: zodResolver(createChatSchema),
-    defaultValues: { image: null, chat: "" },
+    defaultValues: { images: [], chat: "" },
   });
   const text = watch("chat");
   useEffect(() => {
@@ -115,11 +113,10 @@ export default function ChatForm() {
   const onSubmit: SubmitHandler<CreateChatSchema> = async (data) => {
     try {
       await createMessageAsync({
-        formData: true,
-        body: {
+        data: {
           chatRoomId: Number(chatId),
           message: data.chat ?? "",
-          image: data.image,
+          images: data.images ?? [],
         },
       });
     } catch (err: any) {
@@ -131,62 +128,55 @@ export default function ChatForm() {
       toast.error(message ?? "Something went wrong!");
     }
   };
-  const image = watch("image");
-  const handleImageReset = useCallback(() => {
-    setValue("image", null);
-  }, []);
+  const images = watch("images") ?? [];
+  // const handleImageReset = useCallback(() => {
+  //   setValue("images", []);
+  // }, []);
 
   const handleResultChange = (result: string | null | undefined) => {
     if (!result) return null;
     setValue("chat", result);
   };
 
+  const handleClose = (file: File, image: File) => {
+    if (!file) return null;
+    const files = Array.from(images).filter(
+      (img) =>
+        !`${img.name}${img.size}${image.type}`.includes(
+          `${image.name}${image.size}${image.type}`
+        )
+    );
+
+    setValue("images", [...files]);
+  };
+
   return (
-    <div
-      className="fixed bottom-0 inset-x-0 gap-2 z-[101]"
-      style={{
-        backgroundColor:
-          "hsl(var(--nextui-content1) / var(--nextui-content1-opacity, var(--tw-bg-opacity)))",
-      }}
-    >
-      <CommentFormImage
-        image={image}
-        onDataSuccess={handleImageReset}
-        errors={errors.image?.message}
-      />
-      <div className="w-full flex justify-center flex-col gap-2 p-2 border-t-1 border-divider">
+    <ChatFormLayout>
+      {images.length > 0 && (
+        <div className="p-2 border-t-1 border-divider">
+          <Slider>
+            {images.map((image: File) => (
+              <ImageChip
+                image={image}
+                key={image.name + image.size}
+                onClose={(f) => handleClose(f, image)}
+              />
+            ))}
+          </Slider>
+        </div>
+      )}
+
+      <ChatFormBody>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full flex gap-2 items-center"
         >
-          {isSSR ? (
-            <Input placeholder="Message" />
-          ) : (
-            <div className="w-full relative flex items-center justify-start">
-              <TextareaWithControl
-                name="chat"
-                control={control}
-                placeholder="Message"
-                minRows={1}
-                maxRows={4}
-                classNames={{
-                  inputWrapper: clsx(text || image ? "pr-[50px]" : ""),
-                }}
-              />
-              {(text || image) && (
-                <Button
-                  type="submit"
-                  variant="light"
-                  radius="full"
-                  isIconOnly
-                  className="absolute top-[6px] right-0 z-[102]"
-                  color="primary"
-                >
-                  <BiSend size={18} />
-                </Button>
-              )}
-            </div>
-          )}
+          <SendTextarea
+            isShowSendButton={text as unknown as boolean}
+            control={control}
+            name="chat"
+          />
+
           <Recorder
             isEnded={isSubmitSuccessful}
             radius="md"
@@ -194,18 +184,20 @@ export default function ChatForm() {
             onSpeechSuccess={handleResultChange}
           />
           <Controller
-            name="image"
+            name="images"
             control={control}
             render={({ field: { onChange } }) => (
               <FileButton
+                multiple
                 onChange={(e) => {
-                  onChange(e.target?.files?.[0] ?? null);
+                  onChange(Array.from(e.target?.files ?? []));
+                  e.target.value = "";
                 }}
               />
             )}
           />
         </form>
-      </div>
-    </div>
+      </ChatFormBody>
+    </ChatFormLayout>
   );
 }

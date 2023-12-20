@@ -3,6 +3,7 @@ import Giphy from "@/components/giphy";
 import Layout from "@/components/layout/layout";
 import ChatMenu from "@/components/menu/chat-menu";
 import CommentMenu from "@/components/menu/comment-menu";
+import MessageMenu from "@/components/menu/message-menu";
 import PostMenu from "@/components/menu/post-menu";
 import UserMenu from "@/components/menu/user-menu";
 import EditPostModal from "@/components/modal/edit-post-modal";

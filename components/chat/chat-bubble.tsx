@@ -1,11 +1,13 @@
+"use client";
 import clsx from "clsx";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { TypographyMuted, TypographyP } from "../ui/typography";
 import Timestamp from "../timestamp";
 import Gallery from "../image/gallery";
 import { Chat } from "@/types/chat";
 import { Avatar } from "@nextui-org/avatar";
 import { Badge } from "@nextui-org/badge";
+import { useMessageMenuActions } from "@/stores/message-menu-store";
 
 const ChatBubble = forwardRef<
   HTMLDivElement,
@@ -15,6 +17,36 @@ const ChatBubble = forwardRef<
   }
 >(({ chat, isRecipient }, ref) => {
   const images = chat?.attachments ?? [];
+  const [isHolded, setIsHolded] = useState(false);
+  const holdTimeRef = useRef<NodeJS.Timeout | null>(null);
+  const { onOpen } = useMessageMenuActions();
+
+  const resetHold = () => {
+    if (holdTimeRef.current) clearTimeout(holdTimeRef.current);
+    setIsHolded(false);
+  };
+
+  const handleMouseDown = () => {
+    console.time("a");
+    resetHold();
+    holdTimeRef.current = setTimeout(() => {
+      console.timeEnd("a");
+      setIsHolded(true);
+    }, 1000);
+  };
+
+  const handleMouseUp = () => {
+    resetHold();
+  };
+
+  useEffect(() => {
+    if (isHolded) {
+      resetHold();
+      onOpen(chat?.id ?? -1);
+    }
+  }, [isHolded, chat?.id]);
+
+  console.log(isHolded, "Is Holded");
 
   return (
     <div
@@ -40,12 +72,15 @@ const ChatBubble = forwardRef<
         </div>
       )}
       <div
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
         className={clsx(
           isRecipient
             ? "self-start before:content-[''] before:bg-default-200 before:p-2 before:top-0 before:absolute before:-left-1 before:skew-x-[30deg] before:rounded-tl-md"
             : "self-end after:content-[''] after:bg-default-100 after:p-2 after:pl-4 after:top-0 after:absolute after:-right-1 after:skew-x-[-30deg] after:rounded-tr-md",
           "flex flex-col gap-1 relative",
-          chat?.isGroupChat ? "max-w-[85%]" : "max-w-full"
+          chat?.isGroupChat ? "max-w-[85%]" : "max-w-full",
+          "active:brightness-75"
         )}
       >
         <div

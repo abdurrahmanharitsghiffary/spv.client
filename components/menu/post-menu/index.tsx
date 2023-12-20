@@ -4,7 +4,6 @@ import MenuLayout from "../layout";
 import {
   useGetSelectedPost,
   useHidePostMenu,
-  usePostMenuActions,
   usePostMenuIsOpen,
 } from "@/stores/post-menu-store";
 import {
@@ -36,7 +35,6 @@ export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
   const onClose = useHidePostMenu();
   const session = useSession();
-  const { setSelectedPost } = usePostMenuActions();
   const selectedPost = useGetSelectedPost();
   const { isLiked } = useGetPostIsLiked(selectedPost?.id ?? -1);
   const { isSaved } = useGetPostIsSaved(selectedPost?.id ?? -1);
@@ -92,66 +90,60 @@ export default function PostMenu() {
     },
   ];
 
-  const handleMenuAction = async (key: React.Key) => {
-    try {
-      switch (key) {
-        case "copy": {
-          await navigator.clipboard.writeText(
-            postById(selectedPost?.id?.toString() ?? "")
-          );
-          notifyToast("Copied to clipboard!");
-          return null;
-        }
-        case "like": {
-          if (!selectedPost) return null;
-          if (isLiked?.data)
-            return await unlikePostAsync({ postId: selectedPost?.id });
-          return await likePostAsync({ postId: selectedPost?.id });
-        }
-        case "save": {
-          if (!selectedPost) return null;
-          if (isSaved?.data) {
-            await confirm({
-              title: "Delete",
-              body: "Are you sure want to delete this post from your saved posts?",
-              confirmColor: "danger",
-              confirmLabel: "Delete",
-            });
-            return deleteSavedPostAsync({ postId: selectedPost?.id });
-          }
-          return savePostAsync({ postId: selectedPost?.id });
-        }
-        case "report":
-          return notifyToast("Cooming soon!");
-        case "delete": {
-          if (!isAuthored || !selectedPost) return null;
+  const handleMenuActions = async (key: React.Key) => {
+    switch (key) {
+      case "copy": {
+        await navigator.clipboard.writeText(
+          postById(selectedPost?.id?.toString() ?? "")
+        );
+        notifyToast("Copied to clipboard!");
+        return null;
+      }
+      case "like": {
+        if (!selectedPost) return null;
+        if (isLiked?.data)
+          return await unlikePostAsync({ postId: selectedPost?.id });
+        return await likePostAsync({ postId: selectedPost?.id });
+      }
+      case "save": {
+        if (!selectedPost) return null;
+        if (isSaved?.data) {
           await confirm({
             title: "Delete",
-            body: "Are you sure want to delete this post?",
+            body: "Are you sure want to delete this post from your saved posts?",
             confirmColor: "danger",
             confirmLabel: "Delete",
           });
-          await deletePostAsync({ postId: selectedPost?.id });
+          return deleteSavedPostAsync({ postId: selectedPost?.id });
         }
-        case "edit": {
-          if (!isAuthored || !selectedPost) return null;
-          showEditForm(selectedPost?.id);
-        }
-        default:
-          return null;
+        return savePostAsync({ postId: selectedPost?.id });
       }
-    } catch (err) {
-      console.error(err, " Post Menu Error");
-    } finally {
-      setSelectedPost(null);
-      onClose();
+      case "report":
+        return notifyToast("Cooming soon!");
+      case "delete": {
+        if (!isAuthored || !selectedPost) return null;
+        await confirm({
+          title: "Delete",
+          body: "Are you sure want to delete this post?",
+          confirmColor: "danger",
+          confirmLabel: "Delete",
+        });
+        await deletePostAsync({ postId: selectedPost?.id });
+      }
+      case "edit": {
+        if (!isAuthored || !selectedPost) return null;
+        showEditForm(selectedPost?.id);
+      }
+      default:
+        return null;
     }
   };
 
   return (
     <MenuLayout
-      onAction={handleMenuAction}
+      onAction={handleMenuActions}
       isOpen={isOpen}
+      shouldToastWhenActionError
       onClose={onClose}
       items={isAuthored ? items : publicItems}
     />

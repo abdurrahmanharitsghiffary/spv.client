@@ -1,8 +1,8 @@
 "use client";
 
 import { Chat } from "@/types/chat";
-import { useInfinite } from "../hooks";
-import { chatById } from "@/lib/endpoints";
+import { useInfinite, useQ } from "../hooks";
+import { baseMessageRoutes, chatById } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 
 export const useGetMessagesByRoomId = (
@@ -16,4 +16,14 @@ export const useGetMessagesByRoomId = (
   });
 
   return { messages, ...rest };
+};
+
+export const useGetMessage = (messageId: number) => {
+  const { data: message, ...rest } = useQ<Chat>({
+    url: baseMessageRoutes + "/" + messageId,
+    queryKey: ["message", "single", messageId],
+    qConfig: { enabled: messageId !== -1 },
+  });
+
+  return { message, ...rest };
 };

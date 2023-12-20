@@ -104,7 +104,7 @@ export default function UserAutocomplete({
           isEnabled={isScrollShadowEnabled}
           className={clsx(
             "bg-content1 rounded-large shadow-medium absolute left-1/2 -translate-x-1/2 w-full z-20 max-h-[400px]",
-            labelPlacement === "outside" ? "mt-20" : "mt-12"
+            labelPlacement === "outside" && label ? "mt-20" : "mt-12"
           )}
         >
           <ul className="w-full grid grid-cols-1 ">

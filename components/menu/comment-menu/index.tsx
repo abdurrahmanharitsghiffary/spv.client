@@ -77,48 +77,46 @@ export default function CommentMenu() {
       return 1;
     });
 
+  const handleMenuActions = async (key: React.Key) => {
+    if (key === "like-comment" && comment) {
+      if (isLiked?.data)
+        return await unlikeCommentAsync({ commentId: comment?.id });
+      return await likeCommentAsync({ commentId: comment?.id });
+    } else if (key === "delete-report-comment" && !isAuthored)
+      return notifyToast("Cooming soon!");
+    if (isAuthored) {
+      if (key === "delete-comment" && commentId) {
+        return await deleteCommentAsync(
+          { commentId: Number(commentId) },
+          {
+            onSuccess: () => {
+              router.back();
+            },
+          }
+        );
+      } else if (key === "delete-comment" && comment) {
+        await confirm({
+          title: "Delete",
+          body: "Are you sure want to delete this comment?",
+          confirmColor: "danger",
+          confirmLabel: "Delete",
+        });
+        await deleteCommentAsync({ commentId: comment?.id });
+        return null;
+      } else if (key === "edit-comment" && comment) {
+        showCommentEditForm(comment);
+        return null;
+      }
+    }
+  };
+
   return (
     <MenuLayout
       onClose={onClose}
       isOpen={isOpen}
+      shouldToastWhenActionError
       items={isAuthored ? items : publicItems}
-      onAction={async (key) => {
-        try {
-          if (key === "like-comment" && comment) {
-            if (isLiked?.data)
-              return await unlikeCommentAsync({ commentId: comment?.id });
-            return await likeCommentAsync({ commentId: comment?.id });
-          } else if (key === "delete-report-comment" && !isAuthored)
-            return notifyToast("Cooming soon!");
-          if (isAuthored) {
-            if (key === "delete-comment" && commentId) {
-              return await deleteCommentAsync(
-                { commentId: Number(commentId) },
-                {
-                  onSuccess: () => {
-                    router.back();
-                  },
-                }
-              );
-            } else if (key === "delete-comment" && comment) {
-              await confirm({
-                title: "Delete",
-                body: "Are you sure want to delete this comment?",
-                confirmColor: "danger",
-                confirmLabel: "Delete",
-              });
-              await deleteCommentAsync({ commentId: comment?.id });
-              return null;
-            } else if (key === "edit-comment" && comment) {
-              showCommentEditForm(comment);
-              return null;
-            }
-          }
-        } catch (err) {
-        } finally {
-          onClose();
-        }
-      }}
+      onAction={handleMenuActions}
     />
   );
 }

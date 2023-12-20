@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import ModalLayoutV2 from "../layoutV2";
 import { UserAccountPublic } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
@@ -126,7 +126,10 @@ export default function EditGroupModal() {
   };
 
   const file = watch("image");
-  const groupPictureSrc = file ? URL.createObjectURL(file) : "";
+  const groupPictureSrc = useMemo(
+    () => (file ? URL.createObjectURL(file) : ""),
+    [file]
+  );
   return (
     <ModalLayoutV2
       isOpen={isOpen}

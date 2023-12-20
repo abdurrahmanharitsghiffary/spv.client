@@ -1,4 +1,4 @@
-import CommentEditForm from "@/components/form/comment-edit-form";
+import CommentEditForm from "@/components/form/comment-form/edit-form";
 import CommentForm from "@/components/form/comment-form";
 import { Card, CardBody } from "@nextui-org/card";
 import React from "react";

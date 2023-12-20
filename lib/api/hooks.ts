@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
+import { getFormData } from "../getFormData";
 
 type MutationMethod = "post" | "patch" | "delete" | "put";
 
@@ -133,6 +134,9 @@ export const useMutate = <T, P = {}>({
     }) => {
       let newUrl = baseUrl;
       let body = v?.body;
+
+      // const formData = new FormData(body ?? {});
+      // console.log(formData, "FD");
       // const formData = v?.formData
       //   ? getFormData((body as Record<string, string>) ?? {})
       //   : null;

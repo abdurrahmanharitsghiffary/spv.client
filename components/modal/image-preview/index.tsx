@@ -1,5 +1,5 @@
 "use client";
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import ModalLayout from "../layout";
 import { Image } from "@nextui-org/image";
 import { motion } from "framer-motion";
@@ -15,7 +15,6 @@ function ImagePreview() {
   });
   const [isError, setIsError] = useState(false);
   const { onClose: handleClose, isOpen, src } = usePreviewImage();
-  // const constraintRef = useRef(null);
 
   const onClose = () => {
     setAnimation({ scale: 1, rotate: 0 });
@@ -26,12 +25,12 @@ function ImagePreview() {
 
   return (
     <ModalLayout
-      // ref={constraintRef}
       id="image-preview"
       key={src}
       wrapperClassNames={{ wrapper: "overflow-hidden z-[202]" }}
       classNames={{
         wrapper: "my-0 h-auto min-h-[100dvh] bg-[rgba(0,0,0,.5)]",
+        footer: "right-4 absolute bottom-4 w-fit p-0",
       }}
       hideCloseButton
       bodyOnClick={onClose}
@@ -66,7 +65,6 @@ function ImagePreview() {
             // dragConstraints={constraintRef}
             // dragElastic={0}
             // dragSnapToOrigin
-            // style={{ cursor: "grabbing" }}
             as={motion.img}
             radius="none"
             src={src}

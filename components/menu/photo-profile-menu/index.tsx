@@ -26,42 +26,39 @@ export default function PhotoProfileMenu() {
   const session = useSession();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const handleMenuActions = async (key: React.Key) => {
+    if (key === "edit") {
+      fileInputRef.current?.click();
+    } else if (key === "delete") {
+      await confirm({
+        title: "Delete",
+        body: "Are you sure want to delete your profile picture?",
+        confirmColor: "danger",
+        confirmLabel: "Delete",
+        closeLabel: "Cancel",
+      });
+      await toast.promise(
+        deleteAccountImageAsync({})
+          .then((res) => res.data)
+          .catch((err) => Promise.reject(err?.response?.data)),
+        {
+          pending: "Changing profile picture...",
+          success: "Profile picture changed successfully",
+          error: {
+            render({ data }) {
+              return (data as any)?.message ?? "Something went wrong!";
+            },
+          },
+        }
+      );
+    }
+  };
+
   return (
     <MenuLayout
       isOpen={isOpen}
       onClose={onClose}
-      onAction={async (key) => {
-        if (key === "edit") {
-          fileInputRef.current?.click();
-        } else if (key === "delete") {
-          try {
-            await confirm({
-              title: "Delete",
-              body: "Are you sure want to delete your profile picture?",
-              confirmColor: "danger",
-              confirmLabel: "Delete",
-              closeLabel: "Cancel",
-            });
-            await toast.promise(
-              deleteAccountImageAsync({})
-                .then((res) => res.data)
-                .catch((err) => Promise.reject(err?.response?.data)),
-              {
-                pending: "Changing profile picture...",
-                success: "Profile picture changed successfully",
-                error: {
-                  render({ data }) {
-                    return (data as any)?.message ?? "Something went wrong!";
-                  },
-                },
-              }
-            );
-          } catch (err) {
-          } finally {
-            onClose();
-          }
-        }
-      }}
+      onAction={handleMenuActions}
       items={[
         {
           key: "edit",

@@ -1,4 +1,8 @@
 import ChatForm from "@/components/form/chat-form";
+import ChatEditForm from "@/components/form/chat-form/edit-form";
+import ChatMenu from "@/components/menu/chat-menu";
+import MessageMenu from "@/components/menu/message-menu";
+import MessageEditFormProvider from "@/context/message-edit-form-context";
 import React from "react";
 
 export default function ChatLayout({
@@ -7,7 +11,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <MessageEditFormProvider>
       <div
         className="pt-5 flex flex-col gap-5 px-4 w-full max-w-sm pb-20"
         // style={{
@@ -19,6 +23,8 @@ export default function ChatLayout({
         {children}
       </div>
       <ChatForm />
-    </>
+      <MessageMenu />
+      <ChatEditForm />
+    </MessageEditFormProvider>
   );
 }

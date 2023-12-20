@@ -58,6 +58,7 @@ export default function ChatMenu() {
 
   return (
     <MenuLayout
+      isLoading={isLoading}
       isOpen={isOpen}
       onClose={onClose}
       onAction={handleMenuActions}

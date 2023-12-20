@@ -99,6 +99,7 @@ export default function CreatePostForm({
           <TypographyH3 className="!text-lg">Create a new post</TypographyH3>
         )}
         <InputWithControl
+          disableAnimation
           maxLength={40}
           placeholder="Write your post title"
           label="Title"
@@ -107,6 +108,7 @@ export default function CreatePostForm({
         />
         <div className="w-full relative pb-12">
           <TextareaWithControl
+            disableAnimation
             autoFocus={autoFocus}
             minRows={4}
             maxRows={5}

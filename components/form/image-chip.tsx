@@ -9,10 +9,10 @@ import Image from "next/image";
 
 export default function ImageChip({
   image,
-  handleClose,
+  onClose,
 }: {
   image: File;
-  handleClose: (image: File) => null | undefined;
+  onClose: (image: File) => null | undefined;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -20,7 +20,7 @@ export default function ImageChip({
     <Tooltip
       isOpen={isOpen}
       onOpenChange={(isOpen) => setIsOpen(isOpen)}
-      classNames={{ base: "rounded-md h-auto" }}
+      classNames={{ base: "rounded-md h-auto", content:"w-fit" }}
       key={image.name}
       content={
         <div className="p-1 flex flex-col gap-2 max-w-[90%] sm:max-w-[350px]">
@@ -81,7 +81,7 @@ export default function ImageChip({
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
         color={image.size > MAX_FILE_SIZE ? "danger" : "default"}
-        onClose={() => handleClose(image)}
+        onClose={() => onClose(image)}
       >
         {image.name?.length > 10 ? image.name.slice(0, 10) : image.name}{" "}
         {image.name.length > 10 && "..."}

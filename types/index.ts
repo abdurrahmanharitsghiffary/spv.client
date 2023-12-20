@@ -88,7 +88,7 @@ export interface CreateCommentData {
 export interface CreateMessageData {
   chatRoomId: number;
   message?: string;
-  image?: File[];
+  images?: File[];
 }
 export type Key = string | number;
 export type OffsetPaging = { limit?: number; offset?: number } | undefined;

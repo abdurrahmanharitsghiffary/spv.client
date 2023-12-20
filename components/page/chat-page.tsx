@@ -133,8 +133,8 @@ export default function ChatPage() {
                 data: [createdMessage, ...page.data],
                 pagination: {
                   ...page.pagination,
-                  total_records: (page.pagination.total_records += 1),
-                  result_count: (page.pagination.result_count += 1),
+                  total_records: page.pagination.total_records + 1,
+                  result_count: page.pagination.result_count + 1,
                 },
               };
             }
@@ -160,7 +160,7 @@ export default function ChatPage() {
   };
 
   const onDeleteMessage = async (deletedChat: number) => {
-    queryClient.setQueryData<InfiniteChatPaging>(
+    queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
       (oldData) => {
         if (!oldData) return oldData;
@@ -173,8 +173,8 @@ export default function ChatPage() {
               data: p.data.filter((c) => c.id !== deletedChat),
               pagination: {
                 ...p.pagination,
-                total_records: (p.pagination.total_records -= 1),
-                result_count: (p.pagination.result_count -= 1),
+                total_records: p.pagination.total_records - 1,
+                result_count: p.pagination.result_count - 1,
               },
             };
           }),
@@ -184,7 +184,7 @@ export default function ChatPage() {
   };
 
   const onUpdateMessage = async (updatedMessage: Chat) => {
-    queryClient.setQueryData<InfiniteChatPaging>(
+    queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
       (oldData) => {
         if (!oldData) return oldData;
@@ -196,7 +196,7 @@ export default function ChatPage() {
               ...p,
               data: p.data.map((c) => {
                 if (c.id === updatedMessage.id) {
-                  return { ...updatedMessage };
+                  return { ...c, ...updatedMessage };
                 }
                 return c;
               }),

@@ -1,19 +1,13 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody } from "@nextui-org/card";
-import { Input } from "@nextui-org/input";
 import { Divider } from "@nextui-org/divider";
 import React, { useCallback, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BiSend } from "react-icons/bi";
-import CommentFormImage from "./comment-form-image";
+import CommentFormImage from "../comment-form-image";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
-import clsx from "clsx";
-import { useIsSSR } from "@react-aria/ssr";
-import Recorder from "../recorder";
-import CommentFormPopover from "./comment-form-popover";
+import Recorder from "../../recorder";
+import CommentFormPopover from "../comment-form-popover";
 import {
   useCreateComment,
   useCreateReplyComment,
@@ -28,7 +22,12 @@ import {
   useResetReplyValue,
   useGetSelectedCommentReplyUsername,
 } from "@/stores/comment-reply-store";
-import { TextareaWithControl } from "../input/input-with-control";
+import CommentFormLayout from "./layout";
+import CommentFormWrapper from "./wrapper";
+import CommentFormBody from "./body";
+import Spacer from "./spacer";
+import SendTextarea from "@/components/input/send-textarea";
+import { toast } from "react-toastify";
 
 export default function CommentForm({
   hideSpacer,
@@ -56,7 +55,6 @@ export default function CommentForm({
     resolver: zodResolver(createCommentSchema),
     defaultValues: { image: null, comment: "" },
   });
-  const isSSR = useIsSSR();
 
   const file: File | null = watch("image");
 
@@ -71,7 +69,6 @@ export default function CommentForm({
     setValue("image", null);
   }, []);
 
-  // const gifMenuIsOpen = useGiphyGridIsOpen();
   const currentComment = watch("comment");
   const [formHeight, setFormHeight] = useState(0);
   const formContainerRef = useCallback(
@@ -84,59 +81,51 @@ export default function CommentForm({
 
   const fieldIsError = errors.comment?.message ? true : false;
 
-  const onSubmit: SubmitHandler<CreateCommentSchema> = (data) => {
-    // toast.promise(
-    replyId || commentId
-      ? createReplyCommentAsync({
-          comment: data.comment,
-          image: data?.image,
-          commentId: replyId ?? Number(commentId),
-        })
-      : createCommentAsync({
-          data: {
-            ...data,
-            postId: Number(postId),
-            parentId: null,
-          },
-        });
-    //   {
-    //     error: {
-    //       render({ data }) {
-    //         return (data as any)?.message ?? "Something went wrong";
-    //       },
-    //     },
-    //     success: "Comment successfully posted",
-    //     pending: "Posting comment... please wait",
-    //   },
-    //   { autoClose: 1100, position: "bottom-right", hideProgressBar: true }
-    // );
+  const onSubmit: SubmitHandler<CreateCommentSchema> = async (data) => {
+    try {
+      await (replyId || commentId
+        ? createReplyCommentAsync({
+            comment: data.comment,
+            image: data?.image,
+            commentId: replyId ?? Number(commentId),
+          })
+        : createCommentAsync({
+            data: {
+              ...data,
+              postId: Number(postId),
+              parentId: null,
+            },
+          }));
+    } catch (err: any) {
+      if (err?.message) {
+        toast.error(err?.message);
+      }
+    }
   };
 
   const handleSuccessSpeech = (val: string | undefined | null) => {
     if (val) setValue("comment", val);
   };
 
-  const cl = clsx("z-[101] fixed bottom-0 left-0 right-0", className);
-
   return (
     <>
-      {(replyId || file || fieldIsError || formHeight) && !hideSpacer ? (
-        <div
-          className={`w-full ${spacerClassName ?? ""}`}
-          style={{
-            height: formHeight,
-          }}
-        ></div>
-      ) : (
-        ""
-      )}
-      <div className={cl} ref={formContainerRef}>
+      <Spacer
+        isShow={
+          ((replyId || file || fieldIsError || formHeight) &&
+            !hideSpacer) as boolean
+        }
+        className={`w-full ${spacerClassName ?? ""}`}
+        style={{
+          height: formHeight,
+        }}
+      />
+      <CommentFormLayout className={className} ref={formContainerRef}>
         <CommentFormImage
           errors={errors.image?.message}
           image={file}
           onDataSuccess={handleImageReset}
         />
-        <Card className="shadow-none rounded-none ">
+        <CommentFormWrapper>
           <Divider />
           {replyId && replyUsername ? (
             <Chip className="m-2 mb-0" onClose={resetReply}>
@@ -145,12 +134,29 @@ export default function CommentForm({
           ) : (
             ""
           )}
-          <CardBody
-            className="p-2 flex-row flex justify-between items-center gap-2"
-            as="form"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <div className="w-full relative">
+          <CommentFormBody as="form" onSubmit={handleSubmit(onSubmit)}>
+            <SendTextarea
+              control={control}
+              isShowSendButton={(currentComment || file) as unknown as boolean}
+              name="comment"
+              placeholder="Write your comment..."
+              id="cm9ti2pt"
+              autoFocus
+              className="h-fit"
+            />
+            <Recorder
+              className="text-[1.125rem]"
+              onSpeechSuccess={handleSuccessSpeech}
+              radius="md"
+            />
+            <CommentFormPopover control={control} />
+          </CommentFormBody>
+        </CommentFormWrapper>
+      </CommentFormLayout>
+    </>
+  );
+}
+/* <div className="w-full relative">
               {isSSR ? (
                 <Input type="text" placeholder="Write your comment..." />
               ) : (
@@ -185,17 +191,15 @@ export default function CommentForm({
                   )}
                 </div>
               )}
-            </div>
-            <Recorder
-              className="text-[1.125rem]"
-              onSpeechSuccess={handleSuccessSpeech}
-              // color="primary"
-              radius="md"
-            />
-            <CommentFormPopover control={control} />
-          </CardBody>
-        </Card>
-      </div>
-    </>
-  );
-}
+            </div> */
+//   {
+//     error: {
+//       render({ data }) {
+//         return (data as any)?.message ?? "Something went wrong";
+//       },
+//     },
+//     success: "Comment successfully posted",
+//     pending: "Posting comment... please wait",
+//   },
+//   { autoClose: 1100, position: "bottom-right", hideProgressBar: true }
+// );

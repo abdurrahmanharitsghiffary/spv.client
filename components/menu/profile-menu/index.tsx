@@ -30,42 +30,35 @@ export default function ProfileMenu() {
   const session = useSession();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const handleMenuActions = async (key: React.Key) => {
+    if (key === "edit") {
+      fileInputRef.current?.click();
+    } else if (key === "delete") {
+      await confirm({
+        title: "Delete",
+        body: "Are you sure delete your cover image?",
+        confirmColor: "danger",
+        confirmLabel: "Delete",
+        closeLabel: "Cancel",
+      });
+      await deleteCoverImageAsync({});
+    } else if (key === "delete-logout") {
+      await confirm({
+        confirmLabel: "Logout",
+        confirmColor: "danger",
+        body: "Logout from this account?",
+        title: "Logout account",
+      });
+      await logoutAsync();
+    }
+  };
+
   return (
     <MenuLayout
+      shouldToastWhenActionError
       isOpen={isOpen}
       onClose={onClose}
-      onAction={async (key) => {
-        if (key === "edit") {
-          fileInputRef.current?.click();
-        } else if (key === "delete") {
-          try {
-            await confirm({
-              title: "Delete",
-              body: "Are you sure delete your cover image?",
-              confirmColor: "danger",
-              confirmLabel: "Delete",
-              closeLabel: "Cancel",
-            });
-            await deleteCoverImageAsync({});
-          } catch (err) {
-          } finally {
-            onClose();
-          }
-        } else if (key === "delete-logout") {
-          try {
-            await confirm({
-              confirmLabel: "Logout",
-              confirmColor: "danger",
-              body: "Logout from this account?",
-              title: "Logout account",
-            });
-            await logoutAsync();
-          } catch (err) {
-          } finally {
-            onClose();
-          }
-        }
-      }}
+      onAction={handleMenuActions}
       items={[
         {
           key: "edit",

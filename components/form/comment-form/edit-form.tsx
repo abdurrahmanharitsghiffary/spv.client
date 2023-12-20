@@ -1,14 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
-import { Card, CardBody } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
-import { Input } from "@nextui-org/input";
-import { useIsSSR } from "@react-aria/ssr";
 import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BiSend } from "react-icons/bi";
-import Recorder from "../recorder";
+import Recorder from "../../recorder";
 import { useUpdateComment } from "@/lib/api/comments/mutation";
 import {
   useCommentEditStore,
@@ -19,7 +15,10 @@ import clsx from "clsx";
 import { CommentEditSchema, commentEditSchema } from "@/lib/zod-schema/comment";
 import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useGetComment } from "@/lib/api/comments/query";
-import { TextareaWithControl } from "../input/input-with-control";
+import CommentFormLayout from "./layout";
+import CommentFormWrapper from "./wrapper";
+import CommentFormBody from "./body";
+import SendTextarea from "@/components/input/send-textarea";
 
 export default function CommentEditForm({ className }: { className?: string }) {
   const isOpen = useCommentEditStore((state) => state.isOpen);
@@ -27,7 +26,6 @@ export default function CommentEditForm({ className }: { className?: string }) {
   const { updateCommentAsync } = useUpdateComment();
   const selectedComment = useGetSelectedEditComment();
   const { comment } = useGetComment(selectedComment?.id ?? -1);
-  const isSSR = useIsSSR();
   const {
     setValue,
     handleSubmit,
@@ -63,12 +61,9 @@ export default function CommentEditForm({ className }: { className?: string }) {
     });
   };
   const currentComment = watch("comment");
-  const fieldIsError = commentErrors?.message ? true : false;
   const handleSuccessSpeech = (val: string | undefined | null) => {
     if (val) setValue("comment", val);
   };
-
-  const cl = clsx("z-[102] fixed bottom-0 left-0 right-0", className);
 
   useBodyOverflowHidden(isOpen);
 
@@ -80,27 +75,37 @@ export default function CommentEditForm({ className }: { className?: string }) {
         className="fixed inset-0 z-[101] backdrop-blur-sm"
         onClick={handleClose}
       ></div>
-      <div className={cl}>
-        <Card className="shadow-none rounded-none ">
+      <CommentFormLayout className={clsx("z-[102]", className)}>
+        <CommentFormWrapper>
           <Divider />
-          {/* {replyId.id && replyId.username ? (
-            <Chip
-              className="m-2 mb-0"
-              onClose={() => setReplyId({ id: null, username: "" })}
+          <CommentFormBody as="form" onSubmit={handleSubmit(onSubmit)}>
+            <SendTextarea
+              placeholder="Write new comment..."
+              control={control}
+              name="comment"
+              isShowSendButton={currentComment as unknown as boolean}
+            />
+            <Recorder
+              className="text-[1.125rem]"
+              onSpeechSuccess={handleSuccessSpeech}
+              radius="md"
+            />
+            <Button
+              onClick={() => {
+                reset();
+                handleClose();
+              }}
             >
-              Replying to <Link>@{replyId.username}</Link>
-            </Chip>
-          ) : (
-            ""
-          )} */}
-          <CardBody
-            className="p-2 flex-row flex justify-between items-center gap-2"
-            as="form"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            {/* WE CAN DO IT BY USING CONTROLLER */}
-
-            <div className="w-full relative">
+              Cancel
+            </Button>
+          </CommentFormBody>
+        </CommentFormWrapper>
+      </CommentFormLayout>
+    </>
+  );
+}
+{
+  /* <div className="w-full relative">
               {isSSR ? (
                 <Input type="text" placeholder="Write your comment..." />
               ) : (
@@ -141,24 +146,5 @@ export default function CommentEditForm({ className }: { className?: string }) {
                   )}
                 </div>
               )}
-            </div>
-            <Recorder
-              className="text-[1.125rem]"
-              onSpeechSuccess={handleSuccessSpeech}
-              // color="primary"
-              radius="md"
-            />
-            <Button
-              onClick={() => {
-                reset();
-                handleClose();
-              }}
-            >
-              Cancel
-            </Button>
-          </CardBody>
-        </Card>
-      </div>
-    </>
-  );
+            </div> */
 }

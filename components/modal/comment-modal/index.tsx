@@ -2,7 +2,7 @@
 import React from "react";
 import ModalLayoutV2 from "../layoutV2";
 import { useRouter } from "next/navigation";
-import CommentEditForm from "@/components/form/comment-edit-form";
+import CommentEditForm from "@/components/form/comment-form/edit-form";
 import CommentForm from "@/components/form/comment-form";
 
 export default function CommentModal({
