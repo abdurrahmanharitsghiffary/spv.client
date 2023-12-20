@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { zImage } from "@/lib/zod-schema/image";
 import ValidationErrorText from "@/components/validation-error-text";
-import { Avatar } from "@nextui-org/react";
+import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { FiPlus } from "react-icons/fi";
 import InputFile from "@/components/input/file";

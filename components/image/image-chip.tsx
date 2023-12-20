@@ -1,10 +1,10 @@
 "use client";
-import { Tooltip } from "@nextui-org/tooltip";
-import React, { useState } from "react";
+import React from "react";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import { formatBytes } from "@/lib/formatBytes";
 import { MAX_FILE_SIZE } from "@/lib/zod-schema/image";
-import { Chip } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
+import { Chip } from "@nextui-org/chip";
 import Image from "next/image";
 
 export default function ImageChip({
@@ -14,16 +14,19 @@ export default function ImageChip({
   image: File;
   onClose: (image: File) => null | undefined;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Tooltip
-      isOpen={isOpen}
-      onOpenChange={(isOpen) => setIsOpen(isOpen)}
-      classNames={{ base: "rounded-md h-auto", content:"w-fit" }}
-      key={image.name}
-      content={
-        <div className="p-1 flex flex-col gap-2 max-w-[90%] sm:max-w-[350px]">
+    <Popover classNames={{ base: "rounded-md h-auto" }}>
+      <PopoverTrigger>
+        <Chip
+          color={image.size > MAX_FILE_SIZE ? "danger" : "default"}
+          onClose={() => onClose(image)}
+        >
+          {image.name?.length > 10 ? image.name.slice(0, 10) : image.name}{" "}
+          {image.name.length > 10 && "..."}
+        </Chip>
+      </PopoverTrigger>
+      <PopoverContent className="w-fit max-w-[90%] sm:max-w-[350px]">
+        <div className="p-1 flex flex-col gap-2">
           <TypographyLarge className="font-semibold text-sm">
             {image.name}
           </TypographyLarge>
@@ -75,17 +78,7 @@ export default function ImageChip({
             </TypographyMuted>
           )}
         </div>
-      }
-    >
-      <Chip
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-        color={image.size > MAX_FILE_SIZE ? "danger" : "default"}
-        onClose={() => onClose(image)}
-      >
-        {image.name?.length > 10 ? image.name.slice(0, 10) : image.name}{" "}
-        {image.name.length > 10 && "..."}
-      </Chip>
-    </Tooltip>
+      </PopoverContent>
+    </Popover>
   );
 }

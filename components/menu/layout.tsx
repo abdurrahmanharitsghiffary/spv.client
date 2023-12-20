@@ -7,7 +7,7 @@ import { useIsMd } from "@/hooks/use-media-query";
 import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
-import { Avatar } from "@nextui-org/react";
+import { Avatar } from "@nextui-org/avatar";
 import Progress from "../progress";
 import { toast } from "react-toastify";
 

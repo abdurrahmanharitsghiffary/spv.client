@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { cn } from "@nextui-org/system";
-import { InputProps } from "@nextui-org/react";
+import { InputProps } from "@nextui-org/input";
 import { InputWithControl } from "./input-with-control";
 import { FieldValues, UseControllerProps } from "react-hook-form";
 

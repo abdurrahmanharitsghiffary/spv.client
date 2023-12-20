@@ -16,7 +16,7 @@ import ChatFormLayout from "./layout";
 import ChatFormBody from "./body";
 import SendTextarea from "../../input/send-textarea";
 import Slider from "@/components/slider";
-import ImageChip from "../image-chip";
+import ImageChip from "../../image/image-chip";
 
 export default function ChatForm() {
   const socket = useSocket();

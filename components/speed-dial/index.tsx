@@ -1,10 +1,10 @@
 "use client";
 
 import { Key } from "@/types";
-import { Button } from "@nextui-org/button";
-import { ButtonProps, Tooltip } from "@nextui-org/react";
+import { Button, ButtonProps } from "@nextui-org/button";
+import { Tooltip } from "@nextui-org/tooltip";
 import clsx from "clsx";
-import { Variants, motion, useCycle } from "framer-motion";
+import { Variants, motion } from "framer-motion";
 import React, { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@nextui-org/button";
 import { FiMoreVertical } from "react-icons/fi";
 import { useSession } from "@/stores/auth-store";
 import DropdownBase, { DropdownProps } from "../dropdown";

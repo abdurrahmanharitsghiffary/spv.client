@@ -1,5 +1,6 @@
 import { Button } from "@nextui-org/button";
-import { Card, CardBody, Divider } from "@nextui-org/react";
+import { Card, CardBody } from "@nextui-org/card";
+import { Divider } from "@nextui-org/divider";
 import React from "react";
 import { BiX } from "react-icons/bi";
 import ImageWithPreview from "../image/image-with-preview";

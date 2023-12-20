@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Navbar as NavbarTemplate } from "@nextui-org/react";
+import { Navbar as NavbarTemplate } from "@nextui-org/navbar";
 import { usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
 

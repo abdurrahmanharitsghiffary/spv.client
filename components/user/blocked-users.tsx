@@ -3,7 +3,7 @@
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { useGetBlockedUsers } from "@/lib/api/users/query";
 import React from "react";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/spinner";
 import UserCardSkeleton from "./user-card-skeleton";
 import BlockedUserCard from "./blocked-user-card";
 import { TypographyH4 } from "../ui/typography";

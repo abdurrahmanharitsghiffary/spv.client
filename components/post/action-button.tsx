@@ -2,7 +2,7 @@
 import { useLikePost, useUnlikePost } from "@/lib/api/posts/mutation";
 import { useGetPostIsLiked } from "@/lib/api/posts/query";
 import { Button, ButtonGroup } from "@nextui-org/button";
-import { Tooltip } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/tooltip";
 import Link from "next/link";
 import React from "react";
 import { BiComment } from "react-icons/bi";

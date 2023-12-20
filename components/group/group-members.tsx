@@ -6,7 +6,7 @@ import UserCardSkeleton from "../user/user-card-skeleton";
 import { Skeleton } from "@nextui-org/skeleton";
 import ChatParticipant from "../chat/chat-participant";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/spinner";
 
 export default function GroupMembers({ groupId }: { groupId: number }) {
   const {

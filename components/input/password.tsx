@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { InputProps } from "@nextui-org/react";
+import { InputProps } from "@nextui-org/input";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { InputWithControl } from "./input-with-control";
 import { FieldValues, UseControllerProps } from "react-hook-form";

@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback } from "react";
 import clsx from "clsx";
-import ImageChip from "./image-chip";
+import ImageChip from "../image/image-chip";
 
 export default function CreatePostImageChip({
   images,

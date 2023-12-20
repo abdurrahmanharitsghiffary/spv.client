@@ -2,7 +2,8 @@
 import React from "react";
 import InputPassword from "../input/password";
 import FormLayout from "./layout";
-import { Button, Link } from "@nextui-org/react";
+import { Button } from "@nextui-org/button";
+import { Link } from "@nextui-org/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputEmail from "../input/email";

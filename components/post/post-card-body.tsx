@@ -1,4 +1,4 @@
-import { CardBody } from "@nextui-org/react";
+import { CardBody } from "@nextui-org/card";
 import React from "react";
 import { TypographyH4 } from "../ui/typography";
 import PostContent from "./post-content";
