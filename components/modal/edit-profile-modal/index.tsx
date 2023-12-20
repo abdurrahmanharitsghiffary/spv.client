@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useEditProfileControls } from "@/hooks/use-edit-profile";
 import { Button } from "@nextui-org/button";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetMyAccountInfo } from "@/lib/api/account/query";
 import {
@@ -37,7 +37,6 @@ export default function EditProfileModal() {
   const {
     handleSubmit,
     reset,
-    watch,
     control,
     formState: {
       isSubmitSuccessful,
@@ -65,10 +64,10 @@ export default function EditProfileModal() {
   useEffect(() => {
     if (isSuccess) reset();
   }, [isSuccess]);
-  const profileImage = watch("profileImage");
-  const coverImage = watch("coverImage");
+  const profileImage = useWatch({ control, name: "profileImage" });
+  const coverImage = useWatch({ control, name: "coverImage" });
 
-  const disclosure = useEditProfileControls();
+  const { onClose, isOpen } = useEditProfileControls();
   const onSubmit: SubmitHandler<EditProfileValidationSchema> = async (data) => {
     await toast.promise(
       updateAccountAsync({
@@ -103,28 +102,37 @@ export default function EditProfileModal() {
     }
   };
 
+  const handleClose = useCallback(() => {
+    reset();
+    onClose();
+  }, []);
+
   useEffect(() => {
     if (isSubmitSuccessful) {
-      reset();
-      disclosure.onClose();
+      handleClose();
     }
   }, [isSubmitSuccessful]);
 
-  const profileImageSource = profileImage
-    ? URL.createObjectURL(profileImage)
-    : myAccountInfo?.data?.profile?.avatarImage?.src;
+  const profileImageSource = useMemo(
+    () =>
+      profileImage
+        ? URL.createObjectURL(profileImage)
+        : myAccountInfo?.data?.profile?.avatarImage?.src,
+    [myAccountInfo?.data?.profile?.avatarImage?.src, profileImage]
+  );
 
-  const coverImageSource = coverImage
-    ? URL.createObjectURL(coverImage)
-    : myAccountInfo?.data?.profile?.coverImage?.src ?? "";
+  const coverImageSource = useMemo(
+    () =>
+      coverImage
+        ? URL.createObjectURL(coverImage)
+        : myAccountInfo?.data?.profile?.coverImage?.src ?? "",
+    [coverImage, myAccountInfo?.data?.profile?.coverImage?.src]
+  );
 
   return (
     <ModalLayoutV2
-      isOpen={disclosure.isOpen}
-      onClose={() => {
-        disclosure.onClose();
-        reset();
-      }}
+      isOpen={isOpen}
+      onClose={handleClose}
       footer={
         <div className="flex gap-2 justify-center items-center">
           <Button onClick={() => reset()}>Cancel</Button>
@@ -165,6 +173,7 @@ export default function EditProfileModal() {
                   <InputFile
                     onChange={(e) => {
                       onChange(e.target.files?.[0]);
+                      e.target.value = "";
                     }}
                   />
                 )}
@@ -196,6 +205,7 @@ export default function EditProfileModal() {
                   <InputFile
                     onChange={(e) => {
                       onChange(e.target.files?.[0]);
+                      e.target.value = "";
                     }}
                   />
                 )}

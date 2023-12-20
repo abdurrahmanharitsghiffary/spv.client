@@ -191,24 +191,16 @@ export default function CreatePostForm({
             Create Post
           </Button>
         </div>
-
-        {/* {!isNotPostPage && (
-          <Button
-            type="submit"
-            color="primary"
-            className="fixed top-[12px] right-4 z-[41]"
-          >
-            Create Post
-          </Button>
-        )} */}
       </form>
-      <Checkbox
-        isSelected={isShowPreview}
-        onValueChange={setIsShowPreview}
-        className="self-start !pb-5 px-6"
-      >
-        {isShowPreview ? "Hide preview" : "Show preview"}
-      </Checkbox>
+      {withPreview && (
+        <Checkbox
+          isSelected={isShowPreview}
+          onValueChange={setIsShowPreview}
+          className="self-start !pb-5 px-6"
+        >
+          {isShowPreview ? "Hide preview" : "Show preview"}
+        </Checkbox>
+      )}
       {isShowPreview && withPreview && (
         <div className="w-full flex flex-col gap-2 pb-16">
           <TypographyH4 className="px-4 !text-base">Preview</TypographyH4>
