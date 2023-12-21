@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zImage } from "./image";
+import { zImages } from "./image";
 
 export const zChatMessage = z
   .string({ required_error: "Message must not be empty." })
@@ -8,7 +8,7 @@ export const zChatMessage = z
 export const createChatSchema = z
   .object({
     chat: z.string().optional(),
-    images: zImage.array().optional(),
+    images: zImages.optional(),
   })
   .refine(
     (arg) => {

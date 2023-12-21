@@ -88,7 +88,7 @@ export default function ChatEditForm() {
   return (
     <>
       <div
-        className="inset-0 fixed backdrop-blur-sm z-20"
+        className="inset-0 fixed bg-overlay/50 z-20"
         onClick={handleClose}
       ></div>
       <ChatFormLayout>

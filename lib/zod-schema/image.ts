@@ -34,7 +34,7 @@ export const zImage = z
     `Invalid file mime types, accepted types: ${getImageTypes()}`
   );
 
-export const zPostImages = z
+export const zImages = z
   .any()
   .refine(
     (files) => files instanceof FileList || files instanceof Array,

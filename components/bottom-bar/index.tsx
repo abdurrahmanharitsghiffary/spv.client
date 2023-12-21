@@ -54,12 +54,12 @@ export default function BottomBar() {
                 {pathname === item.url && !isSSR ? (
                   <motion.span
                     layoutId="btm_bar_active_bar"
-                    // animate={{ bottom: 0 }}
+                    animate={{ bottom: 0 }}
                     // exit={{ bottom: -10 }}
                     style={{
-                      bottom: 0,
+                      // bottom: 0,
                       position: "absolute",
-                      // bottom: -10,
+                      bottom: -10,
                       display: "block",
                       insetInline: 0,
                       marginInline: "auto",

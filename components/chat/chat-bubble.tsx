@@ -14,8 +14,9 @@ const ChatBubble = forwardRef<
   {
     isRecipient?: boolean;
     chat: Chat | undefined;
+    isDisableMenu?: boolean;
   }
->(({ chat, isRecipient }, ref) => {
+>(({ chat, isRecipient, isDisableMenu = false }, ref) => {
   const images = chat?.attachments ?? [];
   const [isHolded, setIsHolded] = useState(false);
   const holdTimeRef = useRef<NodeJS.Timeout | null>(null);
@@ -40,11 +41,11 @@ const ChatBubble = forwardRef<
   };
 
   useEffect(() => {
-    if (isHolded) {
+    if (isHolded && !isDisableMenu) {
       resetHold();
       onOpen(chat?.id ?? -1);
     }
-  }, [isHolded, chat?.id]);
+  }, [isHolded, chat?.id, isDisableMenu]);
 
   console.log(isHolded, "Is Holded");
 

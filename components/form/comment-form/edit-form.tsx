@@ -72,7 +72,7 @@ export default function CommentEditForm({ className }: { className?: string }) {
   return (
     <>
       <div
-        className="fixed inset-0 z-[101] backdrop-blur-sm"
+        className="fixed inset-0 z-[101] bg-overlay/50"
         onClick={handleClose}
       ></div>
       <CommentFormLayout className={clsx("z-[102]", className)}>

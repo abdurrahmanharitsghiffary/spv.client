@@ -1,8 +1,7 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import CommentFormImage from "../comment-form-image";
 import Recorder from "../../recorder";
 import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
 import FileButton from "../../input/file-btn";
@@ -17,8 +16,12 @@ import ChatFormBody from "./body";
 import SendTextarea from "../../input/send-textarea";
 import Slider from "@/components/slider";
 import ImageChip from "../../image/image-chip";
+import { TypographyMuted } from "@/components/ui/typography";
+import { Checkbox } from "@nextui-org/react";
+import clsx from "clsx";
 
 export default function ChatForm() {
+  const [isChipTruncated, setIsChipTruncated] = useState(true);
   const socket = useSocket();
   const { createMessageAsync } = useCreateMessage();
   const timeRef = useRef<NodeJS.Timeout | undefined>();
@@ -29,13 +32,12 @@ export default function ChatForm() {
     control,
     reset,
     handleSubmit,
-    watch,
     setValue,
   } = useForm<CreateChatSchema>({
     resolver: zodResolver(createChatSchema),
     defaultValues: { images: [], chat: "" },
   });
-  const text = watch("chat");
+  const text = useWatch({ control, name: "chat" });
   useEffect(() => {
     if (text) {
       document.body.scrollIntoView(false);
@@ -116,7 +118,7 @@ export default function ChatForm() {
         data: {
           chatRoomId: Number(chatId),
           message: data.chat ?? "",
-          images: data.images ?? [],
+          images: data.images,
         },
       });
     } catch (err: any) {
@@ -128,7 +130,7 @@ export default function ChatForm() {
       toast.error(message ?? "Something went wrong!");
     }
   };
-  const images = watch("images") ?? [];
+  const images: File[] = useWatch({ control, name: "images" });
   // const handleImageReset = useCallback(() => {
   //   setValue("images", []);
   // }, []);
@@ -140,7 +142,7 @@ export default function ChatForm() {
 
   const handleClose = (file: File, image: File) => {
     if (!file) return null;
-    const files = Array.from(images).filter(
+    const files = images.filter(
       (img) =>
         !`${img.name}${img.size}${image.type}`.includes(
           `${image.name}${image.size}${image.type}`
@@ -153,8 +155,25 @@ export default function ChatForm() {
   return (
     <ChatFormLayout>
       {images.length > 0 && (
-        <div className="p-2 border-t-1 border-divider">
-          <Slider>
+        <div className="p-2 border-t-1 flex flex-col gap-2 border-divider">
+          <TypographyMuted>
+            {images?.length} Image{(images ?? []).length > 1 && "s"} choosen
+          </TypographyMuted>
+          <Checkbox
+            size="sm"
+            isSelected={isChipTruncated}
+            onValueChange={setIsChipTruncated}
+          >
+            Truncate
+          </Checkbox>
+          <Slider
+            classNames={{
+              body: clsx(isChipTruncated ? "flex-nowrap" : "flex-wrap"),
+              wrapper: clsx(
+                !isChipTruncated && "!overflow-y-auto max-h-[250px]"
+              ),
+            }}
+          >
             {images.map((image: File) => (
               <ImageChip
                 image={image}

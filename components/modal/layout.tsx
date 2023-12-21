@@ -81,43 +81,39 @@ const ModalLayout = forwardRef(
     ref: React.Ref<HTMLElement | null>
   ) => {
     return (
-      <>
-        <Modal
-          // portalContainer={
-          //   document && (document.getElementById("modal_portal") as Element)
-          // }
-          ref={ref}
-          backdrop={backdrop}
-          id={id}
-          isDismissable
-          hideCloseButton={hideCloseButton}
-          scrollBehavior={scrollBehavior}
-          classNames={{
-            ...wrapperClassNames,
-            wrapper: wrapperClassNames?.wrapper ?? "" + " z-[201]",
-          }}
-          closeButton={closeButton}
-          placement={placement}
-          className={" my-0 h-auto " + classNames?.wrapper ?? ""}
-          size={size ? size : "md"}
-          isOpen={isOpen}
-          onClose={onClose}
-        >
-          <ModalContent className={classNames?.content ?? ""}>
-            <ModalHeader className={classNames?.header ?? ""}>
-              {header}
-            </ModalHeader>
-            <ModalBody onClick={bodyOnClick} className={classNames?.body ?? ""}>
-              {children}
-            </ModalBody>
-            {footer && (
-              <ModalFooter className={classNames?.footer ?? ""}>
-                {footer}
-              </ModalFooter>
-            )}
-          </ModalContent>
-        </Modal>
-      </>
+      <Modal
+        shouldBlockScroll
+        ref={ref}
+        backdrop={backdrop}
+        id={id}
+        isDismissable
+        hideCloseButton={hideCloseButton}
+        scrollBehavior={scrollBehavior}
+        classNames={{
+          ...wrapperClassNames,
+          wrapper: wrapperClassNames?.wrapper ?? "" + " z-[201]",
+        }}
+        closeButton={closeButton}
+        placement={placement}
+        className={" my-0 h-auto " + classNames?.wrapper ?? ""}
+        size={size ? size : "md"}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalContent className={classNames?.content ?? ""}>
+          <ModalHeader className={classNames?.header ?? ""}>
+            {header}
+          </ModalHeader>
+          <ModalBody onClick={bodyOnClick} className={classNames?.body ?? ""}>
+            {children}
+          </ModalBody>
+          {footer && (
+            <ModalFooter className={classNames?.footer ?? ""}>
+              {footer}
+            </ModalFooter>
+          )}
+        </ModalContent>
+      </Modal>
     );
   }
 );

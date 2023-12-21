@@ -15,6 +15,7 @@ import { useDeleteMessage } from "@/lib/api/messages/mutation";
 import { useConfirm } from "@/stores/confirm-store";
 import { useMessageEditDisclosure } from "@/context/message-edit-form-context";
 import { useSession } from "@/stores/auth-store";
+import { useMessageInfoDisclosure } from "@/context/message-info-context";
 
 export default function MessageMenu() {
   const isOpen = useMessageMenuIsOpen();
@@ -24,6 +25,7 @@ export default function MessageMenu() {
   const { message, isLoading, isSuccess } = useGetMessage(messageId);
   const confirm = useConfirm();
   const { onOpen } = useMessageEditDisclosure();
+  const { onOpen: onDetailClick } = useMessageInfoDisclosure();
   const session = useSession();
 
   console.log(message, "msg");
@@ -61,7 +63,7 @@ export default function MessageMenu() {
         return;
       }
       case "info": {
-        console.log("Info");
+        onDetailClick();
       }
     }
   };

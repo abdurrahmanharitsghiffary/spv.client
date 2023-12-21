@@ -5,7 +5,6 @@ import { Image } from "@nextui-org/image";
 import { motion } from "framer-motion";
 import usePreviewImage from "@/hooks/use-preview-image";
 import AnimationControl from "./animation-control";
-import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { MdBrokenImage } from "react-icons/md";
 
 function ImagePreview() {
@@ -21,7 +20,6 @@ function ImagePreview() {
     handleClose();
     setIsError(false);
   };
-  useBodyOverflowHidden(isOpen);
 
   return (
     <ModalLayout

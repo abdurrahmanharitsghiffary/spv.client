@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { zText, zTitle } from ".";
-import { zPostImages } from "./image";
+import { zImages } from "./image";
 
 export const createPostValidationSchema = z.object({
   title: zTitle,
   content: zText("Content"),
-  images: zPostImages.optional(),
+  images: zImages.optional(),
 });
 
 export type CreatePostValidationSchema = z.infer<
@@ -15,7 +15,7 @@ export type CreatePostValidationSchema = z.infer<
 export const updatePostSchema = z.object({
   title: zTitle,
   content: zText("Content").optional(),
-  images: zPostImages.optional(),
+  images: zImages.optional(),
 });
 
 export type UpdatePostSchema = z.infer<typeof updatePostSchema>;

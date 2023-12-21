@@ -32,6 +32,7 @@ export default function CreatePostForm({
   isNotPostPage?: boolean;
   className?: string;
 }) {
+  const [isChipTruncated, setIsChipTruncated] = useState(true);
   const [isShowPreview, setIsShowPreview] = useState(true);
   const { createPostAsync } = useCreatePost();
   const {
@@ -168,7 +169,14 @@ export default function CreatePostForm({
             <TypographyMuted>
               {images?.length} Image{(images ?? []).length > 1 && "s"} choosen
             </TypographyMuted>
+            <Checkbox
+              isSelected={isChipTruncated}
+              onValueChange={setIsChipTruncated}
+            >
+              Truncate
+            </Checkbox>
             <CreatePostImageChip
+              className={clsx(isChipTruncated ? "flex-nowrap" : "!flex-wrap")}
               images={images}
               onCloseClick={handleCloseClick}
             />
@@ -198,7 +206,7 @@ export default function CreatePostForm({
           onValueChange={setIsShowPreview}
           className="self-start !pb-5 px-6"
         >
-          {isShowPreview ? "Hide preview" : "Show preview"}
+          Show preview
         </Checkbox>
       )}
       {isShowPreview && withPreview && (

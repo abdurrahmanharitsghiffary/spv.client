@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody, CardProps } from "@nextui-org/card";
 import { Avatar, AvatarProps } from "@nextui-org/avatar";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import clsx from "clsx";
@@ -11,6 +11,7 @@ import { SlotsToClasses } from "@nextui-org/theme";
 export default function UserCard({
   className,
   user,
+  as,
   withFollowButton = true,
   classNames,
   cardClassNames,
@@ -19,6 +20,7 @@ export default function UserCard({
   descriptionFontSize,
   avatarProps,
 }: {
+  as?: CardProps["as"];
   user: UserSimplified;
   className?: string;
   withFollowButton?: boolean;
@@ -31,7 +33,7 @@ export default function UserCard({
 }) {
   const cl = clsx("w-full dark:bg-inherit", className);
   return (
-    <Card classNames={cardClassNames} className={cl}>
+    <Card classNames={cardClassNames} className={cl} as={as}>
       <CardBody
         className={clsx(
           "flex flex-col gap-4 relative p-4 max-w-full py-3",
