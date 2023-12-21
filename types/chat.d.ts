@@ -18,7 +18,7 @@ import { UserSimplified } from "./user";
 
 export type Chat = {
   id: number;
-  readedBy: (UserSimplified & { readedAt: Date })[] | null;
+  readedBy: UserChatRead[] | null;
   message: string | null;
   attachments: Image[];
   isGroupChat: boolean;
@@ -27,6 +27,8 @@ export type Chat = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type UserChatRead = UserSimplified & { readedAt: Date };
 
 type UndreadMessageSimplified = {
   total: number;

@@ -64,6 +64,8 @@ export default function JoinButton(props: ButtonProps) {
     <Button
       onClick={handleGroup}
       isIconOnly={isJoinedInGroup}
+      className="w-fit"
+      fullWidth={false}
       color={isJoinedInGroup ? "danger" : "default"}
       {...rest}
     >

@@ -5,14 +5,13 @@ import ModalLayoutV2 from "../layoutV2";
 import { useMessageInfoDisclosure } from "@/context/message-info-context";
 import { useMessageMenuId } from "@/stores/message-menu-store";
 import { useGetMessage } from "@/lib/api/messages/query";
-import UserCard from "@/components/user/user-card";
 import { TypographyH3 } from "@/components/ui/typography";
 import ChatBubble from "@/components/chat/chat-bubble";
 import { useSession } from "@/stores/auth-store";
-import Timestamp from "@/components/timestamp";
 import { RiErrorWarningFill } from "react-icons/ri";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Avatar } from "@nextui-org/avatar";
+import { Listbox } from "@nextui-org/listbox";
+import ListboxUser from "@/components/user/listbox-user";
+import ListboxUsers from "@/components/user/listbox-user";
 
 export default function MessageDetailsModal() {
   const { isOpen, onClose } = useMessageInfoDisclosure();
@@ -122,39 +121,10 @@ export default function MessageDetailsModal() {
               isRecipient={isRecipient}
               isDisableMenu
             />
-            <TypographyH3 className="!text-lg">
+            <TypographyH3 className="!text-lg px-2">
               Read by ({readedBy?.length})
             </TypographyH3>
-            <Listbox className="p-0 gap-2">
-              {readedBy.map((user) => (
-                <ListboxItem
-                  className="px-0"
-                  classNames={{ wrapper: "!max-w-[70%] !truncate text-tiny" }}
-                  key={user.id}
-                  startContent={
-                    <Avatar
-                      className="flex-shrink-0"
-                      src={user?.avatarImage?.src}
-                      name={user?.fullName}
-                      showFallback
-                    />
-                  }
-                  endContent={
-                    <div className="self-end w-[30%]">
-                      <Timestamp
-                        customFormat="ll"
-                        className="!text-tiny !text-foreground-500 truncate"
-                        customDate={user.readedAt}
-                      />
-                    </div>
-                  }
-                  description={user.username}
-                >
-                  {user.fullName}
-                  ssssssssssssssssssssssssssssssssssssssssssssssssss
-                </ListboxItem>
-              ))}
-            </Listbox>
+            <ListboxUsers users={readedBy} />
           </>
         )
       )}

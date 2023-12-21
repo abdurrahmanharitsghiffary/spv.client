@@ -5,7 +5,7 @@ import {
   useCreateGroupActions,
   useCreateGroupIsOpen,
 } from "@/stores/create-group-store";
-import { UserAccountPublic } from "@/types/user";
+import { UserAccountPublic, UserGroup } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
 import { removeDuplicates } from "@/lib";
 import { getUserSimplified } from "@/lib/getUserSimplified";
@@ -22,11 +22,11 @@ import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useCreateGroupChat } from "@/lib/api/chats/mutation";
 import { TypographyLarge } from "@/components/ui/typography";
-import UserGroupList from "@/components/user/user-group-list";
 import {
   InputWithControl,
   TextareaWithControl,
 } from "@/components/input/input-with-control";
+import UserGroupLists from "@/components/user/user-group-lists";
 
 const createGroupSchema = z.object({
   participants: z
@@ -64,7 +64,7 @@ export default function CreateGroupModal() {
   const { onClose } = useCreateGroupActions();
   const watch = useWatch({ control, defaultValue: { participants: [] } });
   const selectedUsers = watch.participants ?? [];
-
+  console.log(selectedUsers, "Selected Users");
   const handleReset = useCallback(() => {
     reset();
   }, []);
@@ -124,6 +124,18 @@ export default function CreateGroupModal() {
     [file]
   );
 
+  const handleCloseClick = useCallback(
+    (user: UserGroup) => {
+      console.log(user, "User");
+      console.log(selectedUsers, "Sel Users");
+      setValue(
+        "participants",
+        selectedUsers.filter((item: any) => item.id !== user.id)
+      );
+    },
+    [selectedUsers]
+  );
+
   return (
     <ModalLayoutV2
       isOpen={isOpen}
@@ -179,16 +191,10 @@ export default function CreateGroupModal() {
             }}
             onItemClick={handleItemClick}
           />
-          <ul className="w-full max-w-full grid grid-cols-1 gap-2">
-            {selectedUsers.map((user) => (
-              <UserGroupList
-                selectedUsers={selectedUsers}
-                key={user.id}
-                setValue={setValue}
-                user={user as any}
-              />
-            ))}
-          </ul>
+          <UserGroupLists
+            users={selectedUsers}
+            onCloseClick={handleCloseClick}
+          />
         </div>
 
         {errors?.participants?.message && (

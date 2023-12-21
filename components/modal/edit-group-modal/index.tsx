@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useMemo } from "react";
 import ModalLayoutV2 from "../layoutV2";
-import { UserAccountPublic } from "@/types/user";
+import { UserAccountPublic, UserGroup } from "@/types/user";
 import UserAutocomplete from "@/components/user/user-autocomplete";
 import { removeDuplicates } from "@/lib";
 import { getUserSimplified } from "@/lib/getUserSimplified";
@@ -29,6 +29,7 @@ import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useParams } from "next/navigation";
 import UserGroupList from "@/components/user/user-group-list";
 import { TypographyLarge } from "@/components/ui/typography";
+import UserGroupLists from "@/components/user/user-group-lists";
 
 const editGroupSchema = z.object({
   participants: z.any().array().optional(),
@@ -67,7 +68,7 @@ export default function EditGroupModal() {
       title: chatRoom?.data?.title ?? "",
     },
   });
-  const selectedUsers = watch("participants");
+  const selectedUsers = watch("participants") ?? [];
   const isOpen = useEditGroupIsOpen();
   const { onClose } = useEditGroupActions();
 
@@ -92,6 +93,18 @@ export default function EditGroupModal() {
           ...(selectedUsers ?? []),
           { ...getUserSimplified(item), role: "user" },
         ]).slice()
+      );
+    },
+    [selectedUsers]
+  );
+
+  const handleCloseClick = useCallback(
+    (user: UserGroup) => {
+      console.log(user, "User");
+      console.log(selectedUsers, "Sel Users");
+      setValue(
+        "participants",
+        selectedUsers.filter((item: any) => item.id !== user.id)
       );
     },
     [selectedUsers]
@@ -190,16 +203,10 @@ export default function EditGroupModal() {
             }}
             onItemClick={handleItemClick}
           />
-          <ul className="w-full max-w-full grid grid-cols-1 gap-2">
-            {(selectedUsers ?? []).map((user) => (
-              <UserGroupList
-                selectedUsers={selectedUsers}
-                key={user.id}
-                setValue={setValue}
-                user={user as any}
-              />
-            ))}
-          </ul>
+          <UserGroupLists
+            users={selectedUsers}
+            onCloseClick={handleCloseClick}
+          />
         </div>
         <InputWithControl
           label="Group title"

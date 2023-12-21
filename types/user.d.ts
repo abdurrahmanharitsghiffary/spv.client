@@ -66,7 +66,7 @@ export interface UserFollowerResponse {
   followers: UserSimplified[];
   total: number;
 }
-
+export type UserGroup = UserSimplified & { role: "admin" | "user" };
 export interface UserFollowingResponse {
   userId: number;
   followedUsers: UserSimplified[];

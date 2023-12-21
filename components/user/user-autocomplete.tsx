@@ -1,7 +1,6 @@
 "use client";
 
 import { useGetSearchResult } from "@/lib/api/search";
-import { getUserSimplified } from "@/lib/getUserSimplified";
 import { UserAccountPublic } from "@/types/user";
 import { Input, InputProps } from "@nextui-org/input";
 import { Spinner } from "@nextui-org/spinner";
@@ -9,8 +8,9 @@ import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import clsx from "clsx";
 import React, { useCallback, useRef, useState } from "react";
 import { FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
-import UserCard from "./user-card";
 import { TypographyMuted } from "../ui/typography";
+import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { Avatar } from "@nextui-org/react";
 
 export default function UserAutocomplete({
   onItemClick,
@@ -39,49 +39,52 @@ export default function UserAutocomplete({
     type: "user",
   });
 
-  const itemsLength = ((searchResult?.data as any) ?? []).length ?? 0;
-
-  const itemRef = useRef<HTMLLIElement | null>(null);
-  const [currentFocus, setCurrentFocus] = useState(-1);
-
-  const handleUserSelection = (item: UserAccountPublic) => {
-    onItemClick(item);
+  const [selectedKeys, setSelectetedKeys] = useState<any>(undefined);
+  console.log(selectedKeys, "SelKeys");
+  const results = (searchResult?.data ?? []) as UserAccountPublic[];
+  const reset = () => {
     setFilterText("");
+    setSelectetedKeys(undefined);
   };
 
-  const handleInputKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement> | KeyboardEvent) => {
-      if (e.key === "Enter") {
-        itemRef.current?.click();
-        setCurrentFocus(-1);
-        setFilterText("");
-      }
-      if (e.key === "ArrowDown") {
-        if (itemsLength - 1 === currentFocus) return null;
-        e.preventDefault();
-        itemRef.current?.scrollIntoView(true);
-        setCurrentFocus((c) => c + 1);
-      } else if (e.key === "ArrowUp") {
-        if (currentFocus === 0) return null;
-        e.preventDefault();
-        itemRef.current?.scrollIntoView(false);
-        setCurrentFocus((c) => c - 1);
-      }
-    },
-    [itemRef, itemsLength, currentFocus]
-  );
+  // const handleInputKeyDown = useCallback(
+  //   (e: React.KeyboardEvent<HTMLInputElement> | KeyboardEvent) => {
+  //     if (e.key === "Enter") {
+  //       itemRef.current?.click();
+  //       setCurrentFocus(-1);
+  //       setFilterText("");
+  //     }
+  //     if (e.key === "ArrowDown") {
+  //       if (itemsLength - 1 === currentFocus) return null;
+  //       e.preventDefault();
+  //       itemRef.current?.scrollIntoView(true);
+  //       setCurrentFocus((c) => c + 1);
+  //     } else if (e.key === "ArrowUp") {
+  //       if (currentFocus === 0) return null;
+  //       e.preventDefault();
+  //       itemRef.current?.scrollIntoView(false);
+  //       setCurrentFocus((c) => c - 1);
+  //     }
+  //   },
+  //   [itemRef, itemsLength, currentFocus]
+  // );
 
-  const handleValueChange = (value: string) => {
-    setCurrentFocus(-1);
-    setFilterText(value);
+  // const handleListsAction = (key: React.Key) => {
+  //   reset();
+  //   onItemClick(results.find((user) => user.id === Number(key)));
+  // };
+
+  const handleListPress = (item: UserAccountPublic) => {
+    onItemClick(item);
+    reset();
   };
 
   return (
     <div className="w-full flex flex-col relative">
       <Input
-        onKeyDown={handleInputKeyDown}
+        // onKeyDown={handleInputKeyDown}
         value={filterText}
-        onValueChange={handleValueChange}
+        onValueChange={setFilterText}
         labelPlacement={labelPlacement}
         startContent={<FiSearch size={18} />}
         classNames={{ clearButton: "mt-[50%] -translate-y-1/2" }}
@@ -108,39 +111,37 @@ export default function UserAutocomplete({
             labelPlacement === "outside" && label ? "mt-20" : "mt-12"
           )}
         >
-          <ul className="w-full grid grid-cols-1 ">
-            {itemsLength > 0 ? (
-              isSuccess &&
-              ((searchResult?.data as UserAccountPublic[]) ?? []).map(
-                (item, i) => (
-                  <li
-                    key={item.id}
-                    ref={(node) => {
-                      if (i === currentFocus) {
-                        itemRef.current = node;
-                      }
-                    }}
-                    className={clsx(
-                      "w-full hover:bg-content2 cursor-pointer",
-                      currentFocus === i ? "bg-content2" : ""
-                    )}
-                    onClick={() => handleUserSelection(item)}
-                  >
-                    <UserCard
-                      className="bg-transparent shadow-none rounded-none border-none p-0"
-                      hideLink
-                      withFollowButton={false}
-                      user={getUserSimplified(item)}
-                    />
-                  </li>
-                )
-              )
-            ) : (
-              <TypographyMuted className="!text-sm p-2 px-4">
+          <Listbox
+            className="py-4 px-2 gap-2"
+            selectionMode="none"
+            items={results as UserAccountPublic[]}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectetedKeys}
+            emptyContent={
+              <TypographyMuted className="!text-sm">
                 No result found.
               </TypographyMuted>
+            }
+            // onAction={handleListsAction}
+          >
+            {(item) => (
+              <ListboxItem
+                key={item.id}
+                onPress={() => handleListPress(item)}
+                startContent={
+                  <div className="flex-shrink-0">
+                    <Avatar
+                      src={item.profile?.avatarImage?.src}
+                      name={item?.fullName ?? ""}
+                    />
+                  </div>
+                }
+                description={item?.username}
+              >
+                {item.fullName}
+              </ListboxItem>
             )}
-          </ul>
+          </Listbox>
         </ScrollShadow>
       )}
     </div>

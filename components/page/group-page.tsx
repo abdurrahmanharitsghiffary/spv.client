@@ -71,7 +71,7 @@ export default function GroupPage({ groupId }: { groupId: number }) {
           {isSuccessGCRP && participant?.data.role !== "user" && (
             <EditGroupTrigger className="flex-1" />
           )}
-          <JoinButton className="flex-1" />
+          <JoinButton />
         </div>
         <GroupDescription description={chatRoom?.data?.description ?? ""} />
       </div>
