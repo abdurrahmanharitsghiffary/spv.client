@@ -18,6 +18,7 @@ import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite } from "../hooks";
+import { UserSimplified } from "@/types/user";
 
 export const useGetPosts = (
   options?: OffsetPaging,
@@ -92,22 +93,20 @@ export const useGetPostFromFollowedUsers = (
 
 export const useGetPostLikeByPostId = (
   postId: number,
+  query: { offset?: number; limit?: number } = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: { limit: query.limit?.toString(), offset: query.offset?.toString() },
+    url: postLikesByPostId(postId.toString(), query),
+    queryKey: [...keys.postLikes(postId), query],
+    config,
+    queryConfig: {
+      enabled: postId > -1,
+    },
+  });
 
-  const { data: postLikes, ...rest } = useQuery<ApiResponseT<PostLikeResponse>>(
-    {
-      queryKey: keys.postLikes(postId),
-      queryFn: () =>
-        request
-          .get(postLikesByPostId(postId.toString()), config)
-          .then((res) => res.data)
-          .catch((err) => Promise.reject(err?.response?.data)),
-    }
-  );
-
-  return { postLikes, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetPostIsLiked = (

@@ -51,7 +51,10 @@ export default function CreateRoomModal() {
         wrapper: "bg-opacity-0 shadow-none",
       }}
       scrollBehavior="outside"
-      wrapperClassNames={{ wrapper: "sm:items-start" }}
+      wrapperClassNames={{
+        wrapper: "sm:items-start z-[201]",
+        backdrop: "z-[200]",
+      }}
       backdrop="blur"
       isOpen={isOpen}
     >

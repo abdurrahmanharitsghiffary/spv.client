@@ -1,17 +1,10 @@
-import UsersGridLayout from "@/components/layout/users-grid-layout";
-import UserCard from "@/components/user/user-card";
-import UserCardSkeleton from "@/components/user/user-card-skeleton";
+import UserListboxLoading from "@/components/loading/user-listbox-loading";
+import ListboxUsers from "@/components/user/listbox-users";
 import { UserAccountPublic, UserSimplified } from "@/types/user";
 import React from "react";
 
 export function UserTabLoading() {
-  return (
-    <UsersGridLayout>
-      {[1, 2, 3].map((item) => (
-        <UserCardSkeleton key={item} className="rounded-none shadow-none" />
-      ))}
-    </UsersGridLayout>
-  );
+  return <UserListboxLoading />;
 }
 
 export default function UsersTab({ users }: { users: UserAccountPublic[] }) {
@@ -27,15 +20,5 @@ export default function UsersTab({ users }: { users: UserAccountPublic[] }) {
       username: user?.username,
     })) ?? [];
 
-  return (
-    <UsersGridLayout>
-      {usersData?.map((user) => (
-        <UserCard
-          user={user}
-          key={user?.id}
-          className="rounded-none shadow-none"
-        />
-      ))}
-    </UsersGridLayout>
-  );
+  return <ListboxUsers users={usersData} />;
 }

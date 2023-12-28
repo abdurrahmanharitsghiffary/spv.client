@@ -11,11 +11,9 @@ export const useObserver = (
     const element = ref.current;
 
     if (!element) setIsInView(false);
-    console.log(options);
     const observer = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
-          console.log(entry.isIntersecting, "IsIntersecting");
           setIsInView(entry.isIntersecting);
         }),
       options

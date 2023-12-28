@@ -3,22 +3,23 @@ import {
   FetchNextPageOptions,
   InfiniteQueryObserverResult,
 } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 
 export default function useFetchNextPageObserver({
   isDisabled,
   fetchNextPage,
   isFetching,
-}: {
+}: // ref,
+{
   isDisabled: boolean;
   isFetching: boolean;
   fetchNextPage: (
     options?: FetchNextPageOptions | undefined
   ) => Promise<InfiniteQueryObserverResult<unknown, unknown>>;
+  // ref?: RefObject<HTMLDivElement>;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isObserving, setIsObserving] = useState(false);
-
   useEffect(() => {
     const element: HTMLDivElement | undefined | null = ref?.current;
     const observer = new IntersectionObserver(
@@ -41,5 +42,5 @@ export default function useFetchNextPageObserver({
     if (isObserving && !isDisabled && !isFetching) fetchNextPage();
   }, [isDisabled, isObserving, isFetching]);
 
-  return { ref };
+  return { ref, isObserving };
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { NextUIProvider } from "@nextui-org/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeProviderProps } from "next-themes/dist/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,6 +9,7 @@ import ImageGalleryProvider from "@/context/image-gallery-context";
 import ToastProvider from "@/components/toastify-container";
 import EditPostProvider from "@/context/edit-post-context";
 import SocketProvider from "@/context/socket-context";
+import { NextUIProvider } from "@/context/nextui-provider";
 
 export interface ProvidersProps {
   children: React.ReactNode;

@@ -28,7 +28,6 @@ export default function MessageMenu() {
   const { onOpen: onDetailClick } = useMessageInfoDisclosure();
   const session = useSession();
 
-  console.log(message, "msg");
   const baseItems: MenuItems[] = [
     { key: "info", label: "Message details", icon: <AiFillInfoCircle /> },
     { key: "copy", label: "Copy message", icon: <AiOutlineCopy /> },

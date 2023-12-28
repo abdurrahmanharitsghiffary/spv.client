@@ -16,6 +16,7 @@ import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useSession } from "@/stores/auth-store";
 import JoinButton from "../button/join-button";
+import { MdGroup } from "react-icons/md";
 
 export default function GroupPage({ groupId }: { groupId: number }) {
   const { chatRoom, isLoading, isSuccess, error, isError } = useGetChatRoomById(
@@ -40,6 +41,7 @@ export default function GroupPage({ groupId }: { groupId: number }) {
           src={chatRoom?.data?.picture?.src}
           alt={chatRoom?.data?.title ?? "Group picture"}
           showFallback
+          fallback={<MdGroup size={40} />}
           className="object-cover text-default-800 dark:text-default-foreground min-h-[128px] max-h-[128px] rounded-full min-w-[128px] max-w-[128px] object-center"
         />
       </div>

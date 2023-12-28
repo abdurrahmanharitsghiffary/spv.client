@@ -8,6 +8,7 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { SlotsToClasses } from "@nextui-org/theme";
+import { HTMLMotionProps } from "framer-motion";
 
 export interface ModalLayoutProps {
   id?: string;
@@ -57,6 +58,7 @@ export interface ModalLayoutProps {
     | "4xl"
     | "5xl";
   closeButton?: any;
+  motionProps?: HTMLMotionProps<"section">;
 }
 
 const ModalLayout = forwardRef(
@@ -74,6 +76,7 @@ const ModalLayout = forwardRef(
       onClose,
       hideCloseButton,
       placement,
+      motionProps,
       closeButton,
       backdrop,
       bodyOnClick = () => {},
@@ -82,6 +85,7 @@ const ModalLayout = forwardRef(
   ) => {
     return (
       <Modal
+        motionProps={motionProps}
         shouldBlockScroll
         ref={ref}
         backdrop={backdrop}

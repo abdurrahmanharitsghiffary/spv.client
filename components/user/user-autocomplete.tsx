@@ -11,6 +11,8 @@ import { FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
 import { TypographyMuted } from "../ui/typography";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { Avatar } from "@nextui-org/react";
+import { listboxUserProps } from "./listbox-user-props";
+import { getUserSimplified } from "@/lib/getUserSimplified";
 
 export default function UserAutocomplete({
   onItemClick,
@@ -40,7 +42,6 @@ export default function UserAutocomplete({
   });
 
   const [selectedKeys, setSelectetedKeys] = useState<any>(undefined);
-  console.log(selectedKeys, "SelKeys");
   const results = (searchResult?.data ?? []) as UserAccountPublic[];
   const reset = () => {
     setFilterText("");
@@ -128,18 +129,8 @@ export default function UserAutocomplete({
               <ListboxItem
                 key={item.id}
                 onPress={() => handleListPress(item)}
-                startContent={
-                  <div className="flex-shrink-0">
-                    <Avatar
-                      src={item.profile?.avatarImage?.src}
-                      name={item?.fullName ?? ""}
-                    />
-                  </div>
-                }
-                description={item?.username}
-              >
-                {item.fullName}
-              </ListboxItem>
+                {...listboxUserProps(getUserSimplified(item))}
+              />
             )}
           </Listbox>
         </ScrollShadow>

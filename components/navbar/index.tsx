@@ -1,8 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { Navbar as NavbarTemplate } from "@nextui-org/navbar";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
+import clsx from "clsx";
 
 const navItem: string[] = [];
 // ["Home", "Login", "SignUp"];
@@ -17,14 +18,17 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [showMenu, setShowMenu] = useState(false);
-
+  const { chatId } = useParams();
   return (
     <NavbarTemplate
-      className="fixed max-w-full w-full flex justify-end"
+      className={clsx(
+        "fixed max-w-full flex justify-end w-auto",
+        chatId && "sm:left-[300px] lg:left-[400px]"
+      )}
       isBordered
       isBlurred={false}
       classNames={{
-        wrapper: "px-0 gap-0 w-full max-w-none",
+        wrapper: "px-0 gap-0 max-w-none",
         menu: "z-[500]",
         item: [
           "flex",

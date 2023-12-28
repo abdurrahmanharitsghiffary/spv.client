@@ -63,6 +63,7 @@ export const useInfinite = <T>({
   config?: AxiosRequestConfig;
   queryConfig?: {
     refetchOnWindowFocus?: boolean;
+    enabled?: boolean;
   };
 }) => {
   const request = useAxiosInterceptor();
@@ -76,6 +77,7 @@ export const useInfinite = <T>({
   const {
     data: infiniteData,
     isSuccess,
+    hasNextPage,
     ...rest
   } = useInfiniteQuery<ApiPagingObjectResponse<T[]>>({
     queryKey: queryKey,
@@ -91,9 +93,7 @@ export const useInfinite = <T>({
     ...queryConfig,
   });
 
-  const isFetchNextNotAvailable =
-    !isSuccess ||
-    (infiniteData?.pageParams ?? []).some((params) => params === null);
+  const isFetchNextNotAvailable = !hasNextPage && isSuccess;
 
   const data = useMemo(
     () => ({
@@ -105,7 +105,14 @@ export const useInfinite = <T>({
     [infiniteData]
   );
 
-  return { data, infiniteData, isSuccess, isFetchNextNotAvailable, ...rest };
+  return {
+    data,
+    infiniteData,
+    hasNextPage,
+    isSuccess,
+    isFetchNextNotAvailable,
+    ...rest,
+  };
 };
 
 export const useMutate = <T, P = {}>({

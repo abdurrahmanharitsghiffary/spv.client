@@ -27,8 +27,10 @@ const getTemplateArea = (items: any[]) => {
 
 export default function Gallery({
   images = [],
+  className,
 }: {
   images: { src: string }[];
+  className?: string;
 }) {
   const showGallery = useShowImageGallery();
   const isSSR = useIsSSR();
@@ -36,6 +38,7 @@ export default function Gallery({
 
   return (
     <div
+      className={className}
       style={{
         gridTemplateAreas:
           images.length > 7 ? galleryStructures[6] : getTemplateArea(images),

@@ -1,10 +1,10 @@
 "use client";
-import { useGetPostFromFollowedUsers } from "@/lib/apiv2";
 import React from "react";
 import PostsGridLayout from "../layout/posts-grid-layout";
 import PostCard from "./post-card";
 import { PostExtended } from "@/types/post";
 import PostCardSkeleton from "./skeleton";
+import { useGetPostFromFollowedUsers } from "@/lib/api/posts/query";
 
 export default function FollowedPosts() {
   const { followedUsersPost, isLoading, isSuccess } =

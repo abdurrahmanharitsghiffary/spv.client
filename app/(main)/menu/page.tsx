@@ -17,7 +17,6 @@ import SendVerifyButton from "@/components/button/send-verify-button";
 import { useRouter } from "next/navigation";
 import { useShowEditProfile } from "@/hooks/use-edit-profile";
 import { useShowChangePasswordModal } from "@/hooks/use-change-password-modal";
-import { useIsSSR } from "@react-aria/ssr";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useShowDeleteAccountModal } from "@/hooks/use-delete-account";
 import { IoLanguage } from "react-icons/io5";

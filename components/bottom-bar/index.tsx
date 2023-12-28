@@ -7,9 +7,7 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { items } from "./bar-items";
 import { useIsSSR } from "@react-aria/ssr";
-// import { useIsMd } from "@/hooks/use-media-query";
-// import { Listbox, ListboxItem } from "@nextui-org/react";
-// import clsx from "clsx";
+
 // fix layout in search bar items
 export default function BottomBar() {
   const pathname = usePathname();

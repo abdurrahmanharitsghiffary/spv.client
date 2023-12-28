@@ -5,6 +5,7 @@ import { Avatar } from "@nextui-org/avatar";
 import React, { useCallback } from "react";
 import IconButton from "../button/icon-button";
 import { FiTrash } from "react-icons/fi";
+import { listboxUserProps } from "./listbox-user-props";
 
 type Props = {
   users: UserGroup[];
@@ -25,21 +26,7 @@ export default function UserGroupLists({ users, onCloseClick }: Props) {
       {(user) => (
         <ListboxItem
           key={user?.id}
-          description={user?.username}
-          classNames={{
-            wrapper: "max-w-[80%] truncate",
-            title: "max-w-full",
-            description: "max-w-full",
-          }}
-          startContent={
-            <div className="flex-shrink-0">
-              <Avatar
-                showFallback
-                src={user?.avatarImage?.src}
-                name={user?.fullName ?? ""}
-              />
-            </div>
-          }
+          {...listboxUserProps(user)}
           endContent={
             <div className="w-[20%] flex flex-col gap-2 items-end">
               <IconButton
@@ -52,9 +39,12 @@ export default function UserGroupLists({ users, onCloseClick }: Props) {
               </IconButton>
             </div>
           }
-        >
-          {user.fullName}
-        </ListboxItem>
+          classNames={{
+            wrapper: "max-w-[80%] truncate",
+            title: "max-w-full",
+            description: "max-w-full",
+          }}
+        />
       )}
     </Listbox>
   );

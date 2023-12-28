@@ -48,10 +48,14 @@ export const userPost = (
 ) => withQuerys(constructUrl([userById(userId), "posts"]), entries(query));
 export const userIsFollowed = (userId: number) =>
   constructUrl([userById(userId.toString()), "followed"]);
-export const userFollowersById = (userId: string) =>
-  constructUrl([userById(userId), "followers"]);
-export const userFollowedUsersById = (userId: string) =>
-  constructUrl([userById(userId), "following"]);
+export const userFollowersById = (
+  userId: string,
+  query?: { limit?: number; offset?: number }
+) => withQuerys(constructUrl([userById(userId), "followers"]), entries(query));
+export const userFollowedUsersById = (
+  userId: string,
+  query?: { limit?: number; offset?: number }
+) => withQuerys(constructUrl([userById(userId), "following"]), entries(query));
 
 // Post routes
 export const basePostRoutes = (query?: { limit?: number; offset?: number }) =>
@@ -72,8 +76,10 @@ export const postCommentsByPostId = (
     constructUrl([postById(postId), "comments"]),
     entries({ ...query, order_by: query?.order_by?.join(",") })
   );
-export const postLikesByPostId = (postId: string) =>
-  constructUrl([postById(postId), "likes"]);
+export const postLikesByPostId = (
+  postId: string,
+  query?: { limit?: number; offset?: number }
+) => withQuerys(constructUrl([postById(postId), "likes"]), entries(query));
 export const postIsLiked = (postId: string) =>
   constructUrl([postById(postId), "liked"]);
 export const postImagesByPostId = (postId: string) =>
@@ -85,8 +91,11 @@ export const postImageByPostAndImageId = (postId: string, imageId: string) =>
 export const baseCommentRoutes = urlBase("/comments");
 export const commentById = (commentId: string) =>
   constructUrl([baseCommentRoutes, commentId]);
-export const commentLikesById = (commentId: string) =>
-  constructUrl([commentById(commentId), "likes"]);
+export const commentLikesById = (
+  commentId: string,
+  query?: { limit?: number; offset?: number }
+) =>
+  withQuerys(constructUrl([commentById(commentId), "likes"]), entries(query));
 
 export const commentIsLiked = (commentId: string) =>
   constructUrl([commentById(commentId), "liked"]);
@@ -115,8 +124,10 @@ export const myChats = (query?: { limit?: number; offset?: number }) =>
 export const followAccount = constructUrl([baseMeRoutes, "follow"]);
 export const followedAccountById = (userId: string) =>
   constructUrl([followAccount, userId]);
-export const myFollowers = constructUrl([baseMeRoutes, "followers"]);
-export const myFollowedUsers = constructUrl([baseMeRoutes, "following"]);
+export const myFollowers = (query?: { limit?: number; offset?: number }) =>
+  withQuerys(constructUrl([baseMeRoutes, "followers"]), entries(query));
+export const myFollowedUsers = (query?: { limit?: number; offset?: number }) =>
+  withQuerys(constructUrl([baseMeRoutes, "following"]), entries(query));
 export const myNotifications = (query?: {
   order_by?: ("latest" | "oldest")[];
   limit?: number;

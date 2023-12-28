@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import clsx from "clsx";
-import { useIsMd } from "@/hooks/use-media-query";
+import { useIsMd, useIsSm } from "@/hooks/use-media-query";
 import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
@@ -62,7 +62,9 @@ export default function MenuLayout({
   isOpen: boolean;
   avatar?: string;
 }) {
-  const isMd = useIsMd();
+  const isSm = useIsSm();
+
+  const BP = isSm;
 
   const [velocity, setVelocity] = useState<number>(0);
   const [offsetHeight, setOffsetHeight] = useState<number>(0);
@@ -79,7 +81,7 @@ export default function MenuLayout({
 
   const refCb = useCallback((node: HTMLDivElement) => {
     if (node) {
-      if (isMd) return setOffsetHeight(node.offsetWidth);
+      if (BP) return setOffsetHeight(node.offsetWidth);
       return setOffsetHeight(node.offsetHeight);
     }
   }, []);
@@ -91,13 +93,13 @@ export default function MenuLayout({
     const dividedOffsetHeight = offsetHeight / 6;
     const dragLimit = offsetHeight - dividedOffsetHeight;
 
-    if (isMd && info.offset.x > dragLimit) {
+    if (BP && info.offset.x > dragLimit) {
       return onClose();
     }
-    if (!isMd && info.offset.y > dragLimit) {
+    if (!BP && info.offset.y > dragLimit) {
       return onClose();
     }
-    if (!isMd) setVelocity(info.velocity.y);
+    if (!BP) setVelocity(info.velocity.y);
   };
 
   if (isLoading && isOpen) return <Progress />;
@@ -108,16 +110,16 @@ export default function MenuLayout({
         {isOpen && (
           <motion.div
             ref={refCb}
-            drag={isMd ? "x" : "y"}
+            drag={BP ? "x" : "y"}
             dragElastic={0}
             dragSnapToOrigin
             dragConstraints={
-              isMd ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
+              BP ? { right: 200, left: 0 } : { top: 0, bottom: 200 }
             }
             onDragEnd={(e, info) => setVelocity(0)}
             key="menu-layout"
             initial={
-              isMd
+              BP
                 ? { x: 200 }
                 : {
                     y: 200,
@@ -125,7 +127,7 @@ export default function MenuLayout({
             }
             onDrag={handleDrag}
             animate={
-              isMd
+              BP
                 ? { x: 0 }
                 : {
                     y: 0,
@@ -137,21 +139,21 @@ export default function MenuLayout({
               ease: "easeIn",
             }}
             exit={
-              isMd
+              BP
                 ? { x: 200 }
                 : {
                     y: 200,
                   }
             }
             className="w-full
-             shadow-large bg-default-50 dark:bg-zinc-950 max-w-lg rounded-t-3xl bottom-0 h-fit fixed md:min-h-[100dvh] md:overflow-y-auto md:hide-scrollbar md:rounded-t-none md:max-w-sm"
+             shadow-large bg-default-50 dark:bg-zinc-950 rounded-t-3xl bottom-0 h-fit fixed sm:min-h-[100dvh] sm:overflow-y-auto sm:hide-scrollbar sm:rounded-t-none sm:max-w-sm"
             style={
-              isMd
+              BP
                 ? { zIndex: 201, insetBlock: 0, right: 0 }
                 : { zIndex: 201, left: "50%", translateX: "-50%" }
             }
           >
-            {isMd ? (
+            {BP ? (
               <div className="w-full justify-start items-center border-b-1 border-divider h-fit p-3">
                 <IconButton onClick={() => onClose()}>
                   <BiChevronRight />

@@ -7,6 +7,8 @@ import { Skeleton } from "@nextui-org/skeleton";
 import ChatParticipant from "../chat/chat-participant";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
+import UserListboxLoading from "../loading/user-listbox-loading";
+import MemberListbox from "./member-listbox";
 
 export default function GroupMembers({ groupId }: { groupId: number }) {
   const {
@@ -28,23 +30,17 @@ export default function GroupMembers({ groupId }: { groupId: number }) {
   return (
     <div className="flex flex-col">
       {isLoading ? (
-        <Skeleton className="h-[12px] rounded-full mx-4 w-[90px]" />
+        <Skeleton className="h-[12px] rounded-full mx-4 w-[90px] mb-2" />
       ) : (
-        <TypographyH4 className="px-4 !text-[1.125rem]">
+        <TypographyH4 className="px-4 !text-base !font-normal pb-2">
           Members ({participants?.pagination?.total_records ?? 0})
         </TypographyH4>
       )}
-      {isLoading
-        ? [1, 2, 3].map((id) => (
-            <UserCardSkeleton
-              key={id}
-              className="shadow-none rounded-none px-0"
-            />
-          ))
-        : isSuccess &&
-          (participants?.data ?? []).map((user) => (
-            <ChatParticipant participant={user} key={user.id} />
-          ))}
+      {isLoading ? (
+        <UserListboxLoading />
+      ) : (
+        isSuccess && <MemberListbox members={participants?.data ?? []} />
+      )}
       {isFetchingNextPage && <Spinner className="my-4" />}
       <div ref={ref}></div>
     </div>

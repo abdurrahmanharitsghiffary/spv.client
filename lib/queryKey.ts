@@ -1,4 +1,4 @@
-import { SearchOptions } from "./apiv2";
+import { SearchOptions } from "@/types";
 
 export const keys = {
   posts: ["posts"] as const,

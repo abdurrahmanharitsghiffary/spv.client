@@ -21,11 +21,11 @@ import { Checkbox } from "@nextui-org/react";
 import clsx from "clsx";
 
 export default function ChatForm() {
+  const { chatId } = useParams();
   const [isChipTruncated, setIsChipTruncated] = useState(true);
   const socket = useSocket();
   const { createMessageAsync } = useCreateMessage();
   const timeRef = useRef<NodeJS.Timeout | undefined>();
-  const { chatId } = useParams();
   const session = useSession();
   const {
     formState: { errors, isSubmitSuccessful },
@@ -89,18 +89,21 @@ export default function ChatForm() {
   }, [socket]);
 
   useEffect(() => {
+    return () => {
+      handleTypingEnd();
+    };
+  }, [handleTypingEnd]);
+
+  useEffect(() => {
     if (text) {
       // handleTypingEnd();
       handleTypingStart();
-      console.time("startTyping");
       timeRef.current = setTimeout(() => {
-        console.timeEnd("startTyping");
         handleTypingEnd();
       }, 4000);
     }
 
     return () => {
-      console.log("TimeOut cleared!");
       clearTimeout(timeRef.current);
     };
   }, [handleTypingEnd, handleTypingStart, text]);
@@ -153,7 +156,7 @@ export default function ChatForm() {
   };
 
   return (
-    <ChatFormLayout>
+    <ChatFormLayout className={chatId && "sm:left-[300px] lg:left-[400px]"}>
       {images.length > 0 && (
         <div className="p-2 border-t-1 flex flex-col gap-2 border-divider">
           <TypographyMuted>
@@ -195,7 +198,6 @@ export default function ChatForm() {
             control={control}
             name="chat"
           />
-
           <Recorder
             isEnded={isSubmitSuccessful}
             radius="md"

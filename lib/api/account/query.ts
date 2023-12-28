@@ -1,7 +1,7 @@
 "use client";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { ApiResponseT } from "@/types/response";
-import { UserAccount } from "@/types/user";
+import { UserAccount, UserSimplified } from "@/types/user";
 import { AxiosRequestConfig } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -71,38 +71,32 @@ export const useGetMyPosts = (
   return { myPosts, ...rest };
 };
 
-export const useGetMyFollowers = (config?: AxiosRequestConfig) => {
-  const request = useAxiosInterceptor();
-
-  const { data: myFollowers, ...rest } = useQuery<
-    ApiResponseT<{ followerIds: number[]; total: number }>
-  >({
-    queryKey: keys.meFollowers(),
-    queryFn: () =>
-      request
-        .get(myFollowersEp, config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+export const useGetMyFollowers = (
+  query: { limit?: number; offset?: number } = { limit: 20, offset: 0 },
+  config?: AxiosRequestConfig
+) => {
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: { limit: query.limit?.toString(), offset: query.offset?.toString() },
+    url: myFollowersEp(query),
+    config,
+    queryKey: [...keys.meFollowers(), query],
   });
 
-  return { myFollowers, ...rest };
+  return { resp, ...rest };
 };
 
-export const useGetMyFollowedUsers = (config?: AxiosRequestConfig) => {
-  const request = useAxiosInterceptor();
-
-  const { data: myFollowedUsers, ...rest } = useQuery<
-    ApiResponseT<{ followedUserIds: number[]; total: number }>
-  >({
-    queryKey: keys.meFollowing(),
-    queryFn: () =>
-      request
-        .get(myFollowedUsersEp, config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+export const useGetMyFollowedUsers = (
+  query: { limit?: number; offset?: number } = { limit: 20, offset: 0 },
+  config?: AxiosRequestConfig
+) => {
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: { limit: query.limit?.toString(), offset: query.offset?.toString() },
+    url: myFollowedUsersEp(query),
+    config,
+    queryKey: [...keys.meFollowing(), query],
   });
 
-  return { myFollowedUsers, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetMyNotifications = (

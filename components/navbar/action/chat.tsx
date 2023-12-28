@@ -7,21 +7,19 @@ import { useSocket } from "@/hooks/use-socket";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { Socket_Event } from "@/lib/socket-event";
 import { useSession } from "@/stores/auth-store";
+import { TypingUser } from "@/types";
 import { Avatar } from "@nextui-org/avatar";
+import { Badge } from "@nextui-org/badge";
 import { Skeleton } from "@nextui-org/skeleton";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { MdGroups } from "react-icons/md";
 
 export default function ChatHeader({ router }: { router: AppRouterInstance }) {
   const { chatId } = useParams();
   const socket = useSocket();
-  const [typingUser, setTypingUser] = useState<{
-    chatId: number;
-    userId: number;
-    fullName: string;
-    username: string;
-  } | null>(null);
+  const [typingUser, setTypingUser] = useState<TypingUser>(null);
   const session = useSession();
   const { chatRoom, isLoading, isSuccess, isError } = useGetChatRoomById(
     Number(chatId)
@@ -31,7 +29,8 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
     setTypingUser(data);
   };
 
-  const onUserTypingEnd = () => {
+  const onUserTypingEnd = (data: any) => {
+    // if (data.chatId === Number(chatId) && data.userId === typingUser?.userId)
     setTypingUser(null);
   };
 
@@ -53,6 +52,15 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
     (participant) => participant.id !== session?.id
   )?.[0];
 
+  const title = isGroupChat
+    ? chatRoomData?.title || `Group chat ${chatRoomData?.id}`
+    : user?.fullName ?? "";
+
+  const isShowTypingAnimation =
+    typingUser &&
+    typingUser.userId !== session?.id &&
+    typingUser.chatId === Number(chatId);
+
   return (
     <div className="flex justify-start items-center">
       <BackButton router={router} />
@@ -72,28 +80,34 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
         ) : (
           isSuccess && (
             <>
-              <Avatar
-                name={
-                  isGroupChat
-                    ? chatRoomData?.title ?? `Group chat`
-                    : user?.fullName ?? ""
-                }
-                src={
-                  isGroupChat
-                    ? chatRoomData?.picture?.src ?? ""
-                    : user?.avatarImage?.src ?? ""
-                }
-              />
+              <Badge
+                color="success"
+                placement="bottom-right"
+                content=""
+                isInvisible={isGroupChat || !user?.isOnline}
+              >
+                <Avatar
+                  showFallback
+                  name={isGroupChat ? undefined : title}
+                  fallback={isGroupChat ? <MdGroups size={22} /> : undefined}
+                  src={
+                    isGroupChat
+                      ? chatRoomData?.picture?.src ?? ""
+                      : user?.avatarImage?.src ?? ""
+                  }
+                />
+              </Badge>
+
               <div className="flex flex-col w-[80%]">
                 <TypographyLarge className="!text-base">
-                  {isGroupChat ? chatRoomData?.title ?? "" : user?.fullName}
+                  {title}
                 </TypographyLarge>
                 {!isGroupChat && (
                   <TypographyMuted className="!text-xs">
                     {user?.username}
                   </TypographyMuted>
                 )}
-                {typingUser !== null && typingUser.userId !== session?.id && (
+                {isShowTypingAnimation && (
                   <TypographyMuted className="!text-xs">
                     {typingUser.fullName} is typing...
                   </TypographyMuted>

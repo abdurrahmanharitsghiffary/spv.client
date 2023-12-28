@@ -25,6 +25,8 @@ import { useShowCommentEditForm } from "@/stores/comment-edit-store";
 import { notifyToast } from "@/lib/toast";
 import { useParams, useRouter } from "next/navigation";
 import { useConfirm } from "@/stores/confirm-store";
+import { MdOutlineInfo } from "react-icons/md";
+import { useCommentLikeModalActions } from "@/stores/comment-likes-modal-store";
 
 export default function CommentMenu() {
   const { commentId } = useParams();
@@ -33,6 +35,7 @@ export default function CommentMenu() {
   const onClose = useHideCommentMenu();
   const isOpen = useCommentMenuIsOpen();
   const showCommentEditForm = useShowCommentEditForm();
+  const { onOpen } = useCommentLikeModalActions();
   const comment = useGetSelectedComment();
   const confirm = useConfirm();
   const { isLiked } = useGetCommentIsLiked(comment?.id ?? -1);
@@ -40,7 +43,10 @@ export default function CommentMenu() {
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
   const isAuthored = (comment?.authorId ?? -1) === (session?.id ?? -2);
+  console.log(comment?.id, "ID");
+  console.log(Number(commentId), "ID");
   const baseItems = [
+    { key: "details", label: "See comment details", icon: <MdOutlineInfo /> },
     {
       key: "like-comment",
       label: isLiked?.data ? "Unlike comment" : "Like comment",
@@ -82,8 +88,12 @@ export default function CommentMenu() {
       if (isLiked?.data)
         return await unlikeCommentAsync({ commentId: comment?.id });
       return await likeCommentAsync({ commentId: comment?.id });
-    } else if (key === "delete-report-comment" && !isAuthored)
+    } else if (key === "delete-report-comment" && !isAuthored) {
       return notifyToast("Cooming soon!");
+    } else if (key === "details") {
+      onOpen(comment?.id ?? Number(commentId));
+      return;
+    }
     if (isAuthored) {
       if (key === "delete-comment" && commentId) {
         return await deleteCommentAsync(

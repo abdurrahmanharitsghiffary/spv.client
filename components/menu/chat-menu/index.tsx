@@ -29,7 +29,7 @@ export default function ChatMenu() {
     (key: React.Key) => {
       switch (key) {
         case "profile": {
-          return router.push(`/profile/${user?.[0]?.id}`);
+          return router.push(`/users/${user?.[0]?.id}`);
         }
         case "group": {
           return router.push(`/group/${chatId}`);

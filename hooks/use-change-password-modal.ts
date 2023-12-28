@@ -1,4 +1,4 @@
-import { DisclosureContext } from "@/context/changepassword-context";
+import { DisclosureContext } from "@/context/change-password-context";
 import { useContext } from "react";
 
 export const useShowChangePasswordModal = () =>

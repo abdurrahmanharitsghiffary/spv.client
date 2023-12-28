@@ -1,6 +1,5 @@
 import ChatForm from "@/components/form/chat-form";
 import ChatEditForm from "@/components/form/chat-form/edit-form";
-import ChatMenu from "@/components/menu/chat-menu";
 import MessageMenu from "@/components/menu/message-menu";
 import MessageDetailsModal from "@/components/modal/message-details-modal";
 import MessageEditFormProvider from "@/context/message-edit-form-context";
@@ -16,7 +15,7 @@ export default function ChatLayout({
     <MessageEditFormProvider>
       <MessageInfoProvider>
         <div
-          className="pt-5 flex flex-col gap-5 px-4 w-full max-w-sm pb-20"
+          className="pt-5 flex flex-col gap-5 px-4 w-full pb-20 sm:pl-[316px] lg:pl-[416px]"
           // style={{
           //   backgroundSize: "100%",
           //   backgroundImage:

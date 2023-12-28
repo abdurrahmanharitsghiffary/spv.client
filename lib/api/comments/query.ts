@@ -14,6 +14,7 @@ import { ApiResponseT } from "@/types/response";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite } from "../hooks";
+import { UserSimplified } from "@/types/user";
 
 export const useGetCommentByPostId = (
   postId: number,
@@ -57,22 +58,19 @@ export const useGetComment = (
 
 export const useGetCommentLikes = (
   commentId: number,
+  query: { limit?: number; offset?: number } = { offset: 0, limit: 20 },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data: commentLikes, ...rest } = useQuery<
-    ApiResponseT<CommentLikeResponse>
-  >({
-    queryKey: keys.commentLikes(commentId),
-    queryFn: () =>
-      request
-        .get(commentLikesById(commentId.toString()), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: { limit: query.limit?.toString(), offset: query.offset?.toString() },
+    url: commentLikesById(commentId.toString(), query),
+    config,
+    queryKey: [...keys.commentLikes(commentId), query],
+    queryConfig: {
+      enabled: commentId > -1,
+    },
   });
-
-  return { commentLikes, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetCommentIsLiked = (

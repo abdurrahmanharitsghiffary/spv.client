@@ -100,8 +100,6 @@ export default function EditGroupModal() {
 
   const handleCloseClick = useCallback(
     (user: UserGroup) => {
-      console.log(user, "User");
-      console.log(selectedUsers, "Sel Users");
       setValue(
         "participants",
         selectedUsers.filter((item: any) => item.id !== user.id)

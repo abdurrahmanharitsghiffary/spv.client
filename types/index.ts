@@ -1,6 +1,7 @@
 import { SVGProps } from "react";
 import { PostExtended } from "./post";
 import { UserAccountPublic } from "./user";
+import { ChatRoom, ChatRoomParticipant } from "./chat";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -114,3 +115,34 @@ export type SearchAllData = {
 export type Gender = "male" | "female" | "not_say" | null;
 
 export type ParticipantsField = { role: "user" | "admin"; id: number };
+
+type URP = {
+  updating: "participants";
+  data: ChatRoomParticipant[];
+};
+
+type URD = {
+  updating: "details";
+  data: ChatRoom;
+};
+
+type URDEL = {
+  updating: "delete-participants";
+  data: number[];
+};
+
+export type UpdateRoom = URP | URD | URDEL;
+
+export type TypingUser = {
+  chatId: number;
+  userId: number;
+  fullName: string;
+  username: string;
+} | null;
+
+export type TypingUserV2 = {
+  chatId: number;
+  userId: number;
+  fullName: string;
+  username: string;
+};

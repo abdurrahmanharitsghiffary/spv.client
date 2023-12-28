@@ -6,14 +6,19 @@ import { TbMessageCirclePlus } from "react-icons/tb";
 import SpeedDial from ".";
 import { useCreateGroupActions } from "@/stores/create-group-store";
 import { useCreateRoomActions } from "@/stores/create-room-store";
+import clsx from "clsx";
 
-export default function CreateRoomSpeedDial() {
+export default function CreateRoomSpeedDial({
+  className,
+}: {
+  className?: string;
+}) {
   const { onOpen: openGroup } = useCreateGroupActions();
   const { onOpen: openRoom } = useCreateRoomActions();
 
   return (
     <SpeedDial
-      className="fixed bottom-16 right-4"
+      className={clsx("fixed bottom-16 right-4", className)}
       onAction={(key) => {
         switch (key) {
           case "group-add": {

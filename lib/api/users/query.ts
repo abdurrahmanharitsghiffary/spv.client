@@ -15,8 +15,8 @@ import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
 import {
   UserAccount,
   UserAccountPublic,
-  UserFollowerResponse,
   UserFollowingResponse,
+  UserSimplified,
 } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
@@ -61,41 +61,38 @@ export const useGetUserById = (userId: number, config?: AxiosRequestConfig) => {
 
 export const useGetUserFollowers = (
   userId: number,
+  query: { offset?: number; limit?: number } = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-  const { data: userFollowersData, ...rest } = useQuery<
-    ApiResponseT<UserFollowerResponse>
-  >({
-    queryKey: keys.userFollowers(userId),
-    queryFn: () =>
-      request
-        .get(userFollowersById(userId.toString()), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: {
+      offset: query?.offset?.toString(),
+      limit: query?.limit?.toString(),
+    },
+    url: userFollowersById(userId.toString(), query),
+    queryKey: [...keys.userFollowers(userId), query],
+    config,
   });
 
-  return { userFollowersData, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetUserFollowedUsers = (
   userId: number,
+  query: { offset?: number; limit?: number } = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data: userFollowedUsersData, ...rest } = useQuery<
-    ApiResponseT<UserFollowingResponse>
-  >({
-    queryKey: keys.userFollowedUsers(userId),
-    queryFn: () =>
-      request
-        .get(userFollowedUsersById(userId.toString()), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+  const { data: resp, ...rest } = useInfinite<UserSimplified>({
+    query: {
+      offset: query?.offset?.toString(),
+      limit: query?.limit?.toString(),
+    },
+    url: userFollowedUsersById(userId.toString(), query),
+    queryKey: [...keys.userFollowedUsers(userId), query],
+    config,
   });
 
-  return { userFollowedUsersData, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetUserIsFollowed = (
@@ -118,7 +115,7 @@ export const useGetUserIsFollowed = (
 };
 
 export const useGetBlockedUsers = (
-  query: { offset?: number; limit?: number } = { limit: 0, offset: 20 },
+  query: { offset?: number; limit?: number } = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
   const { data: blockedUsers, ...rest } = useInfinite<UserAccountPublic>({

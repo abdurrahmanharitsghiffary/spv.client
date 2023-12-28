@@ -9,9 +9,9 @@ import { TypographyH3 } from "@/components/ui/typography";
 import ChatBubble from "@/components/chat/chat-bubble";
 import { useSession } from "@/stores/auth-store";
 import { RiErrorWarningFill } from "react-icons/ri";
-import { Listbox } from "@nextui-org/listbox";
-import ListboxUser from "@/components/user/listbox-user";
-import ListboxUsers from "@/components/user/listbox-user";
+import ListboxUsersRead from "@/components/user/listbox-users-read";
+import UserListboxLoading from "@/components/loading/user-listbox-loading";
+import { Skeleton } from "@nextui-org/react";
 
 export default function MessageDetailsModal() {
   const { isOpen, onClose } = useMessageInfoDisclosure();
@@ -20,80 +20,7 @@ export default function MessageDetailsModal() {
     useGetMessage(messageId);
   const session = useSession();
   const isRecipient = session?.id !== message?.data?.author?.id;
-  const readedBy = [
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date(Date.now()),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-    {
-      firstName: "Lulu",
-      fullName: "Lulu Lala",
-      lastName: "Lala",
-      isOnline: true,
-      id: 999,
-      readedAt: new Date("2014"),
-      username: "Jukiodas",
-      avatarImage: null,
-    },
-  ];
-  console.log(isLoading);
-  console.log(message, "Message");
+  const readedBy = message?.data?.readedBy ?? [];
 
   const isForbidden = isError && (error as any)?.statusCode === 403;
 
@@ -102,10 +29,10 @@ export default function MessageDetailsModal() {
       isOpen={isOpen}
       onClose={onClose}
       wrapperClassNames={{
-        body: "w-full max-w-sm mx-auto hide-scrollbar px-4",
+        body: "w-full max-w-sm mx-auto hide-scrollbar px-4 pt-4",
       }}
     >
-      {isForbidden ? (
+      {isForbidden && (
         <div className="absolute inset-0 flex justify-center items-center flex-col gap-2 max-w-sm left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-center">
           <RiErrorWarningFill className="text-danger" size={30} />
           <TypographyH3 className="!text-lg">
@@ -113,6 +40,12 @@ export default function MessageDetailsModal() {
             the group
           </TypographyH3>
         </div>
+      )}
+      {isLoading ? (
+        <>
+          <Skeleton className="h-4 w-[25%] rounded-full" />
+          <UserListboxLoading />
+        </>
       ) : (
         isSuccess && (
           <>
@@ -121,22 +54,13 @@ export default function MessageDetailsModal() {
               isRecipient={isRecipient}
               isDisableMenu
             />
-            <TypographyH3 className="!text-lg px-2">
+            <TypographyH3 className="!text-base px-2">
               Read by ({readedBy?.length})
             </TypographyH3>
-            <ListboxUsers users={readedBy} />
+            <ListboxUsersRead users={readedBy} />
           </>
         )
       )}
     </ModalLayoutV2>
   );
 }
-// isLoading
-//               ? [1, 2, 3].map((it) => (
-//                   <UserCardSkeleton
-//                     key={it}
-//                     as="li"
-//                     className="shadow-none rounded-none p-0"
-//                   />
-//                 ))
-//               :

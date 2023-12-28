@@ -2,11 +2,14 @@
 
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { useGetBlockedUsers } from "@/lib/api/users/query";
-import React from "react";
+import React, { useMemo } from "react";
 import { Spinner } from "@nextui-org/spinner";
-import UserCardSkeleton from "./user-card-skeleton";
-import BlockedUserCard from "./blocked-user-card";
 import { TypographyH4 } from "../ui/typography";
+import ListboxBlockedUsers from "./listbox-blocked-users";
+import { getUserSimplified } from "@/lib/getUserSimplified";
+import UserListboxLoading from "../loading/user-listbox-loading";
+import { FaBoxOpen } from "react-icons/fa";
+import { GoInbox } from "react-icons/go";
 
 export default function BlockedUsers() {
   const {
@@ -24,24 +27,18 @@ export default function BlockedUsers() {
     isDisabled: isFetchNextNotAvailable,
     isFetching,
   });
+
+  const users = useMemo(
+    () => (blockedUsers?.data ?? []).map((user) => getUserSimplified(user)),
+    [blockedUsers]
+  );
+
   return (
     <>
       {isLoading ? (
-        [1, 2, 3].map((item) => (
-          <UserCardSkeleton className="rounded-none shadow-none" key={item} />
-        ))
-      ) : isSuccess && (blockedUsers?.data ?? []).length > 0 ? (
-        blockedUsers?.data
-          ?.map((user) => ({ ...user, avatarImage: user.profile?.avatarImage }))
-          .map((user) => (
-            <BlockedUserCard
-              user={user}
-              key={user?.id}
-              className="rounded-none shadow-none"
-            />
-          ))
+        <UserListboxLoading />
       ) : (
-        <TypographyH4>No blocked user</TypographyH4>
+        isSuccess && <ListboxBlockedUsers users={users} />
       )}
       {isFetchingNextPage && <Spinner className="my-4" />}
       <div className="w-full" ref={ref}></div>

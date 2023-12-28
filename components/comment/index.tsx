@@ -26,7 +26,7 @@ function Comment({
 
   const style = `${
     level > 0 ? "border-l" : ""
-  } rounded-none dark:border-[#FFFFFF26] border-[rgba(18, 18, 18, 0.15)] shadow-none pl-4 ml-5 w-full ${
+  } rounded-none dark:border-[#FFFFFF26] border-[rgba(18,18,18,0.15)] shadow-none pl-4 ml-5 w-full ${
     className ?? ""
   }`;
 
@@ -47,7 +47,7 @@ function Comment({
         href={`/users/${comment?.user?.id}`}
         name={comment?.user?.username}
         src={comment?.user?.avatarImage?.src}
-        className="absolute"
+        className="absolute z-10"
       />
       {level > 1 && (
         <span className="absolute top-[20px] w-[10%] h-[1px] bg-divider -left-[20px]"></span>

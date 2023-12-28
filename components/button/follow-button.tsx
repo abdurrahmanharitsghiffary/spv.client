@@ -3,7 +3,7 @@ import {
   useFollowAccount,
   useUnfollowAccount,
 } from "@/lib/api/follow/mutation";
-import { useGetUserIsFollowed } from "@/lib/apiv2";
+import { useGetUserIsFollowed } from "@/lib/api/users/query";
 import { useSession } from "@/stores/auth-store";
 import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";

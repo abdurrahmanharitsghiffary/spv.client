@@ -64,7 +64,6 @@ export default function CreateGroupModal() {
   const { onClose } = useCreateGroupActions();
   const watch = useWatch({ control, defaultValue: { participants: [] } });
   const selectedUsers = watch.participants ?? [];
-  console.log(selectedUsers, "Selected Users");
   const handleReset = useCallback(() => {
     reset();
   }, []);
@@ -126,8 +125,6 @@ export default function CreateGroupModal() {
 
   const handleCloseClick = useCallback(
     (user: UserGroup) => {
-      console.log(user, "User");
-      console.log(selectedUsers, "Sel Users");
       setValue(
         "participants",
         selectedUsers.filter((item: any) => item.id !== user.id)

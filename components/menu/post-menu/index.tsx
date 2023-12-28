@@ -30,10 +30,13 @@ import {
 } from "@/lib/api/posts/mutation";
 import { useShowEditPost } from "@/hooks/use-edit-post";
 import { useConfirm } from "@/stores/confirm-store";
+import { MdOutlineInfo } from "react-icons/md";
+import { usePostLikeModalActions } from "@/stores/post-likes-modal-store";
 
 export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
   const onClose = useHidePostMenu();
+  const { onOpen } = usePostLikeModalActions();
   const session = useSession();
   const selectedPost = useGetSelectedPost();
   const { isLiked } = useGetPostIsLiked(selectedPost?.id ?? -1);
@@ -49,6 +52,7 @@ export default function PostMenu() {
   const isAuthored = session?.id === selectedPost?.authorId;
 
   const baseItems: DropdownProps[] = [
+    { key: "details", label: "See post details", icon: <MdOutlineInfo /> },
     {
       key: "like",
       label: isLiked?.data ? "Unlike post" : "Like post",
@@ -92,6 +96,10 @@ export default function PostMenu() {
 
   const handleMenuActions = async (key: React.Key) => {
     switch (key) {
+      case "details": {
+        onOpen(selectedPost?.id ?? -1);
+        return null;
+      }
       case "copy": {
         await navigator.clipboard.writeText(
           postById(selectedPost?.id?.toString() ?? "")

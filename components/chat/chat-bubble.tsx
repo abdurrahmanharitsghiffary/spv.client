@@ -28,10 +28,8 @@ const ChatBubble = forwardRef<
   };
 
   const handleMouseDown = () => {
-    console.time("a");
     resetHold();
     holdTimeRef.current = setTimeout(() => {
-      console.timeEnd("a");
       setIsHolded(true);
     }, 1000);
   };
@@ -47,8 +45,6 @@ const ChatBubble = forwardRef<
     }
   }, [isHolded, chat?.id, isDisableMenu]);
 
-  console.log(isHolded, "Is Holded");
-
   return (
     <div
       ref={ref}
@@ -56,7 +52,7 @@ const ChatBubble = forwardRef<
       style={{ flexDirection: !isRecipient ? "row-reverse" : "row" }}
     >
       {chat?.isGroupChat && (
-        <div className="aspect-square min-w-[24px] min-h-[24px] max-w-[15%]">
+        <div className="aspect-square min-w-[24px] min-h-[24px] max-w-fit max-h-fit">
           <Badge
             isInvisible={!chat?.author?.isOnline}
             color="success"
@@ -102,7 +98,7 @@ const ChatBubble = forwardRef<
             {chat?.message}
           </TypographyP>
           {images && images.length > 0 ? (
-            <Gallery images={images as any} />
+            <Gallery className="max-w-[270px]" images={images as any} />
           ) : null}
         </div>
         <Timestamp

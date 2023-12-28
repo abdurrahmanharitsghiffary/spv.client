@@ -49,7 +49,6 @@ export default function CreatePostForm({
   const images: File[] = useWatch({ control, name: "images" });
   const title = useWatch({ control, name: "title" });
   const content = useWatch({ control, name: "content" });
-  console.log(images, "Images");
   const postsImages: { src: string }[] = useMemo(() => {
     return images.map((image) => ({
       src: URL.createObjectURL(image),
