@@ -4,7 +4,7 @@ import { ButtonProps } from "@nextui-org/button";
 import React from "react";
 import { FiMoreVertical } from "react-icons/fi";
 
-export default function UserMenuTrigger(props: ButtonProps) {
+export default function UserMenuTrigger({ ref, ...props }: ButtonProps) {
   const { onOpen } = useUserMenuActions();
 
   return (

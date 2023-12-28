@@ -7,6 +7,7 @@ import { FiMoreVertical } from "react-icons/fi";
 
 export default function PostMenuTrigger({
   post,
+  ref,
   onClick,
   ...rest
 }: { post: PostId } & ButtonProps) {

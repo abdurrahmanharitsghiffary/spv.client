@@ -9,6 +9,7 @@ import { FiMoreHorizontal } from "react-icons/fi";
 export default function ParticipantMenuTrigger({
   participantId,
   onClick,
+  ref,
   ...rest
 }: { participantId: number } & ButtonProps) {
   const { onOpen } = useParticipantMenuActions();

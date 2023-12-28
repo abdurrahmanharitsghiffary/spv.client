@@ -7,6 +7,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 export default function BackButton({
   router,
   push,
+  ref,
   ...props
 }: {
   push?: string;
