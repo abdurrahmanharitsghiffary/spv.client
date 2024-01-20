@@ -73,7 +73,7 @@ export default function LoginForm() {
             type="button"
             radius="sm"
             as={NextLink}
-            href="http://localhost:5000/api/auth/google"
+            href={(process.env.BASE_API_ROUTE ?? "") + "/api/auth/google"}
             endContent={<FcGoogle size={20} />}
           >
             Sign in with Google
