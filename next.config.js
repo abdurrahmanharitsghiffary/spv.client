@@ -7,8 +7,8 @@ const nextConfig = {
   // productionBrowserSourceMaps: false,
   env: {
     GIPHY_API_KEY: process.env.GIPHY_API_KEY,
-    NEXT_AUTH_SECRET: process.env.NEXT_AUTH_SECRET,
     BASE_WEB_URL: process.env.BASE_WEB_URL,
+    BASE_API_ROUTE: process.env.BASE_API_ROUTE,
   },
 };
 
