@@ -14,9 +14,10 @@ import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
 import { ParticipantRole } from "@/types/chat";
 import { useConfirm } from "@/stores/confirm-store";
 import {
-  useAddGroupParticipantsOptimistic,
-  useRemoveParticipantsOptimistic,
+  useAddGroupParticipants,
+  useRemoveParticipants,
 } from "@/lib/api/chats/mutation";
+import MemberRole from "@/components/group/member-role";
 
 export default function ParticipantMenu() {
   const participantId = useParticipantMenuId();
@@ -26,12 +27,13 @@ export default function ParticipantMenu() {
   const { groupId } = useParams();
   const gId = Number(groupId);
   const session = useSession();
-  const { participant } = useGetChatRoomParticipant(gId, session?.id ?? -1);
+  const { participant, isLoading: isLoadCurrentUser } =
+    useGetChatRoomParticipant(gId, session?.id ?? -1);
   const { participant: selectedParticipant, isLoading } =
     useGetChatRoomParticipant(gId, participantId);
   const confirm = useConfirm();
-  const { removeParticipantsAsync } = useRemoveParticipantsOptimistic();
-  const { addGroupParticipantsAsync } = useAddGroupParticipantsOptimistic();
+  const { removeParticipantsAsync } = useRemoveParticipants();
+  const { addParticipantsAsync } = useAddGroupParticipants();
   const currentUserRole = participant?.data?.role ?? "user";
   const selectedParticipantRole: ParticipantRole =
     selectedParticipant?.data?.role ?? "user";
@@ -42,7 +44,7 @@ export default function ParticipantMenu() {
         router.push(`/users/${participantId}`);
         return;
       }
-      case "delete-z": {
+      case "z-delete": {
         await confirm({
           confirmColor: "danger",
           confirmLabel: "Remove",
@@ -62,9 +64,9 @@ export default function ParticipantMenu() {
       }
       case "grant": {
         if (!selectedParticipant) return;
-        await addGroupParticipantsAsync({
+        await addParticipantsAsync({
           body: {
-            participants: [{ ...selectedParticipant?.data, role: "admin" }],
+            participants: [{ id: selectedParticipant.data.id, role: "admin" }],
           },
           params: {
             roomId: gId,
@@ -75,13 +77,14 @@ export default function ParticipantMenu() {
       case "dismiss-delete": {
         if (!selectedParticipant) return;
         await confirm({
-          body: "Demote this user from admin?",
-          title: "Demote",
-          confirmLabel: "Demote",
+          body: "Dismiss this user from admin?",
+          title: "Dismiss",
+          confirmLabel: "Dismiss",
+          confirmColor: "danger",
         });
-        await addGroupParticipantsAsync({
+        await addParticipantsAsync({
           body: {
-            participants: [{ ...selectedParticipant?.data, role: "user" }],
+            participants: [{ id: selectedParticipant.data.id, role: "user" }],
           },
           params: {
             roomId: gId,
@@ -96,10 +99,7 @@ export default function ParticipantMenu() {
     { key: "profile", label: "See profile", icon: <BiUser /> },
   ];
 
-  const adminItems = [
-    ...menuItems,
-    { key: "delete-z", label: "Remove from group", icon: <BiTrash /> },
-  ];
+  const adminItems = [...menuItems];
 
   const isAdminUpdatingAdmin =
     selectedParticipantRole === "admin" && currentUserRole === "admin";
@@ -118,10 +118,10 @@ export default function ParticipantMenu() {
       icon: <BiUserMinus />,
     });
 
-  adminItems.sort((a, b) => {
-    if (a.key.includes("delete")) return 1;
-    if (b.key.includes("delete")) return -1;
-    return 1;
+  adminItems.push({
+    key: "z-delete",
+    label: "Remove from group",
+    icon: <BiTrash />,
   });
 
   const selectedItems =
@@ -133,10 +133,20 @@ export default function ParticipantMenu() {
 
   return (
     <MenuLayout
-      isLoading={isLoading}
+      isLoading={isLoading || isLoadCurrentUser}
       shouldToastWhenActionError
       avatar={selectedParticipant?.data?.avatarImage?.src ?? ""}
-      title={selectedParticipant?.data?.fullName ?? ""}
+      title={
+        <div className="flex justify-between">
+          <span className="flex-1 pr-2 truncate">
+            {selectedParticipant?.data?.fullName ?? ""}
+          </span>
+          <MemberRole
+            className="flex-shrink-0"
+            role={selectedParticipant?.data?.role ?? "user"}
+          />
+        </div>
+      }
       description={selectedParticipant?.data?.username}
       isOpen={isOpen}
       onClose={onClose}

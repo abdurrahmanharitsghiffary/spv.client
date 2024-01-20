@@ -1,38 +1,36 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { NavbarContent } from "@nextui-org/navbar";
 import React from "react";
-import { navActionItems } from "./items";
-import ChatButton from "@/components/button/chat-button";
+import { getNavItem } from "./utils";
+import { navItems } from "./items";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import clsx from "clsx";
-import { getNavActionItem } from "./utils";
 
-export default function NavActions({
+export default function DesktopAction({
   pathname,
   router,
 }: {
-  pathname: string;
   router: AppRouterInstance;
+  pathname: string;
 }) {
-  const item = getNavActionItem(navActionItems, pathname);
+  const item = getNavItem(navItems, pathname);
+  const items = item?.items(router);
 
-  if (item?.action === null) return null;
+  if (items === null || (items ?? []).length < 1) return null;
+
+  const isSingleItem = (items ?? []).length === 1;
 
   return (
-    <div
-      style={item?.style}
-      className={clsx(
-        "w-full grid px-2 grid-flow-col text-[1.25rem]",
-        item ? "content-between" : "content-end",
-        item?.className ?? ""
-      )}
+    <NavbarContent
+      justify="start"
+      style={{ ...item?.style }}
+      className={clsx("items-center px-2 w-full", item?.className)}
     >
-      {item?.action(router)}
-      {!item && (
-        <ul className="place-self-end flex gap-2 items-center">
-          <li>
-            <ChatButton />
+      {(items ?? []).length > 0 &&
+        (items ?? []).map((item) => (
+          <li className={clsx(isSingleItem && "w-full")} key={item.key}>
+            {item.element}
           </li>
-        </ul>
-      )}
-    </div>
+        ))}
+    </NavbarContent>
   );
 }

@@ -4,7 +4,6 @@ import React from "react";
 import { FiSearch } from "react-icons/fi";
 
 export default function InputSearch({
-  autoFocus,
   startContent,
   type,
   variant,
@@ -15,7 +14,6 @@ export default function InputSearch({
   return (
     <Input
       isClearable
-      autoFocus={autoFocus ?? true}
       startContent={startContent ?? <FiSearch size={18} />}
       classNames={{
         inputWrapper: clsx("h-fit", classNames?.inputWrapper),

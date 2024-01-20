@@ -1,17 +1,23 @@
 import { cssTransition, toast } from "react-toastify";
+
+const Slide = cssTransition({
+  enter: "righttoleft",
+  exit: "tobottom",
+  collapse: false,
+});
+
 const Fade = cssTransition({
   enter: "fadein",
   exit: "fadeout",
   collapse: false,
-  appendPosition: false,
+  collapseDuration: 700,
 });
 export const notifyToast = (content: string) =>
   toast(content, {
-    autoClose: 500,
+    autoClose: 700,
+    containerId: "toast_container",
     hideProgressBar: true,
     closeButton: false,
-    // transition: Fade,
-    // bodyClassName: "p-0 m-0 h-fit w-fit mb-8",
+    transition: Fade,
     position: "bottom-center",
-    // className: "text-xs h-fit w-fit mx-auto min-h-unit-8",
   });

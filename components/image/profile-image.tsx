@@ -10,7 +10,7 @@ export default function ProfileImage({
   isNotOwned?: boolean;
 }) {
   return (
-    <div className="w-32 h-32 rounded-full z-10 absolute top-[25%] md:top-[26%] left-1/2 -translate-x-1/2 ">
+    <div className="w-32 h-32 rounded-full z-10 absolute top-[120px] left-1/2 -translate-x-1/2 md:left-[20%]">
       <AvatarWithPreview
         color="default"
         isBordered

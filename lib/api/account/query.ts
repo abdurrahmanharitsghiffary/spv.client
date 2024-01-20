@@ -1,53 +1,49 @@
 "use client";
-import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { ApiResponseT } from "@/types/response";
 import { UserAccount, UserSimplified } from "@/types/user";
 import { AxiosRequestConfig } from "axios";
-import { useQuery } from "@tanstack/react-query";
 import {
   myAccount as myAccountEp,
   myChats as myChatsEp,
   myFollowedUsers as myFollowedUsersEp,
   myFollowers as myFollowersEp,
   myPosts as myPostsEp,
-  myNotifications as myNotificationsEp,
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
 import { PostExtended } from "@/types/post";
-import { useInfinite } from "../hooks";
+import { useInfinite, useQ } from "../hooks";
 import { ChatRoom } from "@/types/chat";
 
 export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
-  const request = useAxiosInterceptor();
-
-  const { data: myAccountInfo, ...rest } = useQuery<ApiResponseT<UserAccount>>({
+  const { data: resp, ...rest } = useQ<UserAccount>({
+    url: myAccountEp,
+    config,
     queryKey: keys.meAccount(),
-    queryFn: () =>
-      request
-        .get(myAccountEp, config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
   });
 
-  return { myAccountInfo, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetMyAssociatedChatRooms = ({
-  query = { limit: "20", offset: "0" },
+  query = { limit: 20, offset: 0 },
   type = "all",
   q,
   config,
 }: {
   q?: string;
-  query?: Record<string, any>;
+  query?: OffsetPaging;
   type?: "all" | "group" | "personal";
   config?: AxiosRequestConfig;
 }) => {
+  const que = {
+    limit: query.limit?.toString() ?? "20",
+    offset: query.offset?.toString() ?? "0",
+  };
+
   const { data: chatRooms, ...rest } = useInfinite<ChatRoom>({
-    query: { ...query, type, q } as Record<string, any>,
+    query: { ...que, type, q },
     url: myChatsEp(),
-    queryKey: [...keys.meChats(), { ...query, type, q }],
+    queryKey: [...keys.meChats(), { ...que, type, q }],
     config,
   });
 
@@ -97,22 +93,4 @@ export const useGetMyFollowedUsers = (
   });
 
   return { resp, ...rest };
-};
-
-export const useGetMyNotifications = (
-  query?: OffsetPaging & { order_by?: ("latest" | "oldest")[] },
-  config?: AxiosRequestConfig
-) => {
-  const request = useAxiosInterceptor();
-
-  const { data: myNotifications, ...rest } = useQuery({
-    queryKey: [...keys.meNotifications(), query],
-    queryFn: () =>
-      request
-        .get(myNotificationsEp(query), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
-  });
-
-  return { myNotifications, ...rest };
 };

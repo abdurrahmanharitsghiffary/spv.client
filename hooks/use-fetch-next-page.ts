@@ -9,17 +9,18 @@ export default function useFetchNextPageObserver({
   isDisabled,
   fetchNextPage,
   isFetching,
-}: // ref,
-{
+  options,
+}: {
   isDisabled: boolean;
   isFetching: boolean;
   fetchNextPage: (
     options?: FetchNextPageOptions | undefined
   ) => Promise<InfiniteQueryObserverResult<unknown, unknown>>;
-  // ref?: RefObject<HTMLDivElement>;
+  options?: IntersectionObserverInit | undefined;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isObserving, setIsObserving] = useState(false);
+  console.log(isObserving, "isObserving");
   useEffect(() => {
     const element: HTMLDivElement | undefined | null = ref?.current;
     const observer = new IntersectionObserver(
@@ -28,7 +29,7 @@ export default function useFetchNextPageObserver({
           setIsObserving(entry.isIntersecting);
         });
       },
-      { threshold: 0.8 }
+      { threshold: 0.8, ...options }
     );
 
     if (element) observer.observe(element);

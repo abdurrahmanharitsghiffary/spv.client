@@ -15,7 +15,7 @@ export default function ChatLayout({
     <MessageEditFormProvider>
       <MessageInfoProvider>
         <div
-          className="pt-5 flex flex-col gap-5 px-4 w-full pb-20 sm:pl-[316px] lg:pl-[416px]"
+          className="pt-5 flex flex-col gap-5 px-4 w-full pb-4 md:pb-20 sm:pl-[316px] lg:pl-[416px]"
           // style={{
           //   backgroundSize: "100%",
           //   backgroundImage:

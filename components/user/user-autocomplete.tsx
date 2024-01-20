@@ -36,13 +36,13 @@ export default function UserAutocomplete({
     ...rest
   } = inputProps;
   const [filterText, setFilterText] = useState("");
-  const { isLoading, searchResult, isSuccess } = useGetSearchResult({
+  const { isLoading, resp, isSuccess } = useGetSearchResult({
     q: filterText,
     type: "user",
   });
 
   const [selectedKeys, setSelectetedKeys] = useState<any>(undefined);
-  const results = (searchResult?.data ?? []) as UserAccountPublic[];
+  const results = (resp?.data ?? []) as UserAccountPublic[];
   const reset = () => {
     setFilterText("");
     setSelectetedKeys(undefined);
@@ -127,6 +127,7 @@ export default function UserAutocomplete({
           >
             {(item) => (
               <ListboxItem
+                textValue={item?.fullName!}
                 key={item.id}
                 onPress={() => handleListPress(item)}
                 {...listboxUserProps(getUserSimplified(item))}

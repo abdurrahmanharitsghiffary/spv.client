@@ -25,7 +25,7 @@ export const useQ = <T>({
   queryKey?: QueryKey | undefined;
   query?: Record<string, any>;
   url: string;
-  qConfig?: { enabled?: boolean };
+  qConfig?: { enabled?: boolean; keepPreviousData?: boolean };
   config?: AxiosRequestConfig;
 }) => {
   const request = useAxiosInterceptor();
@@ -38,7 +38,7 @@ export const useQ = <T>({
   }
 
   const q = useQuery<ApiResponseT<T>>({
-    queryKey: queryKey,
+    queryKey: query ? [...(queryKey ?? []), query] : queryKey,
     queryFn: () =>
       request
         .get(newUrl.href, config)
@@ -78,30 +78,33 @@ export const useInfinite = <T>({
     data: infiniteData,
     isSuccess,
     hasNextPage,
+    isFetching,
     ...rest
   } = useInfiniteQuery<ApiPagingObjectResponse<T[]>>({
     queryKey: queryKey,
     queryFn: ({ pageParam }) =>
-      pageParam === null
-        ? Promise.resolve(undefined)
-        : request
-            .get(pageParam ? pageParam : reqUrl.href, config)
-            .then((res) => res.data)
-            .catch((err) => Promise.reject(err?.response?.data)),
-    getNextPageParam: (res) => res?.pagination?.next ?? null,
-    getPreviousPageParam: (res) => res?.pagination?.previous ?? null,
+      request
+        .get(pageParam ? pageParam : reqUrl.href, config)
+        .then((res) => res.data)
+        .catch((err) => Promise.reject(err?.response?.data)),
+    getNextPageParam: (res) => res?.pagination?.next ?? undefined,
+    getPreviousPageParam: (res) => res?.pagination?.previous ?? undefined,
     ...queryConfig,
   });
 
   const isFetchNextNotAvailable = !hasNextPage && isSuccess;
-
   const data = useMemo(
-    () => ({
-      ...infiniteData?.pages?.[0],
-      data: infiniteData?.pages
-        ?.map((page) => (page?.data ?? []).filter((data) => data !== undefined))
-        .flat(),
-    }),
+    () =>
+      url.includes("/search")
+        ? { ...infiniteData?.pages?.[0] }
+        : {
+            ...infiniteData?.pages?.[0],
+            data: infiniteData?.pages
+              ?.map((page) =>
+                (page?.data ?? []).filter((data) => data !== undefined)
+              )
+              .flat(),
+          },
     [infiniteData]
   );
 
@@ -110,6 +113,7 @@ export const useInfinite = <T>({
     infiniteData,
     hasNextPage,
     isSuccess,
+    isFetching,
     isFetchNextNotAvailable,
     ...rest,
   };
@@ -122,12 +126,15 @@ export const useMutate = <T, P = {}>({
 }: {
   method: MutationMethod;
   baseUrl: string;
-  invalidateTags?: (v: {
-    body?: T | undefined;
-    formData?: boolean | undefined;
-    params?: Record<string, string | number> | P | undefined;
-    config?: AxiosRequestConfig<any> | undefined;
-  }) => QueryKey[];
+  invalidateTags?: (
+    v: {
+      body?: T | undefined;
+      formData?: boolean | undefined;
+      params?: Record<string, string | number> | P | undefined;
+      config?: AxiosRequestConfig<any> | undefined;
+    },
+    d?: any
+  ) => QueryKey[];
 }) => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
@@ -180,8 +187,8 @@ export const useMutate = <T, P = {}>({
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onSuccess: (d, v) => {
-      if (invalidateTags && invalidateTags(v)?.length > 0) {
-        invalidateTags(v)?.forEach((tag) => {
+      if (invalidateTags && invalidateTags(v, d)?.length > 0) {
+        invalidateTags(v, d)?.forEach((tag) => {
           queryClient.invalidateQueries({ queryKey: tag });
         });
       }
@@ -210,6 +217,7 @@ export const useOptimistic = <T, P = any, TB = any>({
   }) => QueryKey[];
   optimisticUpdater: (v: {
     body?: T;
+    query?: Record<string, string>;
     formData?: boolean;
     params?: Record<string, string | number> | P;
     config?: AxiosRequestConfig;
@@ -229,6 +237,7 @@ export const useOptimistic = <T, P = any, TB = any>({
     ...rest
   } = useMutation({
     mutationFn: (v: {
+      query?: Record<string, string>;
       body?: T;
       formData?: boolean;
       params?: Record<string, string | number>;
@@ -243,9 +252,13 @@ export const useOptimistic = <T, P = any, TB = any>({
         },
       };
 
-      let newUrl = baseUrl;
+      let newUrl = new URL(baseUrl);
       for (let [key, value] of Object.entries(v?.params ?? {})) {
-        newUrl = newUrl.replaceAll(`:${key}`, value.toString());
+        newUrl.href = newUrl.href.replaceAll(`:${key}`, value.toString());
+      }
+
+      for (let [key, value] of Object.entries(v?.query ?? {})) {
+        newUrl.searchParams.set(key, value);
       }
 
       if (v?.formData) {
@@ -253,14 +266,14 @@ export const useOptimistic = <T, P = any, TB = any>({
       }
 
       if (["delete"].includes(method)) {
-        return request[method](newUrl, {
+        return request[method](newUrl.href, {
           ...config,
           data: { ...config.data, ...body },
         })
           .then((res) => res.data)
           .catch((err) => Promise.reject(err?.response?.data));
       }
-      return request[method](newUrl, body, config)
+      return request[method](newUrl.href, body, config)
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data));
     },

@@ -30,6 +30,8 @@ export default function PostPage({ postId }: { postId: string }) {
     isFetching,
   });
 
+  const comments = postComments?.data ?? [];
+
   useNotFoundRedirect(error, isError, postId === "-1" || postId === undefined);
 
   return (
@@ -46,7 +48,7 @@ export default function PostPage({ postId }: { postId: string }) {
         {isCommentLoading
           ? [1, 2, 3].map((item) => <CommentSkeleton key={item} />)
           : isCommentSuccess &&
-            (postComments?.data ?? []).map((comment) => (
+            comments.map((comment) => (
               <Comment comment={comment} key={comment.id} />
             ))}
         {isFetchingNextPage && <Spinner className="my-4" />}

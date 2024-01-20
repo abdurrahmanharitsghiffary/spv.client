@@ -21,22 +21,6 @@ export const useCreateChatRoom = () => {
   return { createChatRoom, createChatRoomAsync, ...rest };
 };
 
-// export const useCreateChatRoomOptimistic = () => {
-//   const {} = useOptimistic<{user:UserSimplified}>({baseUrl:baseChatRoutes, method:"post", optimisticUpdater(v) {
-//     return [{
-//       queryKey:keys.meChats(),
-//       isInfiniteData:true,
-//       updater<OD extends InfiniteData<ApiPagingObjectResponse<ChatRoom[]>>>(oldData:OD):OD {
-//         if(!oldData) return oldData
-//         return {...oldData, pages:oldData.pages.map(page => {
-//           page.
-//         })}
-//       },
-//     }]
-//   },})
-
-// }
-
 export const useCreateGroupChat = () => {
   const {
     mutate: createGroupChat,
@@ -70,11 +54,11 @@ export const useUpdateGroupChat = () => {
   } = useMutate<UpdateGroupOptions, UpdateGroupParams>({
     baseUrl: baseChatRoutes + "/group/:groupId",
     method: "patch",
-    invalidateTags: (v) => [
-      keys.meChats(),
-      keys.participantByRoomId(Number(v.params?.groupId)),
-      keys.chatByRoomId(Number(v.params?.groupId)),
-    ],
+    // invalidateTags: (v) => [
+    //   keys.meChats(),
+    //   keys.participantByRoomId(Number(v.params?.groupId)),
+    //   keys.chatByRoomId(Number(v.params?.groupId)),
+    // ],
   });
   return { updateGroupChat, updateGroupChatAsync, ...rest };
 };
@@ -87,10 +71,10 @@ export const useDeleteGroupChat = () => {
   } = useMutate<undefined, { groupId: number }>({
     baseUrl: baseChatRoutes + "/group/:groupId",
     method: "delete",
-    invalidateTags: (v) => [
-      keys.meChats(),
-      keys.chatByRoomId(Number(v.params?.groupId)),
-    ],
+    // invalidateTags: (v) => [
+    //   keys.meChats(),
+    //   keys.chatByRoomId(Number(v.params?.groupId)),
+    // ],
   });
   return { deleteGroupChat, deleteGroupChatAsync, ...rest };
 };
@@ -113,6 +97,63 @@ export const useJoinGroupChat = () => {
   return { joinGroupChat, joinGroupChatAsync, ...rest };
 };
 
+export const useLeaveGroupChat = () => {
+  const {
+    mutate: leaveGroupChat,
+    mutateAsync: leaveGroupChatAsync,
+    ...rest
+  } = useMutate<undefined, { groupId: number }>({
+    baseUrl: baseChatRoutes + "/group/:groupId/leave",
+    method: "delete",
+    invalidateTags: (v) => [
+      keys.meChats(),
+      keys.participantByRoomId(Number(v.params?.groupId)),
+      keys.chatByRoomId(Number(v.params?.groupId)),
+    ],
+  });
+
+  return { leaveGroupChat, leaveGroupChatAsync, ...rest };
+};
+
+type AddParticipantsOptions = { participants: ParticipantsField[] };
+type AddParticipantsParams = { roomId: string | number };
+export const useAddGroupParticipants = () => {
+  const {
+    mutate: addParticipants,
+    mutateAsync: addParticipantsAsync,
+    ...rest
+  } = useMutate<AddParticipantsOptions, AddParticipantsParams>({
+    baseUrl: baseChatRoutes + "/:roomId/participants",
+    method: "patch",
+    // invalidateTags: (v) => [
+    //   keys.meChats(),
+    //   keys.participantByRoomId(Number(v.params?.roomId)),
+    //   keys.chatByRoomId(Number(v.params?.roomId)),
+    // ],
+  });
+
+  return { addParticipants, addParticipantsAsync, ...rest };
+};
+
+export const useRemoveParticipants = () => {
+  const {
+    mutate: removeParticipants,
+    mutateAsync: removeParticipantsAsync,
+    ...rest
+  } = useMutate<{ ids: number[] }, { roomId: number }>({
+    baseUrl: baseChatRoutes + "/:roomId/participants",
+    method: "delete",
+    // invalidateTags: (v) => [
+    //   keys.meChats(),
+    //   keys.participantByRoomId(Number(v.params?.roomId)),
+    //   keys.chatByRoomId(Number(v.params?.roomId)),
+    // ],
+  });
+
+  return { removeParticipants, removeParticipantsAsync, ...rest };
+};
+
+// NU
 export const useJoinGroupChatOptimistic = () => {
   const {
     optimistic: joinGroup,
@@ -171,24 +212,7 @@ export const useJoinGroupChatOptimistic = () => {
   return { joinGroup, joinGroupAsync, ...rest };
 };
 
-export const useLeaveGroupChat = () => {
-  const {
-    mutate: leaveGroupChat,
-    mutateAsync: leaveGroupChatAsync,
-    ...rest
-  } = useMutate<undefined, { groupId: number }>({
-    baseUrl: baseChatRoutes + "/group/:groupId/leave",
-    method: "delete",
-    invalidateTags: (v) => [
-      keys.meChats(),
-      keys.participantByRoomId(Number(v.params?.groupId)),
-      keys.chatByRoomId(Number(v.params?.groupId)),
-    ],
-  });
-
-  return { leaveGroupChat, leaveGroupChatAsync, ...rest };
-};
-
+// NU
 export const useLeaveGroupChatOptimistic = () => {
   const {
     optimistic: leaveGroup,
@@ -248,47 +272,10 @@ export const useLeaveGroupChatOptimistic = () => {
   return { leaveGroup, leaveGroupAsync, ...rest };
 };
 
-type AddParticipantsOptions = { participants: ParticipantsField[] };
-type AddParticipantsParams = { roomId: string | number };
-export const useAddGroupParticipants = () => {
-  const {
-    mutate: addParticipants,
-    mutateAsync: addParticipantsAsync,
-    ...rest
-  } = useMutate<AddParticipantsOptions, AddParticipantsParams>({
-    baseUrl: baseChatRoutes + "/:roomId/participants",
-    method: "patch",
-    invalidateTags: (v) => [
-      keys.meChats(),
-      keys.participantByRoomId(Number(v.params?.roomId)),
-      keys.chatByRoomId(Number(v.params?.roomId)),
-    ],
-  });
-
-  return { addParticipants, addParticipantsAsync, ...rest };
-};
-
-export const useRemoveParticipants = () => {
-  const {
-    mutate: removeParticipants,
-    mutateAsync: removeParticipantsAsync,
-    ...rest
-  } = useMutate<{ ids: number[] }, { roomId: number }>({
-    baseUrl: baseChatRoutes + "/:roomId/participants",
-    method: "delete",
-    invalidateTags: (v) => [
-      keys.meChats(),
-      keys.participantByRoomId(Number(v.params?.roomId)),
-      keys.chatByRoomId(Number(v.params?.roomId)),
-    ],
-  });
-
-  return { removeParticipants, removeParticipantsAsync, ...rest };
-};
 type InfiniteParticipantsData = InfiniteData<
   ApiPagingObjectResponse<ChatRoomParticipant[]>
 >;
-
+// NU
 export const useAddGroupParticipantsOptimistic = () => {
   const {
     optimistic: addGroupParticipants,
@@ -349,6 +336,7 @@ export const useAddGroupParticipantsOptimistic = () => {
     ...rest,
   };
 };
+// NU
 export const useRemoveParticipantsOptimistic = () => {
   const {
     optimistic: removeParticipants,
@@ -405,7 +393,7 @@ export const useRemoveParticipantsOptimistic = () => {
 
   return { removeParticipants, removeParticipantsAsync, ...rest };
 };
-
+// NU
 export const useUpdateGroupChatOptimistic = () => {
   const {
     optimistic: updateGroupChat,

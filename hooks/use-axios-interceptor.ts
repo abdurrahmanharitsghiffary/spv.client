@@ -50,7 +50,7 @@ export default function useAxiosInterceptor() {
             originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
             return instance(originalRequest);
           } catch (err) {
-            console.error(err);
+            console.error(err, "Interceptors errors");
             router.push("/login");
           }
         }

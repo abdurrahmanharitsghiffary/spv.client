@@ -27,6 +27,7 @@ import {
   TextareaWithControl,
 } from "@/components/input/input-with-control";
 import UserGroupLists from "@/components/user/user-group-lists";
+import { MdGroup } from "react-icons/md";
 
 const createGroupSchema = z.object({
   participants: z
@@ -151,12 +152,10 @@ export default function CreateGroupModal() {
         <div className="w-fit h-fit mx-auto flex flex-col gap-4 justify-center items-center">
           <TypographyLarge>Group picture</TypographyLarge>
           <Avatar
-            fallback={
-              <div className="p-4 w-[60px] h-[60px] aspect-square">
-                <BsCardImage className="w-full h-full aspect-square" />
-              </div>
-            }
+            fallback={<MdGroup size={40} />}
             src={groupPictureSrc}
+            showFallback
+            isBordered
             className="w-[120px] h-[120px] aspect-square"
           />
 

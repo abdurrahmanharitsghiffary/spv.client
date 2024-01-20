@@ -27,12 +27,18 @@ export default function CommentHeader({
 
   return (
     <CardHeader className="pb-0 pt-0 flex justify-between w-full">
-      <NextLink href={`/users/${userId}`} className="flex flex-col">
-        <TypographyP className="font-semibold text-sm !leading-[1.50rem]">
+      <NextLink
+        href={`/users/${userId}`}
+        className="flex flex-col truncate max-w-full"
+      >
+        <TypographyP className="text-sm !leading-[1.50rem] truncate">
           {username}
         </TypographyP>
         <div className="flex gap-1 items-center">
-          <Timestamp date={createdAt} className="text-xs" />
+          <Timestamp
+            date={createdAt}
+            className="text-xs !text-foreground-500 truncate"
+          />
           {/* <TypographyMuted className="!text-xs !text-foreground-800"></TypographyMuted> */}
         </div>
       </NextLink>

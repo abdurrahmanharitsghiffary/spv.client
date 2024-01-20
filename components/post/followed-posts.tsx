@@ -5,19 +5,41 @@ import PostCard from "./post-card";
 import { PostExtended } from "@/types/post";
 import PostCardSkeleton from "./skeleton";
 import { useGetPostFromFollowedUsers } from "@/lib/api/posts/query";
+import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
+import { Spinner } from "@nextui-org/spinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function FollowedPosts() {
-  const { followedUsersPost, isLoading, isSuccess } =
-    useGetPostFromFollowedUsers();
+  const {
+    resp,
+    isLoading,
+    isSuccess,
+    isFetchNextNotAvailable,
+    isFetchingNextPage,
+    isFetching,
+    fetchNextPage,
+  } = useGetPostFromFollowedUsers();
+
+  const data = resp?.data ?? [];
+
+  const { ref } = useFetchNextPageObserver({
+    isDisabled: isFetchNextNotAvailable,
+    isFetching,
+    fetchNextPage,
+  });
 
   return (
-    <PostsGridLayout className="pt-[9px] !pb-12">
-      {isLoading
-        ? [1, 2].map((item) => <PostCardSkeleton key={item} />)
-        : isSuccess &&
-          (followedUsersPost?.data ?? []).map((post: PostExtended) => (
-            <PostCard post={post} key={post.id} />
-          ))}
-    </PostsGridLayout>
+    <>
+      <PostsGridLayout className="pt-[9px]">
+        {isLoading
+          ? [1, 2].map((item) => <PostCardSkeleton key={item} />)
+          : isSuccess &&
+            data.map((post: PostExtended) => (
+              <PostCard post={post} key={post.id} />
+            ))}
+        {isFetchingNextPage && <Spinner className="mx-auto my-4" />}
+      </PostsGridLayout>
+      <div ref={ref}></div>
+    </>
   );
 }

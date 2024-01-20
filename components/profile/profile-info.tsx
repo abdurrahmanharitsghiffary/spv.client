@@ -14,7 +14,7 @@ export default function ProfileInfo({
   followedCount: number;
 }) {
   return (
-    <div className="w-full flex my-8 justify-evenly mx-auto">
+    <div className="w-full flex my-8 justify-evenly mx-auto md:my-4">
       {["Posts", "Followers", "Following"].map((i) => {
         if (i === "Posts") {
           return (

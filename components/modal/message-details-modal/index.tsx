@@ -35,7 +35,7 @@ export default function MessageDetailsModal() {
       {isForbidden && (
         <div className="absolute inset-0 flex justify-center items-center flex-col gap-2 max-w-sm left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-center">
           <RiErrorWarningFill className="text-danger" size={30} />
-          <TypographyH3 className="!text-lg">
+          <TypographyH3 className="!text-base !font-normal">
             Can&apos;t see message information, because you are not member of
             the group
           </TypographyH3>
@@ -54,7 +54,7 @@ export default function MessageDetailsModal() {
               isRecipient={isRecipient}
               isDisableMenu
             />
-            <TypographyH3 className="!text-base px-2">
+            <TypographyH3 className="!text-base !font-normal px-2">
               Read by ({readedBy?.length})
             </TypographyH3>
             <ListboxUsersRead users={readedBy} />

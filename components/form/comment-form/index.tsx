@@ -28,6 +28,7 @@ import CommentFormBody from "./body";
 import Spacer from "./spacer";
 import SendTextarea from "@/components/input/send-textarea";
 import { toast } from "react-toastify";
+import useHistory from "@/hooks/use-history";
 
 export default function CommentForm({
   hideSpacer,
@@ -85,16 +86,20 @@ export default function CommentForm({
     try {
       await (replyId || commentId
         ? createReplyCommentAsync({
-            comment: data.comment,
-            image: data?.image,
-            commentId: replyId ?? Number(commentId),
+            body: {
+              comment: data.comment,
+              image: data?.image,
+              commentId: replyId ?? Number(commentId),
+            },
+            formData: true,
           })
         : createCommentAsync({
-            data: {
+            body: {
               ...data,
               postId: Number(postId),
               parentId: null,
             },
+            formData: true,
           }));
     } catch (err: any) {
       if (err?.message) {
@@ -106,6 +111,20 @@ export default function CommentForm({
   const handleSuccessSpeech = (val: string | undefined | null) => {
     if (val) setValue("comment", val);
   };
+
+  useEffect(() => {
+    const main = document.querySelector("main.container");
+    if (main) {
+      main.classList.remove("pb-14");
+    }
+
+    return () => {
+      if (main) main.classList.add("pb-14");
+    };
+  }, []);
+
+  const history = useHistory();
+  console.log(history, "History");
 
   return (
     <>

@@ -3,29 +3,15 @@
 import { baseMessageRoutes } from "@/lib/endpoints";
 import { useMutate } from "../hooks";
 import { CreateMessageData } from "@/types";
-import { useMutation } from "@tanstack/react-query";
-import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { getFormData } from "@/lib/getFormData";
-import { AxiosRequestConfig } from "axios";
 
 export const useCreateMessage = () => {
-  const req = useAxiosInterceptor();
-
   const {
     mutate: createMessage,
     mutateAsync: createMessageAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: {
-      data: CreateMessageData;
-      config?: AxiosRequestConfig;
-    }) => {
-      const formData = getFormData(v.data);
-      return req
-        .post(baseMessageRoutes, formData)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
+  } = useMutate<CreateMessageData>({
+    method: "post",
+    baseUrl: baseMessageRoutes,
   });
 
   return { createMessage, createMessageAsync, ...rest };

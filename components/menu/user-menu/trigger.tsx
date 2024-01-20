@@ -8,7 +8,7 @@ export default function UserMenuTrigger({ ref, ...props }: ButtonProps) {
   const { onOpen } = useUserMenuActions();
 
   return (
-    <IconButton {...props} onClick={onOpen}>
+    <IconButton {...props} variant="solid" radius="md" onClick={onOpen}>
       <FiMoreVertical />
     </IconButton>
   );

@@ -30,7 +30,12 @@ export default function PostCardSkeleton(props: CardProps) {
           </div>
         </div>
 
-        <Button isIconOnly variant="light" radius="full">
+        <Button
+          isIconOnly
+          variant="light"
+          radius="full"
+          className="text-[1.25rem]"
+        >
           <FiMoreVertical />
         </Button>
       </CardHeader>

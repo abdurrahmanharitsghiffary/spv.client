@@ -21,7 +21,6 @@ function Comment({
   level?: number;
 }) {
   const [isShow, setIsShow] = useState(false);
-  // USE MEMO ??
   const containerRef = useRef<HTMLDivElement>(null);
 
   const style = `${

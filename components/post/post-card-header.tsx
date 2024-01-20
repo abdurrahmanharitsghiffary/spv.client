@@ -3,6 +3,8 @@ import User from "../user/user";
 import PostMenuTrigger from "../menu/post-menu/trigger";
 import { PostExtended, PostId } from "@/types/post";
 import { CardHeader } from "@nextui-org/card";
+import IconButton from "../button/icon-button";
+import { FiMoreVertical } from "react-icons/fi";
 
 export default function PostCardHeader({
   createdAt,
@@ -16,9 +18,15 @@ export default function PostCardHeader({
   postId: PostId;
 }) {
   return (
-    <CardHeader className="justify-between">
+    <CardHeader className="justify-between w-full max-w-full">
       <User createdAt={createdAt} user={author} isPreview={isPreview} />
-      <PostMenuTrigger post={postId} />
+      {isPreview ? (
+        <IconButton>
+          <FiMoreVertical />
+        </IconButton>
+      ) : (
+        <PostMenuTrigger post={postId} />
+      )}
     </CardHeader>
   );
 }

@@ -22,9 +22,10 @@ export default function UserGroupLists({ users, onCloseClick }: Props) {
   );
 
   return (
-    <Listbox items={users} className="px-0">
+    <Listbox items={users} className="px-0" emptyContent="No users selected.">
       {(user) => (
         <ListboxItem
+          textValue={user?.fullName!}
           key={user?.id}
           {...listboxUserProps(user)}
           endContent={

@@ -7,7 +7,7 @@ import { useGetUserIsFollowed } from "@/lib/api/users/query";
 import { useSession } from "@/stores/auth-store";
 import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";
-import React from "react";
+import React, { MouseEvent, MouseEventHandler } from "react";
 
 export default function FollowButton({
   userId,
@@ -18,11 +18,12 @@ export default function FollowButton({
   const { isFollowed } = useGetUserIsFollowed(userId);
   const { followAccount } = useFollowAccount();
   const { unfollowAccount } = useUnfollowAccount();
-  const handleFollow = () => {
+  const handleFollow = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     if (isFollowed?.data) {
-      return unfollowAccount({ userId: userId });
+      return unfollowAccount({ params: { userId: userId } });
     }
-    return followAccount({ userId: userId });
+    return followAccount({ body: { userId: userId } });
   };
 
   if (session?.id === userId) return null;

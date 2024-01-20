@@ -6,7 +6,7 @@ import React from "react";
 
 export default async function HomePage() {
   return (
-    <PostsGridLayout className="pt-[9px] !pb-12">
+    <PostsGridLayout className="pt-[9px]">
       <CreatePostForm isNotPostPage withPreview={false} autoFocus={false} />
       <FollowSuggestion />
       <FollowedPosts />

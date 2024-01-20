@@ -5,8 +5,7 @@ import { useGetPostById, useGetPostLikeByPostId } from "@/lib/api/posts/query";
 import React from "react";
 import ModalLayoutV2 from "../layoutV2";
 import ListboxUsers from "@/components/user/listbox-users";
-import Empty from "@/components/empty";
-import { TypographyH3, TypographyP } from "@/components/ui/typography";
+import { TypographyH3 } from "@/components/ui/typography";
 import UserListboxLoading from "@/components/loading/user-listbox-loading";
 import { Spinner } from "@nextui-org/spinner";
 import {
@@ -14,9 +13,7 @@ import {
   usePostLikeModalActions,
   usePostLikeModalIsOpen,
 } from "@/stores/post-likes-modal-store";
-import moment from "moment";
 import { Divider } from "@nextui-org/divider";
-import { Avatar } from "@nextui-org/avatar";
 import Author from "@/components/author";
 import History from "@/components/history";
 
@@ -61,18 +58,15 @@ export default function PostLikesModal() {
       </div>
       <Divider />
       {totalLikes > 0 && (
-        <TypographyH3 className="!text-base px-4">
-          Total like{totalLikes > 1 && "s"} ({totalLikes})
+        <TypographyH3 className="!text-base !font-normal px-4">
+          Liked by ({totalLikes})
         </TypographyH3>
       )}
       {isLoading ? (
         <UserListboxLoading />
       ) : (
         isSuccess && (
-          <ListboxUsers
-            users={users}
-            emptyContent={<Empty>No user liked this post.</Empty>}
-          />
+          <ListboxUsers users={users} emptyContent="No user liked this post." />
         )
       )}
       <div ref={ref}></div>

@@ -129,7 +129,7 @@ export const myFollowers = (query?: { limit?: number; offset?: number }) =>
 export const myFollowedUsers = (query?: { limit?: number; offset?: number }) =>
   withQuerys(constructUrl([baseMeRoutes, "following"]), entries(query));
 export const myNotifications = (query?: {
-  order_by?: ("latest" | "oldest")[];
+  order_by?: "latest" | "oldest";
   limit?: number;
   offset?: number;
 }) => withQuerys(constructUrl([baseMeRoutes, "notifications"]), entries(query));

@@ -6,6 +6,7 @@ import PostCard from "@/components/post/post-card";
 import PostCardSkeleton from "@/components/post/skeleton";
 import ProfileInfo from "@/components/profile/profile-info";
 import ProfileSkeleton from "@/components/profile/profile-skeleton";
+import TextWithLimit from "@/components/text-with-limit";
 import { TypographyH3, TypographyMuted } from "@/components/ui/typography";
 import UserActionButton from "@/components/user/user-action-button";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
@@ -57,19 +58,24 @@ export default function UserPage({ params }: { params: { userId: string } }) {
           <div className="w-full pt-2 flex flex-col items-center justify-start gap-2 relative">
             <CoverImage
               src={userData?.data?.profile?.coverImage?.src ?? ""}
-              className="mb-20 pt-2"
+              className="pt-2"
             />
             <ProfileImage
               isNotOwned
               src={userData?.data?.profile?.avatarImage?.src ?? ""}
             />
-            <div className="flex flex-col justify-start items-center w-full px-4">
-              <TypographyH3 className="text-center">
-                {userData?.data?.fullName ?? ""}
-              </TypographyH3>
-              <TypographyMuted className="text-center">
-                {userData?.data?.username ?? ""}
-              </TypographyMuted>
+            <div className="flex pt-20 md:pt-16 flex-col justify-start items-center w-full px-4 md:items-start md:px-6 md:pb-2">
+              <div className="flex gap-2 flex-col md:items-start justify-start md:flex-shrink-0 max-w-full break-words">
+                <TypographyH3 className="text-center">
+                  {userData?.data?.fullName ?? ""}
+                </TypographyH3>
+                <TypographyMuted className="text-center md:!text-base">
+                  {userData?.data?.username ?? ""}
+                </TypographyMuted>
+                <TextWithLimit
+                  text={userData?.data?.profile?.description ?? ""}
+                />
+              </div>
 
               <ProfileInfo
                 userId={Number(params.userId)}

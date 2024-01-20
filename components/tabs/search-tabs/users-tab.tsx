@@ -20,5 +20,5 @@ export default function UsersTab({ users }: { users: UserAccountPublic[] }) {
       username: user?.username,
     })) ?? [];
 
-  return <ListboxUsers users={usersData} />;
+  return <ListboxUsers emptyContent="No user found." users={usersData} />;
 }

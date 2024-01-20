@@ -7,7 +7,7 @@ export const listboxUserBaseProps: OmitCommonProps<ListboxItemProps, "key"> = {
   classNames: {
     wrapper: "truncate mr-auto flex-auto",
     title: "max-w-full",
-    description: "max-w-full",
+    description: "max-w-full truncate",
   },
 };
 

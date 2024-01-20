@@ -3,9 +3,9 @@ import {
   FiHome,
   FiSearch,
   FiPlusSquare,
-  FiBell,
   FiMoreHorizontal,
 } from "react-icons/fi";
+import NotificationIcon from "./notification-icon";
 
 export const items: {
   url: string;
@@ -34,8 +34,8 @@ export const items: {
   {
     label: "Notification",
     url: "/notification",
-    icon: <FiBell size={20} />,
-    active: <FiBell stroke="#0070F0" size={20} />,
+    icon: <NotificationIcon />,
+    active: <NotificationIcon isActive />,
   },
   {
     label: "Menu",

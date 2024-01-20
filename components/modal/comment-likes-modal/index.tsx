@@ -6,7 +6,6 @@ import ModalLayoutV2 from "../layoutV2";
 import { TypographyH3 } from "@/components/ui/typography";
 import UserListboxLoading from "@/components/loading/user-listbox-loading";
 import ListboxUsers from "@/components/user/listbox-users";
-import Empty from "@/components/empty";
 import { Spinner } from "@nextui-org/spinner";
 import {
   useCommentLikeModalActions,
@@ -58,8 +57,8 @@ export default function CommentLikesModal() {
       </div>
       <Divider />
       {totalLikes > 0 && (
-        <TypographyH3 className="!text-base px-4">
-          Total like{totalLikes > 1 && "s"} ({totalLikes})
+        <TypographyH3 className="!text-base !font-normal px-4">
+          Liked by ({totalLikes})
         </TypographyH3>
       )}
       {isLoading ? (
@@ -68,7 +67,7 @@ export default function CommentLikesModal() {
         isSuccess && (
           <ListboxUsers
             users={users}
-            emptyContent={<Empty>No user liked this comment.</Empty>}
+            emptyContent="No user liked this comment."
           />
         )
       )}

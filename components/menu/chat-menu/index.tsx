@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useSession } from "@/stores/auth-store";
 import { HiOutlineUserGroup } from "react-icons/hi2";
+import { GoReport } from "react-icons/go";
 
 export default function ChatMenu() {
   const { chatId } = useParams();
@@ -20,6 +21,8 @@ export default function ChatMenu() {
     Number(chatId)
   );
   const session = useSession();
+
+  const isGroupChat = chatRoom?.data?.isGroupChat ?? false;
 
   const user = chatRoom?.data?.participants?.users?.filter(
     (user) => user.id !== session?.id
@@ -52,9 +55,13 @@ export default function ChatMenu() {
     },
   ];
 
-  const menuItems = chatRoom?.data?.isGroupChat
-    ? groupChatItems
-    : personalChatItems;
+  const menuItems = isGroupChat ? groupChatItems : personalChatItems;
+
+  menuItems.push({
+    key: "report-delete",
+    label: `Report ${isGroupChat ? "group" : "user"}`,
+    icon: <GoReport />,
+  });
 
   return (
     <MenuLayout

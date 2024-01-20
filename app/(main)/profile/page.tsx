@@ -3,11 +3,7 @@ import CoverImage from "@/components/image/cover-image";
 import PostsGridLayout from "@/components/layout/posts-grid-layout";
 import PostCard from "@/components/post/post-card";
 import ProfileImage from "@/components/image/profile-image";
-import {
-  TypographyH3,
-  TypographyMuted,
-  TypographyP,
-} from "@/components/ui/typography";
+import { TypographyH3, TypographyMuted } from "@/components/ui/typography";
 import { Divider } from "@nextui-org/divider";
 import React from "react";
 import ProfileInfo from "@/components/profile/profile-info";
@@ -18,9 +14,10 @@ import ProfileSkeleton from "@/components/profile/profile-skeleton";
 import PostCardSkeleton from "@/components/post/skeleton";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
+import TextWithLimit from "@/components/text-with-limit";
 
 export default function ProfilePage() {
-  const { myAccountInfo, isLoading, isSuccess } = useGetMyAccountInfo();
+  const { resp, isLoading, isSuccess } = useGetMyAccountInfo();
   const {
     myPosts,
     isLoading: isPostLoading,
@@ -38,9 +35,9 @@ export default function ProfilePage() {
   });
 
   const userPosts = myPosts?.data ?? [];
-  const followers = myAccountInfo?.data?.followedBy?.total ?? 0;
-  const following = myAccountInfo?.data?.following?.total ?? 0;
-  const totalPost = myAccountInfo?.data?.posts?.total ?? 0;
+  const followers = resp?.data?.followedBy?.total ?? 0;
+  const following = resp?.data?.following?.total ?? 0;
+  const totalPost = resp?.data?.posts?.total ?? 0;
 
   return (
     <>
@@ -49,26 +46,21 @@ export default function ProfilePage() {
       ) : (
         isSuccess && (
           <div className="w-full pt-2 flex flex-col items-center justify-start gap-2 relative">
-            <CoverImage
-              src={myAccountInfo?.data?.profile?.coverImage?.src ?? ""}
-              className="mb-20 pt-2"
-            />
-            <ProfileImage
-              src={myAccountInfo?.data?.profile?.avatarImage?.src ?? ""}
-            />
-            <div className="flex flex-col justify-start items-center w-full px-4">
-              <TypographyH3 className="text-center">
-                {myAccountInfo?.data?.fullName}
-              </TypographyH3>
-              <TypographyMuted className="text-center">
-                {myAccountInfo?.data?.username}
-              </TypographyMuted>
-              <TypographyP>
-                {myAccountInfo?.data?.profile?.description}
-              </TypographyP>
+            <CoverImage src={resp?.data?.profile?.coverImage?.src ?? ""} />
+            <ProfileImage src={resp?.data?.profile?.avatarImage?.src ?? ""} />
+            <div className="flex pt-20 md:pt-16 flex-col justify-start items-center w-full px-4 md:items-start md:px-6 md:pb-2">
+              <div className="flex gap-2 flex-col md:items-start justify-start md:flex-shrink-0 max-w-full">
+                <TypographyH3 className="text-center">
+                  {resp?.data?.fullName}
+                </TypographyH3>
+                <TypographyMuted className="text-center">
+                  {resp?.data?.username}
+                </TypographyMuted>
+                <TextWithLimit text={resp?.data?.profile?.description ?? ""} />
+              </div>
 
               <ProfileInfo
-                userId={myAccountInfo?.data?.id ?? -1}
+                userId={resp?.data?.id ?? -1}
                 followedCount={following}
                 followersCount={followers}
                 postCount={totalPost}

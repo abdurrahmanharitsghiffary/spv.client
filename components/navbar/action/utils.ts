@@ -1,4 +1,4 @@
-import { NavItemsAction } from "./items";
+import { NavItem } from "./items";
 
 const extractParams = (itemPaths: string[], currPaths: string[]) => {
   const allParamsIndex: number[] = [];
@@ -13,26 +13,23 @@ const extractParams = (itemPaths: string[], currPaths: string[]) => {
     });
 };
 
-export const getNavActionItem = (
-  navActionItems: NavItemsAction[],
-  pathname: string
-) => {
+export const getNavItem = (navActionItems: NavItem[], pathname: string) => {
   const item = navActionItems.find((item) => {
     const paths = pathname.split("/").filter((path) => path !== "");
 
-    if ((item.keys?.length ?? 0) > 0) {
-      return item.keys?.some((item) => {
-        const itemPath = item.split("/").filter((path) => path !== "");
-        extractParams(itemPath, paths);
-        return itemPath.join("/") === paths.join("/");
-      });
-    }
+    // if ((item.keys?.length ?? 0) > 0) {
+    return item.keys?.some((item) => {
+      const itemPath = item.split("/").filter((path) => path !== "");
+      extractParams(itemPath, paths);
+      return itemPath.join("/") === paths.join("/");
+    });
+    // }
 
-    const itemPath = item.key.split("/").filter((path) => path !== "");
+    // const itemPath = item.key.split("/").filter((path) => path !== "");
 
-    extractParams(itemPath, paths);
+    // extractParams(itemPath, paths);
 
-    return paths.join("/") === itemPath.join("/");
+    // return paths.join("/") === itemPath.join("/");
   });
 
   return item;

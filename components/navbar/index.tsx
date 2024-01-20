@@ -4,6 +4,7 @@ import { Navbar as NavbarTemplate } from "@nextui-org/navbar";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
 import clsx from "clsx";
+import NavEndContent from "./end-content";
 
 const navItem: string[] = [];
 // ["Home", "Login", "SignUp"];
@@ -48,7 +49,13 @@ export default function Navbar() {
       isMenuOpen={showMenu}
       onMenuOpenChange={setShowMenu}
     >
-      <NavActions router={router} pathname={pathname} />
+      {/* <NavbarBrand
+        className={clsx("hidden md:flex px-4 gap-1", chatId && "!hidden")}
+      >
+        <span className="text-lg font-semibold">AstroVerse</span>
+      </NavbarBrand> */}
+      <NavActions pathname={pathname} router={router} />
+      <NavEndContent pathname={pathname} router={router} />
       {/* <NavbarContent className="hidden sm:flex">
         {navItem.map((item) => (
           <NavbarItem

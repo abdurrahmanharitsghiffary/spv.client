@@ -2,15 +2,7 @@
 
 import { ApiPagingObjectResponse } from "@/types/response";
 import { InfiniteData } from "@tanstack/react-query";
-
-export const flatInfiniteData = <T>(
-  infiniteData: InfiniteData<ApiPagingObjectResponse<T[]>>
-): T[] => {
-  return infiniteData.pages
-    .filter((p) => p !== undefined)
-    .map((item) => item.data)
-    .flat();
-};
+import { produce } from "immer";
 
 type InfinitePagingData<T> =
   | InfiniteData<ApiPagingObjectResponse<T[]>>
@@ -18,7 +10,8 @@ type InfinitePagingData<T> =
 
 export const prependPagingData = <T = unknown>(
   oldData: InfinitePagingData<T>,
-  newData: unknown
+  newData: unknown,
+  isRemoveOldest: boolean = false
 ): InfinitePagingData<T> => {
   if (!oldData) return oldData;
   const pages = (oldData?.pages ?? []).filter((page) => page !== undefined);
@@ -36,7 +29,7 @@ export const prependPagingData = <T = unknown>(
         },
       };
     }
-    if (i === pages.length - 1) {
+    if (i === pages.length - 1 && isRemoveOldest) {
       const slicedData = page.data.slice(0, -1);
       return {
         ...page,
@@ -59,7 +52,8 @@ export const prependPagingData = <T = unknown>(
 
 export const appendPagingData = <T = unknown>(
   oldData: InfinitePagingData<T>,
-  newData: unknown
+  newData: unknown,
+  isRemoveOldest?: boolean
 ): InfinitePagingData<T> => {
   if (!oldData) return oldData;
   const pages = (oldData?.pages ?? []).filter((page) => page !== undefined);
@@ -77,7 +71,7 @@ export const appendPagingData = <T = unknown>(
         },
       };
     }
-    if (i === 0) {
+    if (i === 0 && isRemoveOldest) {
       const slicedData = page.data.slice(1);
       return {
         ...page,
@@ -143,3 +137,45 @@ export const deletePagingData = <T = unknown>(
     }),
   };
 };
+
+export class Immer {
+  static updatePagingData<T>(
+    oldData: InfinitePagingData<T>,
+    newData: T,
+    dataKey: keyof T
+  ): InfinitePagingData<T> {
+    return produce(oldData, (draft) => {
+      if (draft?.pages) {
+        draft.pages.forEach((p, pi) => {
+          p.data.forEach((d, di) => {
+            if ((d as any)[dataKey] === newData[dataKey]) {
+              draft.pages[pi].data[di] = newData as any;
+            }
+          });
+        });
+      }
+    });
+  }
+
+  static deletePagingData<T>(
+    oldData: InfinitePagingData<T>,
+    dataId: number,
+    idKey: keyof T
+  ): InfinitePagingData<T> {
+    return produce(oldData, (draft) => {
+      if (draft?.pages) {
+        draft.pages.forEach((p, pi) => {
+          p.data.forEach((d) => {
+            if ((d as any)[idKey] === dataId) {
+              draft.pages[pi].data = p.data.filter(
+                (t) => (t as any)[idKey] !== dataId
+              );
+              draft.pages[pi].pagination.result_count -= 1;
+              draft.pages[pi].pagination.total_records -= 1;
+            }
+          });
+        });
+      }
+    });
+  }
+}

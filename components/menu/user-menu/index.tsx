@@ -26,18 +26,20 @@ export default function UserMenu() {
   const params = useParams();
   const { followAccountAsync } = useFollowAccount();
   const { unfollowAccountAsync } = useUnfollowAccount();
-  const { isFollowed } = useGetUserIsFollowed(Number(params.userId ?? -1));
+  const { isFollowed, isLoading: isLoadIsFollowed } = useGetUserIsFollowed(
+    Number(params.userId ?? -1)
+  );
   const { blockUserAsync } = useBlockUser();
 
   const handleMenuActions = async (key: React.Key) => {
     if (key === "follow") {
       if (isFollowed?.data) {
         return await unfollowAccountAsync({
-          userId: Number(params.userId ?? -1),
+          params: { userId: Number(params.userId ?? -1) },
         });
       }
       return await followAccountAsync({
-        userId: Number(params.userId ?? -1),
+        body: { userId: Number(params.userId ?? -1) },
       });
     } else if (key === "message") {
       router.push(`/chats/${params.userId ?? -1}`);
@@ -48,40 +50,43 @@ export default function UserMenu() {
         confirmLabel: "Block",
         confirmColor: "danger",
       });
-      await blockUserAsync({ userId: Number(params.userId ?? -1) });
+      await blockUserAsync({ body: { userId: Number(params.userId ?? -1) } });
     }
   };
+
+  const items = [
+    {
+      key: "follow",
+      label: isFollowed?.data ? "Unfollow user" : "Follow user",
+      icon: isFollowed?.data ? (
+        <AiFillHeart className="text-danger" />
+      ) : (
+        <AiOutlineHeart />
+      ),
+    },
+    {
+      key: "message",
+      label: "Message user",
+      icon: <BsChat />,
+    },
+    {
+      key: "report-delete",
+      label: "Report user",
+      icon: <GoReport />,
+    },
+    {
+      key: "block-delete",
+      label: "Block user",
+      icon: <BiBlock />,
+    },
+  ];
 
   return (
     <MenuLayout
       isOpen={isOpen}
+      isLoading={isLoadIsFollowed}
       onClose={onClose}
-      items={[
-        {
-          key: "follow",
-          label: isFollowed?.data ? "Unfollow user" : "Follow user",
-          icon: isFollowed?.data ? (
-            <AiFillHeart className="text-danger" />
-          ) : (
-            <AiOutlineHeart />
-          ),
-        },
-        {
-          key: "message",
-          label: "Message user",
-          icon: <BsChat />,
-        },
-        {
-          key: "block-delete",
-          label: "Block user",
-          icon: <BiBlock />,
-        },
-        {
-          key: "report-delete",
-          label: "Report user",
-          icon: <GoReport />,
-        },
-      ]}
+      items={items}
       onAction={handleMenuActions}
     />
   );

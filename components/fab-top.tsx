@@ -13,7 +13,7 @@ export default function FabTop({ className, radius, color }: ButtonProps) {
   );
 
   return (
-    <div className={clsx("w-full", y > 200 ? "p-6" : "p-0")}>
+    <div className={clsx("w-full", y > 200 ? "p-6 sm:p-0" : "p-0")}>
       <Button
         onClick={() => {
           if (typeof window !== "undefined") window.scroll(0, 0);

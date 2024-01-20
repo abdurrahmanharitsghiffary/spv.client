@@ -9,7 +9,7 @@ export default function GroupLayout({
 }) {
   return (
     <>
-      <div className="w-full pt-12 pb-20 flex flex-col gap-4">{children}</div>
+      <div className="w-full pt-12 flex flex-col gap-4">{children}</div>
       <EditGroupModal />
       <ParticipantMenu />
     </>

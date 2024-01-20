@@ -9,7 +9,7 @@ export default function CommentIdLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="w-full shadow-none mx-0 max-w-lg pt-5 absolute top-0 rounded-none min-h-[100dvh]">
+    <Card className="w-full shadow-none mx-0 max-w-lg pt-3 absolute top-0 rounded-none min-h-[100dvh]">
       <CardBody className="p-0 m-0 relative w-full">{children}</CardBody>
       <CommentForm />
       <CommentEditForm />

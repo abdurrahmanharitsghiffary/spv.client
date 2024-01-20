@@ -7,8 +7,6 @@ import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import ListboxUsers from "../user/listbox-users";
 import UserListboxLoading from "../loading/user-listbox-loading";
 import { Spinner } from "@nextui-org/spinner";
-import { Skeleton } from "@nextui-org/skeleton";
-import Empty from "../empty";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 
 export default function FollowingPage() {
@@ -35,24 +33,14 @@ export default function FollowingPage() {
   const users = resp?.data ?? [];
   return (
     <div className="flex flex-col gap-2 w-full max-w-sm pt-6">
+      <TypographyH3 className="px-3 !text-base">
+        {total} {total < 2 ? " followed user" : " followed users"}
+      </TypographyH3>
       {isLoading ? (
-        <>
-          <Skeleton className="h-3 rounded-full w-[5rem] mx-4" />
-          <UserListboxLoading />
-        </>
+        <UserListboxLoading />
       ) : (
         isSuccess && (
-          <>
-            {total > 0 && (
-              <TypographyH3 className="px-3 !text-base">
-                {total} {total < 2 ? " followed user" : " followed users"}
-              </TypographyH3>
-            )}
-            <ListboxUsers
-              emptyContent={<Empty>No followed user.</Empty>}
-              users={users}
-            />
-          </>
+          <ListboxUsers emptyContent="No followed user." users={users} />
         )
       )}
       <div id="next_fllwing_ftchr" ref={ref}></div>

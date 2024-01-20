@@ -1,6 +1,5 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   commentById,
   commentIsLiked,
@@ -8,12 +7,10 @@ import {
   postCommentsByPostId,
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
-import { OffsetPagingwithOrder } from "@/types";
-import { Comment, CommentLikeResponse } from "@/types/comment";
-import { ApiResponseT } from "@/types/response";
-import { useQuery } from "@tanstack/react-query";
+import { OffsetPaging, OffsetPagingwithOrder } from "@/types";
+import { Comment } from "@/types/comment";
 import { AxiosRequestConfig } from "axios";
-import { useInfinite } from "../hooks";
+import { useInfinite, useQ } from "../hooks";
 import { UserSimplified } from "@/types/user";
 
 export const useGetCommentByPostId = (
@@ -42,30 +39,33 @@ export const useGetComment = (
   commentId: number,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data: comment, ...rest } = useQuery<ApiResponseT<Comment>>({
+  const { data: comment, ...rest } = useQ<Comment>({
+    url: commentById(commentId.toString()),
+    config,
     queryKey: keys.commentById(commentId),
-    queryFn: () =>
-      request
-        .get(commentById(commentId.toString()), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
-    enabled: commentId !== -1 && commentId !== undefined,
+    qConfig: {
+      enabled: commentId !== -1 && commentId !== undefined,
+    },
   });
+
   return { comment, ...rest };
 };
 
 export const useGetCommentLikes = (
   commentId: number,
-  query: { limit?: number; offset?: number } = { offset: 0, limit: 20 },
+  query: OffsetPaging = { offset: 0, limit: 20 },
   config?: AxiosRequestConfig
 ) => {
+  const q = {
+    limit: query.limit?.toString() ?? "20",
+    offset: query.offset?.toString() ?? "0",
+  };
+
   const { data: resp, ...rest } = useInfinite<UserSimplified>({
-    query: { limit: query.limit?.toString(), offset: query.offset?.toString() },
+    query: q,
     url: commentLikesById(commentId.toString(), query),
     config,
-    queryKey: [...keys.commentLikes(commentId), query],
+    queryKey: [...keys.commentLikes(commentId), q],
     queryConfig: {
       enabled: commentId > -1,
     },
@@ -77,16 +77,11 @@ export const useGetCommentIsLiked = (
   commentId: number | undefined,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
-
-  const { data: isLiked, ...rest } = useQuery<ApiResponseT<boolean>>({
+  const { data: isLiked, ...rest } = useQ<boolean>({
+    url: commentIsLiked((commentId ?? -1).toString()),
     queryKey: keys.commentIsLiked(commentId ?? -1),
-    queryFn: () =>
-      request
-        .get(commentIsLiked((commentId ?? -1).toString()), config)
-        .then((res) => res.data)
-        .catch((err) => err?.response?.data),
-    enabled: commentId !== -1 && commentId !== undefined,
+    config,
+    qConfig: { enabled: commentId !== -1 && commentId !== undefined },
   });
 
   return { isLiked, ...rest };

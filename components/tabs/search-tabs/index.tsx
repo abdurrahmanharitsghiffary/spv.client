@@ -1,46 +1,90 @@
 "use client";
 import { Tab, Tabs } from "@nextui-org/tabs";
-import React, { useState } from "react";
+import React, { Suspense } from "react";
 import TabLayout from "../../layout/tab-layout";
-import { TypographyH3 } from "../../ui/typography";
 import UsersTab, { UserTabLoading } from "./users-tab";
 import PostsTab, { PostTabLoading } from "./posts-tab";
 import { useGetSearchResult } from "@/lib/api/search";
-import InputSearch from "@/components/input/search";
 import { Key, SearchAllData } from "@/types";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { PostExtended } from "@/types/post";
+import { UserAccountPublic } from "@/types/user";
+import Search from "@/components/search";
 
 type SearchType = "post" | "user" | "all";
 
 export default function SearchTabs() {
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState<Key>("all");
-  const { searchResult, isLoading, isSuccess } = useGetSearchResult({
-    q: searchInput,
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q") ?? "";
+  const type = (searchParams.get("type") as SearchType) ?? "all";
+  console.log(type, "Type");
+  const { resp, isLoading, isSuccess } = useGetSearchResult({
+    q,
     limit: 10,
-    type: selectedTab as SearchType,
+    type,
   });
-  const handleChange = (key: Key) => {
-    setSelectedTab(key);
+
+  const getUrl = (query?: Record<string, string>) => {
+    const url = new URL(pathname, "http://localhost:3000");
+    searchParams.forEach((v, k, p) => {
+      url.searchParams.set(k, v);
+    });
+    for (let [k, v] of Object.entries(query ?? {})) {
+      url.searchParams.set(k, v);
+    }
+    console.log(url.href.split(":3000")[1], "URL");
+    return url.href.split(":3000")[1];
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
+  const handleSelectionChange = (key: Key) => {
+    router.push(getUrl({ type: key as string }));
   };
+
+  const data = resp?.data ?? [];
+
+  const loader =
+    type === "all" ? (
+      <>
+        <PostTabLoading />
+        <UserTabLoading />
+      </>
+    ) : type === "post" ? (
+      <PostTabLoading />
+    ) : (
+      <UserTabLoading />
+    );
+
+  const tabContent =
+    type === "all" ? (
+      <>
+        <PostsTab
+          posts={(data as unknown as SearchAllData).posts?.data ?? []}
+        />
+        <UsersTab
+          users={(data as unknown as SearchAllData)?.users?.data ?? []}
+        />
+      </>
+    ) : type === "post" ? (
+      <PostsTab posts={data as PostExtended[]} />
+    ) : (
+      <UsersTab users={data as UserAccountPublic[]} />
+    );
 
   return (
     <>
-      <div className="fixed top-[13px] right-3 z-[41] left-3">
-        <InputSearch
-          onClear={() => setSearchInput("")}
-          radius="full"
-          value={searchInput}
-          onChange={handleInputChange}
-        />
-      </div>
+      {/* <div className="fixed top-[13px] md:static right-3 z-[41] left-3">
+        <Search />
+      </div> */}
+      <Suspense>
+        <Search className="my-2 max-w-[280px] px-2 hidden md:block" />
+      </Suspense>
       <Tabs
-        selectedKey={selectedTab}
-        onSelectionChange={handleChange}
-        className="fixed inset-x-0 z-[40] bg-background border-b-1 border-divider pt-0 px-2 pb-0 top-[60px]"
+        onSelectionChange={handleSelectionChange}
+        selectedKey={type}
+        aria-label="Search..."
+        className="fixed inset-x-0 z-[40] bg-background border-b-1 border-divider pt-0 px-2 pb-0 top-[60px] md:pb-auto md:static md:pb-2 md:mb-2 md:w-full md:px-0"
         classNames={{
           tabContent: "px-1",
           tab: "w-[54px]",
@@ -49,68 +93,11 @@ export default function SearchTabs() {
         variant="underlined"
         color="primary"
       >
-        <Tab key="all" title="All" className="px-0">
-          <TabLayout>
-            {isLoading ? (
-              <>
-                <PostTabLoading />
-                <TypographyH3 className="px-4 text-[1.25rem]">
-                  Users
-                </TypographyH3>
-                <UserTabLoading />
-              </>
-            ) : (
-              isSuccess &&
-              selectedTab === "all" && (
-                <>
-                  <PostsTab
-                    posts={
-                      (searchResult?.data as SearchAllData).posts?.data ?? []
-                    }
-                  />
-                  {((searchResult?.data as SearchAllData)?.users?.data ?? [])
-                    ?.length > 0 && (
-                    <TypographyH3 className="px-4 text-[1.25rem]">
-                      Users
-                    </TypographyH3>
-                  )}
-                  <UsersTab
-                    users={
-                      (searchResult?.data as SearchAllData)?.users?.data ?? []
-                    }
-                  />
-                </>
-              )
-            )}
-          </TabLayout>
-        </Tab>
-        <Tab key="post" title="Posts" className="px-0">
-          <TabLayout>
-            {isLoading ? (
-              <PostTabLoading />
-            ) : (
-              isSuccess &&
-              selectedTab === "post" && (
-                // @ts-ignore
-                <PostsTab posts={searchResult?.data ?? []} />
-              )
-            )}
-          </TabLayout>
-        </Tab>
-        <Tab key="user" title="Users" className="px-0">
-          <TabLayout>
-            {isLoading ? (
-              <UserTabLoading />
-            ) : (
-              isSuccess &&
-              selectedTab === "user" && (
-                // @ts-ignore
-                <UsersTab users={searchResult?.data ?? []} />
-              )
-            )}
-          </TabLayout>
-        </Tab>
+        <Tab key="all" title="All"></Tab>
+        <Tab key="user" title="Users"></Tab>
+        <Tab key="post" title="Posts"></Tab>
       </Tabs>
+      <TabLayout>{isLoading ? loader : isSuccess && tabContent}</TabLayout>
     </>
   );
 }

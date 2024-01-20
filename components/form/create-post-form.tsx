@@ -14,12 +14,13 @@ import { PostExtended } from "@/types/post";
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
-import FileButton from "../input/file-btn";
+import ImageFileButton from "../input/image-file-button";
 import {
   InputWithControl,
   TextareaWithControl,
 } from "../input/input-with-control";
 import { Checkbox } from "@nextui-org/checkbox";
+import { useConfirm } from "@/stores/confirm-store";
 
 export default function CreatePostForm({
   withPreview = true,
@@ -32,6 +33,7 @@ export default function CreatePostForm({
   isNotPostPage?: boolean;
   className?: string;
 }) {
+  const confirm = useConfirm();
   const [isChipTruncated, setIsChipTruncated] = useState(true);
   const [isShowPreview, setIsShowPreview] = useState(true);
   const { createPostAsync } = useCreatePost();
@@ -56,7 +58,7 @@ export default function CreatePostForm({
   }, [images]);
 
   const onSubmit: SubmitHandler<CreatePostValidationSchema> = (data) =>
-    toast.promise(createPostAsync({ data }), {
+    toast.promise(createPostAsync({ body: data, formData: true }), {
       success: {
         render({ data }) {
           return "Post successfully created";
@@ -105,6 +107,16 @@ export default function CreatePostForm({
     [images]
   );
 
+  const handleCancel = async () => {
+    await confirm({
+      body: "Are you sure discard this post?",
+      title: "Discard",
+      confirmColor: "danger",
+      confirmLabel: "Discard",
+    });
+    reset();
+  };
+
   return (
     <>
       <form
@@ -145,7 +157,7 @@ export default function CreatePostForm({
                 control={control}
                 name="images"
                 render={({ field: { onChange } }) => (
-                  <FileButton
+                  <ImageFileButton
                     color="secondary"
                     inputProps={{ id: "file_input" }}
                     radius="full"
@@ -190,7 +202,7 @@ export default function CreatePostForm({
         )}
         <div className="flex gap-2 items-center w-full justify-end">
           {(title || (images?.length ?? 0) > 0 || content) && (
-            <Button type="button" color="default" onClick={() => reset()}>
+            <Button type="button" color="default" onClick={handleCancel}>
               Cancel
             </Button>
           )}
@@ -209,7 +221,7 @@ export default function CreatePostForm({
         </Checkbox>
       )}
       {isShowPreview && withPreview && (
-        <div className="w-full flex flex-col gap-2 pb-16">
+        <div className="w-full flex flex-col gap-2">
           <TypographyH4 className="px-4 !text-base">Preview</TypographyH4>
           <PostCard
             shadow="none"
@@ -237,7 +249,7 @@ export default function CreatePostForm({
                   name="images"
                   render={({ field: { onChange } }) => (
                     <>
-                    <FileButton color="secondary" inputProps={{id:"file_input"}} radius="full" variant="light" inputClassName="opacity-0 z-[10] absolute inset-0" onChange={(e) => {
+                    <ImageFileButton color="secondary" inputProps={{id:"file_input"}} radius="full" variant="light" inputClassName="opacity-0 z-[10] absolute inset-0" onChange={(e) => {
                         onChange(Array.from(e?.target?.files ?? []));
                       }} multiple={true}/>
                      <input

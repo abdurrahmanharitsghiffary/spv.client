@@ -14,7 +14,6 @@ import React, {
 } from "react";
 import ChatBubble from "../chat/chat-bubble";
 import { useSession } from "@/stores/auth-store";
-import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { useGetMessagesByRoomId } from "@/lib/api/messages/query";
 import { Chat, UserChatRead } from "@/types/chat";
 import { ApiPagingObjectResponse } from "@/types/response";
@@ -25,12 +24,12 @@ import { BiChevronDown } from "react-icons/bi";
 import { useObserver } from "@/hooks/use-observer";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
-import {
-  deletePagingData,
-  prependPagingData,
-  updatePagingData,
-} from "@/lib/api/utils";
 import { TypingUser, TypingUserV2 } from "@/types";
+import { PiChatCenteredDots } from "react-icons/pi";
+import ChatTimestamp from "../chat/chat-timestamp";
+import { removeDuplicates } from "@/lib/remove-duplicates";
+import { produce } from "immer";
+import { Immer } from "@/lib/api/utils";
 
 type InfiniteChatPaging = InfiniteData<ApiPagingObjectResponse<Chat[]>>;
 
@@ -40,26 +39,33 @@ export default function ChatPage() {
   const queryClient = useQueryClient();
   const [isSelfTyped, setIsSelfTyped] = useState(false);
   const {
+    infiniteData,
     messages: resp,
     isFetchedAfterMount,
+    isFetchNextNotAvailable,
     error,
     isFetching,
-    hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
     isSuccess,
   } = useGetMessagesByRoomId(Number(chatId));
   const { ref: fetcherRef } = useFetchNextPageObserver({
-    isDisabled: !hasNextPage && isSuccess === false && !isFetching,
+    isDisabled: isFetchNextNotAvailable,
     fetchNextPage,
     isFetching,
   });
 
+  console.log(infiniteData, "Infinite Data");
   const [newReceivedMessages, setNewReceivedMessages] = useState<{
     firstReceivedMessageId: number | null;
     count: number;
   }>({ count: 0, firstReceivedMessageId: null });
-  const messages = useMemo(() => resp?.data?.slice().reverse() ?? [], [resp]);
+  const messages = useMemo(
+    () => removeDuplicates(resp?.data?.slice().reverse() ?? [], "id") ?? [],
+    [resp?.data]
+  );
+  const set = new Set();
+
   const [typingUser, setTypingUser] = useState<TypingUser>(null);
   const [ref, setRef] = useState<RefObject<HTMLDivElement | null>>({
     current: null,
@@ -150,7 +156,17 @@ export default function ChatPage() {
     if (createdMessage.roomId !== Number(chatId)) return null;
     queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
-      (oldData) => prependPagingData(oldData, createdMessage)
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages = draft.pages.filter((p) => p !== undefined);
+          if (draft?.pages?.[0]) {
+            draft.pages[0].data.unshift(createdMessage);
+            draft.pages[0].pagination.total_records += 1;
+            draft.pages[0].pagination.result_count += 1;
+            draft.pages[0].pagination.limit += 1;
+          }
+        }
+      })
     );
 
     if (
@@ -185,7 +201,7 @@ export default function ChatPage() {
 
     queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
-      (oldData) => deletePagingData(oldData, data.chatId, "id")
+      (oldData) => Immer.deletePagingData(oldData, data.chatId, "id")
     );
   };
 
@@ -194,7 +210,7 @@ export default function ChatPage() {
 
     queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
-      (oldData) => updatePagingData(oldData, updatedMessage, "id")
+      (oldData) => Immer.updatePagingData(oldData, updatedMessage, "id")
     );
   };
 
@@ -202,30 +218,21 @@ export default function ChatPage() {
     data: UserChatRead & { roomId: number; chatId: number }
   ) => {
     if (data.roomId !== Number(chatId)) return null;
+    const { roomId, chatId: cId, ...rest } = data;
     queryClient.setQueriesData<InfiniteChatPaging>(
       keys.messagebyRoomId(Number(chatId)),
-      (oldData) => {
-        const { roomId, chatId, ...rest } = data;
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: (oldData?.pages ?? []).map((p) => {
-            if (!p) return p;
-            return {
-              ...p,
-              data: (p?.data ?? []).map((chat) => {
-                if (chat.id === chatId) {
-                  return {
-                    ...chat,
-                    readedBy: [...(chat?.readedBy ?? []), { ...rest }],
-                  };
-                }
-                return chat;
-              }),
-            };
-          }),
-        };
-      }
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((page, pi) => {
+            page.data.forEach((msg, mi) => {
+              if (msg.id === cId && draft.pages?.[pi]?.data?.[mi]?.readedBy) {
+                // @ts-ignore
+                draft.pages[pi].data[mi].readedBy.push(rest);
+              }
+            });
+          });
+        }
+      })
     );
   };
 
@@ -255,28 +262,43 @@ export default function ChatPage() {
       </div>
     );
   }
-
   const isShowTypingAnimation =
     typingUser &&
     typingUser.userId !== session?.id &&
     typingUser.chatId === Number(chatId);
 
+  const isMessageEmpty = messages.length < 1 && isSuccess;
+
   return (
     <>
       {isFetchingNextPage && <Spinner className="my-4 mx-auto" />}
       <div ref={fetcherRef}></div>
-      {messages.map((chat) => (
-        <ChatBubble
-          key={chat?.id}
-          ref={
-            newReceivedMessages?.firstReceivedMessageId === chat?.id
-              ? refCb
-              : undefined
-          }
-          chat={chat}
-          isRecipient={chat.author.id !== session?.id}
-        />
-      ))}
+      {messages.map((chat, i) => {
+        const day = new Date(chat.createdAt).getDate();
+        const beforeSize = set.size;
+        set.add(day);
+        const isDateChanged = set.size !== beforeSize;
+        return (
+          <React.Fragment key={chat?.id}>
+            {isDateChanged && <ChatTimestamp date={chat.createdAt} />}
+            <ChatBubble
+              ref={
+                newReceivedMessages?.firstReceivedMessageId === chat?.id
+                  ? refCb
+                  : undefined
+              }
+              chat={chat}
+              isRecipient={chat.author.id !== session?.id}
+            />
+          </React.Fragment>
+        );
+      })}
+      {isMessageEmpty && (
+        <div className="mx-auto flex flex-col gap-2 items-center">
+          <PiChatCenteredDots size={30} />
+          <span>Start conversation.</span>
+        </div>
+      )}
       <div
         className="fixed bottom-20 right-4 z-20"
         style={{
@@ -300,3 +322,15 @@ export default function ChatPage() {
     </>
   );
 }
+
+// Problem
+// When we are adding data and the data is not have a next data anymore (the latest offset)
+// We are removing that last data, but it wont refetch next page because next page is not available
+// because is the last page
+// i want to solve this when the hasNextPage is false, or does not have next page
+// i want the set query not to remove the last data
+// but it not working as i expected because whenever i doing a mutation the data also the hasNextPage
+// become undefined which make conflict on my socket event
+// way to fix this
+// 1. just dont remove the last data each time we prepend or append
+// and instead we display the message with not duplicated value based on the id

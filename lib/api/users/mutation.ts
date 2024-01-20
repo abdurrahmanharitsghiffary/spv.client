@@ -1,102 +1,68 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
-import { blockUserByIdRoute, blockUserRoute, userById } from "@/lib/endpoints";
+import { baseUserRoutes, blockUserRoute } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { UpdateUserDataOptions } from "@/types";
-import { ApiResponseT } from "@/types/response";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosRequestConfig } from "axios";
+import { useMutate } from "../hooks";
 
+// NU
 export const useUpdateUser = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
     mutate: updateUser,
     mutateAsync: updateUserAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: {
-      userId: number;
-      data?: UpdateUserDataOptions;
-      config?: AxiosRequestConfig;
-    }) =>
-      request
-        .patch(userById(v.userId.toString()), v?.data, v?.config)
-        .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data)),
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
-    },
+  } = useMutate<UpdateUserDataOptions, { userId: number }>({
+    baseUrl: baseUserRoutes + "/:userId",
+    method: "patch",
+    invalidateTags: (v) => [keys.userById(Number(v.params?.userId))],
   });
 
   return { updateUser, updateUserAsync, ...rest };
 };
 
 export const useDeleteUser = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
     mutate: deleteUser,
     mutateAsync: deleteUserAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
-      request
-        .delete(userById(v.userId.toString()), v?.config)
-        .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data)),
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
-    },
+  } = useMutate<undefined, { userId: number }>({
+    baseUrl: baseUserRoutes + "/:userId",
+    method: "delete",
+    invalidateTags: (v) => [keys.userById(Number(v.params?.userId))],
   });
 
   return { deleteUser, deleteUserAsync, ...rest };
 };
 
 export const useBlockUser = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
     mutate: blockUser,
     mutateAsync: blockUserAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
-      request
-        .post(blockUserRoute, { userId: v.userId }, v?.config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
-      queryClient.invalidateQueries({ queryKey: keys.blockedUsers() });
-    },
+  } = useMutate<{ userId: number }>({
+    baseUrl: blockUserRoute,
+    method: "post",
+    invalidateTags: (v) => [
+      keys.userById(Number(v.body?.userId)),
+      keys.blockedUsers(),
+    ],
   });
 
   return { blockUser, blockUserAsync, ...rest };
 };
 
 export const useUnblockUser = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
     mutate: unblock,
     mutateAsync: unblockAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { userId: number; config?: AxiosRequestConfig }) =>
-      request
-        .delete(blockUserByIdRoute(v.userId), v?.config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: keys.userById(v.userId) });
-      queryClient.invalidateQueries({ queryKey: keys.blockedUsers() });
-    },
+  } = useMutate<undefined, { userId: number }>({
+    baseUrl: blockUserRoute + "/:userId",
+    method: "delete",
+    invalidateTags: (v) => [
+      keys.userById(Number(v.params?.userId)),
+      keys.blockedUsers(),
+    ],
   });
 
   return { unblock, unblockAsync, ...rest };

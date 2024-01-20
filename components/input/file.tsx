@@ -23,7 +23,7 @@ const InputFile = forwardRef(
       ref={ref}
       type="file"
       multiple={multiple ?? false}
-      accept={ACCEPTED_IMAGE_TYPES.join(",")}
+      accept={accept ?? ACCEPTED_IMAGE_TYPES.join(",")}
       className={clsx("absolute inset-0 opacity-0", className)}
       onChange={onChange}
       {...rest}

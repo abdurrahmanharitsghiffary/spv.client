@@ -15,7 +15,6 @@ export default function SavedPostsPage() {
     isLoading,
     isFetchingNextPage,
     isFetching,
-    isSuccess,
     fetchNextPage,
   } = useGetMySavedPosts();
 

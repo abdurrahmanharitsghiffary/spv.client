@@ -3,7 +3,7 @@ import {
   usePhotoProfileActions,
   usePhotoProfileMenuIsOpen,
 } from "@/stores/photo-profile-store";
-import React, { useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import MenuLayout from "../layout";
 import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
 import {
@@ -15,8 +15,10 @@ import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
 import InputFile from "@/components/input/file";
 import { toast } from "react-toastify";
+import { zImage } from "@/lib/zod-schema/image";
 
 export default function PhotoProfileMenu() {
+  const [file, setFile] = useState<File | null>(null);
   const isOpen = usePhotoProfileMenuIsOpen();
   const { onClose } = usePhotoProfileActions();
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
@@ -43,7 +45,7 @@ export default function PhotoProfileMenu() {
           .catch((err) => Promise.reject(err?.response?.data)),
         {
           pending: "Changing profile picture...",
-          success: "Profile picture changed successfully",
+          success: "Profile picture successfully deleted.",
           error: {
             render({ data }) {
               return (data as any)?.message ?? "Something went wrong!";
@@ -54,80 +56,93 @@ export default function PhotoProfileMenu() {
     }
   };
 
+  const handleFileUpload = useCallback(async () => {
+    if (!file) return;
+    try {
+      await zImage.parseAsync(file);
+      await confirm({
+        title: "Edit",
+        body: "Save changes with this picture?",
+        imgSrc: URL.createObjectURL(file),
+        imageClassName:
+          "w-150 h-150 object-cover rounded-full aspect-square border-2 border-divider",
+        size: "full",
+        modalClassNames: {
+          body: "items-center gap-5",
+        },
+        modalWrapperClassNames: {
+          wrapper: "sm:!justify-end",
+          base: "!h-full right-0 md:max-w-sm !w-full",
+        },
+      });
+      await toast.promise(
+        updateAccountImageAsync({
+          body: { image: file },
+          formData: true,
+        })
+          .then((res) => res)
+          .catch((err) => Promise.reject(err)),
+        {
+          pending: "Changing profile picture...",
+          success: "Profile picture successfully changed",
+          error: {
+            render({ data }) {
+              return (data as any)?.message ?? "Something went wrong!";
+            },
+          },
+        }
+      );
+      await createPostAsync({
+        body: {
+          content: `${session?.fullName ?? ""} updated their profile picture`,
+          images: [file],
+        },
+        formData: true,
+      });
+    } catch (err: any) {
+      if (err?.errors?.[0]?.message)
+        toast.error(err?.errors?.[0]?.message ?? "Something went wrong!", {
+          autoClose: 5500,
+        });
+    } finally {
+      setFile(null);
+    }
+  }, [file, session?.fullName]);
+
+  useEffect(() => {
+    handleFileUpload();
+  }, [handleFileUpload]);
+
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e?.target?.files?.[0]) return null;
+    setFile(e?.target?.files?.[0] ?? null);
+    e.target.value = "";
+  };
+
   return (
-    <MenuLayout
-      isOpen={isOpen}
-      onClose={onClose}
-      onAction={handleMenuActions}
-      items={[
-        {
-          key: "edit",
-          label: "Upload photo profile",
-          action: (
-            <form className="absolute w-0 h-0" encType="multipart/form-data">
-              <InputFile
-                ref={fileInputRef}
-                onChange={async (e) => {
-                  if (!e?.target?.files?.[0]) return null;
-                  try {
-                    await confirm({
-                      title: "Edit",
-                      body: "Save changes with this picture?",
-                      imgSrc: URL.createObjectURL(e?.target?.files?.[0] ?? ""),
-                      imageClassName:
-                        "w-150 h-150 object-cover rounded-full aspect-square border-2 border-divider",
-                      size: "full",
-                      modalClassNames: {
-                        body: "items-center gap-5",
-                      },
-                      modalWrapperClassNames: {
-                        base: "!h-full !w-full",
-                      },
-                    });
-                    await toast.promise(
-                      updateAccountImageAsync({
-                        image: e?.target?.files?.[0],
-                      })
-                        .then((res) => res)
-                        .catch((err) => Promise.reject(err)),
-                      {
-                        pending: "Changing profile picture...",
-                        success: "Profile picture changed successfully",
-                        error: {
-                          render({ data }) {
-                            return (
-                              (data as any)?.message ?? "Something went wrong!"
-                            );
-                          },
-                        },
-                      }
-                    );
-                    await createPostAsync({
-                      data: {
-                        content: `${
-                          session?.fullName ?? ""
-                        } updated their profile picture`,
-                        images: [e?.target?.files?.[0]],
-                      },
-                    });
-                  } catch (err) {
-                  } finally {
-                    e.target.value = "";
-                    onClose();
-                  }
-                }}
-                className="absolute w-0 h-0"
-              />
-            </form>
-          ),
-          icon: <AiOutlineUpload />,
-        },
-        {
-          key: "delete",
-          label: "Delete photo profile",
-          icon: <AiOutlineDelete />,
-        },
-      ]}
-    />
+    <>
+      <MenuLayout
+        isOpen={isOpen}
+        onClose={onClose}
+        onAction={handleMenuActions}
+        items={[
+          {
+            key: "edit",
+            label: "Upload photo profile",
+            icon: <AiOutlineUpload />,
+          },
+          {
+            key: "delete",
+            label: "Delete photo profile",
+            icon: <AiOutlineDelete />,
+          },
+        ]}
+      />
+      <InputFile
+        ref={fileInputRef}
+        onChange={handleInputChange}
+        className="absolute w-0 h-0 hidden"
+      />
+    </>
   );
 }

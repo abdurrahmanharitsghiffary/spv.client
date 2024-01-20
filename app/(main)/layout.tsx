@@ -3,6 +3,7 @@ import Giphy from "@/components/giphy";
 import Layout from "@/components/layout/layout";
 import ChatMenu from "@/components/menu/chat-menu";
 import CommentMenu from "@/components/menu/comment-menu";
+import GroupMenu from "@/components/menu/group-menu";
 import PostMenu from "@/components/menu/post-menu";
 import UserMenu from "@/components/menu/user-menu";
 import CommentLikesModal from "@/components/modal/comment-likes-modal";
@@ -22,7 +23,7 @@ export default function MainLayout({
   return (
     <EditProfileProvider>
       <Navbar />
-      <main className="pb-0 pt-14 min-h-[100dvh] container mx-auto max-w-7xl flex-grow">
+      <main className="pb-14 md:pb-0 pt-14 min-h-[100dvh] container mx-auto max-w-7xl flex-grow">
         <Layout>{children}</Layout>
       </main>
       <Giphy />
@@ -32,6 +33,7 @@ export default function MainLayout({
       <ChatMenu />
       <BottomBar />
       <PostMenu />
+      <GroupMenu />
       <CommentLikesModal />
       <PostLikesModal />
       <EditPostModal />

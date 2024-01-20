@@ -1,5 +1,5 @@
 "use client";
-import { downloadImage } from "@/lib/downloadImage";
+import { downloadFile } from "@/lib/downloadFile";
 import { Button } from "@nextui-org/button";
 import { Card } from "@nextui-org/card";
 import React from "react";
@@ -74,7 +74,7 @@ export default function AnimationControl({
         variant="light"
         size="lg"
         radius="full"
-        onClick={() => downloadImage(src ?? "")}
+        onClick={() => downloadFile(src ?? "")}
       >
         <BiDownload size={20} />
       </Button>

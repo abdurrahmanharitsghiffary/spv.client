@@ -27,12 +27,16 @@ import {
   InputWithControl,
   TextareaWithControl,
 } from "@/components/input/input-with-control";
+import { DISCARD_CHANGE_CONFIRM_PROPS, saveChangesProps } from "@/lib/consts";
+import { useConfirm } from "@/stores/confirm-store";
+import CancelButton from "@/components/button/reset-button";
 
 export default function EditProfileModal() {
+  const confirm = useConfirm();
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { updateAccountAsync } = useUpdateMyAccountInfo();
-  const { myAccountInfo, isSuccess } = useGetMyAccountInfo();
+  const { resp, isSuccess } = useGetMyAccountInfo();
 
   const {
     handleSubmit,
@@ -54,11 +58,11 @@ export default function EditProfileModal() {
       username: "",
     },
     values: {
-      firstName: myAccountInfo?.data?.firstName ?? "",
-      lastName: myAccountInfo?.data?.lastName ?? "",
-      username: myAccountInfo?.data?.username ?? "",
-      bio: myAccountInfo?.data?.profile?.description ?? "",
-      gender: myAccountInfo?.data?.profile?.gender ?? "not_say",
+      firstName: resp?.data?.firstName ?? "",
+      lastName: resp?.data?.lastName ?? "",
+      username: resp?.data?.username ?? "",
+      bio: resp?.data?.profile?.description ?? "",
+      gender: resp?.data?.profile?.gender ?? "not_say",
     },
   });
   useEffect(() => {
@@ -69,9 +73,10 @@ export default function EditProfileModal() {
 
   const { onClose, isOpen } = useEditProfileControls();
   const onSubmit: SubmitHandler<EditProfileValidationSchema> = async (data) => {
+    await confirm(saveChangesProps("profile"));
     await toast.promise(
       updateAccountAsync({
-        data: {
+        body: {
           gender: data?.gender === "not_say" ? null : data?.gender,
           firstName: data?.firstName,
           lastName: data?.lastName,
@@ -95,10 +100,16 @@ export default function EditProfileModal() {
     );
 
     if (data?.profileImage) {
-      await updateAccountImageAsync({ image: data.profileImage });
+      await updateAccountImageAsync({
+        body: { image: data.profileImage },
+        formData: true,
+      });
     }
     if (data?.coverImage) {
-      await updateCoverImageAsync({ image: data.coverImage });
+      await updateCoverImageAsync({
+        formData: true,
+        body: { image: data.coverImage },
+      });
     }
   };
 
@@ -117,17 +128,22 @@ export default function EditProfileModal() {
     () =>
       profileImage
         ? URL.createObjectURL(profileImage)
-        : myAccountInfo?.data?.profile?.avatarImage?.src,
-    [myAccountInfo?.data?.profile?.avatarImage?.src, profileImage]
+        : resp?.data?.profile?.avatarImage?.src,
+    [resp?.data?.profile?.avatarImage?.src, profileImage]
   );
 
   const coverImageSource = useMemo(
     () =>
       coverImage
         ? URL.createObjectURL(coverImage)
-        : myAccountInfo?.data?.profile?.coverImage?.src ?? "",
-    [coverImage, myAccountInfo?.data?.profile?.coverImage?.src]
+        : resp?.data?.profile?.coverImage?.src ?? "",
+    [coverImage, resp?.data?.profile?.coverImage?.src]
   );
+
+  const handleCancel = async () => {
+    await confirm(DISCARD_CHANGE_CONFIRM_PROPS);
+    reset();
+  };
 
   return (
     <ModalLayoutV2
@@ -135,7 +151,7 @@ export default function EditProfileModal() {
       onClose={handleClose}
       footer={
         <div className="flex gap-2 justify-center items-center">
-          <Button onClick={() => reset()}>Cancel</Button>
+          <CancelButton onReset={reset} />
           <Button color="primary" form="edit-profile-form" type="submit">
             Save changes
           </Button>
@@ -150,11 +166,7 @@ export default function EditProfileModal() {
         <div className="w-full flex flex-col gap-4">
           <div className="flex flex-col gap-4 items-center">
             <TypographyH4>Profile picture</TypographyH4>
-            <Avatar
-              name={myAccountInfo?.data?.username}
-              src={profileImageSource}
-              className="w-32 h-32"
-            />
+            <Avatar isBordered src={profileImageSource} className="w-32 h-32" />
             {pIErr?.message && (
               <ValidationErrorText>
                 {pIErr?.message.toString()}

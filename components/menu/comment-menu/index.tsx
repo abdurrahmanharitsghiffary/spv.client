@@ -38,13 +38,14 @@ export default function CommentMenu() {
   const { onOpen } = useCommentLikeModalActions();
   const comment = useGetSelectedComment();
   const confirm = useConfirm();
-  const { isLiked } = useGetCommentIsLiked(comment?.id ?? -1);
+  const { isLiked, isLoading: isLoadIsLiked } = useGetCommentIsLiked(
+    comment?.id ?? -1
+  );
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
   const isAuthored = (comment?.authorId ?? -1) === (session?.id ?? -2);
-  console.log(comment?.id, "ID");
-  console.log(Number(commentId), "ID");
+
   const baseItems = [
     { key: "details", label: "See comment details", icon: <MdOutlineInfo /> },
     {
@@ -86,8 +87,8 @@ export default function CommentMenu() {
   const handleMenuActions = async (key: React.Key) => {
     if (key === "like-comment" && comment) {
       if (isLiked?.data)
-        return await unlikeCommentAsync({ commentId: comment?.id });
-      return await likeCommentAsync({ commentId: comment?.id });
+        return await unlikeCommentAsync({ params: { commentId: comment?.id } });
+      return await likeCommentAsync({ params: { commentId: comment?.id } });
     } else if (key === "delete-report-comment" && !isAuthored) {
       return notifyToast("Cooming soon!");
     } else if (key === "details") {
@@ -97,7 +98,7 @@ export default function CommentMenu() {
     if (isAuthored) {
       if (key === "delete-comment" && commentId) {
         return await deleteCommentAsync(
-          { commentId: Number(commentId) },
+          { params: { commentId: Number(commentId) } },
           {
             onSuccess: () => {
               router.back();
@@ -111,7 +112,7 @@ export default function CommentMenu() {
           confirmColor: "danger",
           confirmLabel: "Delete",
         });
-        await deleteCommentAsync({ commentId: comment?.id });
+        await deleteCommentAsync({ params: { commentId: comment?.id } });
         return null;
       } else if (key === "edit-comment" && comment) {
         showCommentEditForm(comment);
@@ -122,6 +123,7 @@ export default function CommentMenu() {
 
   return (
     <MenuLayout
+      isLoading={isLoadIsLiked}
       onClose={onClose}
       isOpen={isOpen}
       shouldToastWhenActionError

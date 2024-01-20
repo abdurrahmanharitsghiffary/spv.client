@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardBody, CardProps } from "@nextui-org/card";
 import { Avatar, AvatarProps } from "@nextui-org/avatar";
-import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import clsx from "clsx";
 import Link from "next/link";
 import { UserSimplified } from "@/types/user";
@@ -16,8 +15,6 @@ export default function UserCard({
   classNames,
   cardClassNames,
   hideLink,
-  titleFontSize,
-  descriptionFontSize,
   avatarProps,
 }: {
   as?: CardProps["as"];
@@ -27,11 +24,29 @@ export default function UserCard({
   classNames?: { body?: string };
   cardClassNames?: SlotsToClasses<"base" | "body" | "footer" | "header">;
   hideLink?: boolean;
-  titleFontSize?: number | string;
-  descriptionFontSize?: number | string;
   avatarProps?: AvatarProps;
 }) {
   const cl = clsx("w-full dark:bg-inherit", className);
+
+  const content = (
+    <>
+      <Avatar
+        name={user?.username}
+        src={user?.avatarImage?.src}
+        className="flex-shrink-0"
+        {...avatarProps}
+      />
+      <div className="w-full flex flex-col items-start justify-center truncate mr-auto flex-auto">
+        <span className="flex-1 text-small font-normal truncate max-w-full">
+          {user?.fullName ?? ""}
+        </span>
+        <span className="w-full text-tiny text-foreground-500 max-w-full">
+          {user?.username}
+        </span>
+      </div>
+    </>
+  );
+
   return (
     <Card classNames={cardClassNames} className={cl} as={as}>
       <CardBody
@@ -44,49 +59,21 @@ export default function UserCard({
           {hideLink ? (
             <div
               className={clsx(
-                "flex gap-4 items-center",
+                "flex gap-2 items-center",
                 !withFollowButton ? "w-full" : "w-[70%]"
               )}
             >
-              <Avatar
-                name={user?.username}
-                src={user?.avatarImage?.src}
-                className="flex-shrink-0"
-                {...avatarProps}
-              />
-              <div className="flex flex-col gap-1 truncate w-[75%]">
-                <TypographyLarge className="!text-[0.875rem] truncate">
-                  {user?.fullName ?? ""}
-                </TypographyLarge>
-                <TypographyMuted className="text-xs truncate">
-                  {user?.username}
-                </TypographyMuted>
-              </div>
+              {content}
             </div>
           ) : (
             <Link
               className={clsx(
-                "flex gap-4 items-center",
+                "flex gap-2 items-center",
                 !withFollowButton ? "w-full" : "w-[70%]"
               )}
               href={`/users/${user?.id}`}
             >
-              <div className="h-fit flex justify-start items-center px-1">
-                <Avatar
-                  name={user?.username}
-                  src={user?.avatarImage?.src}
-                  {...avatarProps}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1 truncate w-[75%]">
-                <TypographyLarge className="!text-base truncate">
-                  {user?.fullName ?? ""}
-                </TypographyLarge>
-                <TypographyMuted className="text-xs truncate">
-                  {user?.username}
-                </TypographyMuted>
-              </div>
+              {content}
             </Link>
           )}
           {withFollowButton && (

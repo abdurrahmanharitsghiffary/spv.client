@@ -15,7 +15,7 @@ export default function ChatListbox({ chats }: { chats: ChatRoom[] }) {
 
   const totalUnreadMessages = (chat: ChatRoom) => chat.unreadMessages.total;
   return (
-    <Listbox items={chats} className="p-2" hideEmptyContent>
+    <Listbox items={chats} className="p-2" hideEmptyContent aria-label="chats">
       {(chat) => {
         const user = chat.participants?.users?.find(
           (user) => user?.id !== session?.id
@@ -32,6 +32,11 @@ export default function ChatListbox({ chats }: { chats: ChatRoom[] }) {
 
         return (
           <ListboxItem
+            textValue={
+              chat.isGroupChat
+                ? chat.title || `Chat group #${chat.id}`
+                : user?.fullName!
+            }
             showDivider
             key={chat?.id}
             startContent={

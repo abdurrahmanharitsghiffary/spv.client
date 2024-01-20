@@ -5,6 +5,7 @@ import IconButton from "../button/icon-button";
 import { BiChevronLeft, BiX } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
+import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useIsSm } from "@/hooks/use-media-query";
 
 const ModalLayoutV2 = forwardRef(
@@ -21,6 +22,9 @@ const ModalLayoutV2 = forwardRef(
     }: ModalLayoutProps,
     ref: React.Ref<HTMLElement> | undefined
   ) => {
+    const isSm = useIsSm();
+    useBodyOverflowHidden(rest.isOpen);
+
     return (
       <ModalLayout
         {...rest}
@@ -28,19 +32,22 @@ const ModalLayoutV2 = forwardRef(
         header={<Divider className="w-full" />}
         classNames={{
           wrapper: clsx(
-            "h-full max-h-none bg-background sm:max-w-sm sm:border-l sm:border-divider",
+            "h-full max-h-none sm:h-auto bg-background",
             classNames?.wrapper
           ),
-          header: clsx("p-0 h-[64px] items-end", classNames?.header),
+          header: clsx(
+            "p-0 h-[64px] sm:h-[50px] items-end",
+            classNames?.header
+          ),
           footer: clsx("p-4", classNames?.footer),
-          body: clsx("hide-scrollbar", classNames?.body),
+          body: clsx("hide-scrollbar max-w-none sm:p-4", classNames?.body),
           content: classNames?.content,
           modalBtn: classNames?.modalBtn,
         }}
         wrapperClassNames={{
-          wrapper: "sm:justify-end z-[201]",
+          wrapper: "z-[201] sm:!items-start",
           closeButton: clsx(
-            "left-2 top-[12px]",
+            "left-2 top-[12px] sm:left-auto sm:top-[5px]",
             wrapperClassNames?.closeButton
           ),
           ...wrapperClassNames,
@@ -52,8 +59,8 @@ const ModalLayoutV2 = forwardRef(
           </IconButton>
         }
         scrollBehavior="inside"
-        placement="center"
-        size="full"
+        placement={"center"}
+        size={isSm ? "md" : "full"}
       >
         {children}
       </ModalLayout>

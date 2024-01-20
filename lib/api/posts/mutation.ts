@@ -2,411 +2,283 @@
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import {
   basePostRoutes,
-  mySavedPost,
   mySavedPostsRoute,
-  postById,
   postImageByPostAndImageId,
   postImagesByPostId,
-  postLikesByPostId,
-  urlBase,
 } from "@/lib/endpoints";
-import { getFormData } from "@/lib/getFormData";
 import { keys } from "@/lib/queryKey";
-import { CreatePostData, UpdatePostDataOptions } from "@/types";
-import { ApiResponseT } from "@/types/response";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreatePostData } from "@/types";
+import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
-import { useOptimistic } from "../hooks";
-import { useCallback } from "react";
+import { useMutate, useOptimistic } from "../hooks";
+import { produce } from "immer";
+import { PostExtended } from "@/types/post";
+import { UserAccount } from "@/types/user";
 type UpdatePostOptions = {
   content?: string;
   title?: string;
   images?: File[];
 };
-export const useCreatePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
 
+type InfinitePost = InfiniteData<ApiPagingObjectResponse<PostExtended[]>>;
+type PostResponse = ApiResponseT<PostExtended>;
+
+export const useCreatePost = () => {
   const {
     mutate: createPost,
     mutateAsync: createPostAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { data: CreatePostData; config?: AxiosRequestConfig }) => {
-      const formData = new FormData();
-      if (v?.data?.title) formData.append("title", v?.data?.title);
-      formData.append("content", v?.data?.content);
-      if (v?.data?.images && v?.data?.images?.length > 0) {
-        v?.data.images.forEach((image) => formData.append("images", image));
-      }
-      return request
-        .post(basePostRoutes(), formData, {
-          ...v?.config,
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: keys.posts });
-      queryClient.invalidateQueries({ queryKey: keys.mePosts() });
-      queryClient.invalidateQueries({ queryKey: keys.meAccount() });
-    },
+  } = useMutate<CreatePostData>({
+    baseUrl: basePostRoutes(),
+    method: "post",
+    invalidateTags: (v) => [
+      keys.posts,
+      keys.followedUsersPost(),
+      keys.mePosts(),
+      keys.meAccount(),
+    ],
   });
 
   return { createPost, createPostAsync, ...rest };
 };
+
+const updatePostOptimistic = (
+  oldData: InfinitePost | PostResponse,
+  body: (UpdatePostOptions & { postId: number }) | undefined
+) =>
+  produce(oldData, (draft) => {
+    if (Array.isArray(oldData)) {
+      if ((draft as any)?.pages) {
+        (draft as InfinitePost).pages.forEach((p, pi) => {
+          p.data.forEach((post, di) => {
+            if (post.id === body?.postId) {
+              (draft as InfinitePost).pages[pi].data[di].title =
+                body.title ?? post.title;
+              (draft as InfinitePost).pages[pi].data[di].content =
+                body.content ?? post.content;
+              (draft as InfinitePost).pages[pi].data[di].images =
+                body.images?.map((image) => ({
+                  id: image.size + Date.now(),
+                  src: URL.createObjectURL(image),
+                })) ?? post.images;
+              (draft as InfinitePost).pages[pi].data[di].title =
+                body.title ?? post.title;
+            }
+          });
+        });
+      }
+    } else if (typeof draft === "object") {
+      const postResp = draft as PostResponse;
+      if (
+        (draft as PostResponse)?.data &&
+        (draft as PostResponse).data.id === body?.postId
+      ) {
+        (draft as PostResponse).data.title = body.title ?? postResp.data.title;
+        (draft as PostResponse).data.content =
+          body.content ?? postResp.data.content;
+        (draft as PostResponse).data.images =
+          body.images?.map((image) => ({
+            id: image.size + Date.now(),
+            src: URL.createObjectURL(image),
+          })) ?? postResp.data.images;
+      }
+    }
+  });
 
 export const useUpdatePost = () => {
   const {
     optimistic: updatePost,
     optimisticAsync: updatePostAsync,
     ...rest
-  } = useOptimistic<
-    {
-      postId: number;
-    } & UpdatePostOptions
-  >({
+  } = useOptimistic<UpdatePostOptions, { postId: number }>({
     method: "patch",
-    baseUrl: urlBase("/posts/:postId"),
+    baseUrl: basePostRoutes() + "/:postId",
+    invalidateTags: (v) => [["search"]],
     optimisticUpdater: (v) => {
       const params = v?.params;
-      const { title, content, images = [], postId } = v?.body ?? {};
-      const updatePostOptimistic = (old: any, type: "single" | "multiple") => {
-        if (type === "single")
-          return {
-            ...old,
-            data: {
-              ...old?.data,
-              title: title ? title : old?.title,
-              content: content ? content : old?.content,
-              images:
-                images?.length > 0
-                  ? images.map((item) => ({ src: URL.createObjectURL(item) }))
-                  : old?.content,
-            },
-          };
-        return {
-          ...old,
-          title: title ? title : old?.title,
-          content: content ? content : old?.content,
-          images:
-            images?.length > 0
-              ? images.map((item) => ({ src: URL.createObjectURL(item) }))
-              : old?.content,
-        };
-      };
+      const body = { ...v?.body, postId: Number(params?.postId) };
 
       return [
         {
           queryKey: keys.postById(Number(params?.postId)),
-          updater: (oldData) => updatePostOptimistic(oldData, "single"),
+          updater: (oldData) => updatePostOptimistic(oldData, body),
         },
         {
           queryKey: keys.posts,
-          updater: (old: any) => ({
-            ...old,
-            data: (old?.data ?? []).map((item: any) => {
-              if (item?.id === postId)
-                return updatePostOptimistic(item, "multiple");
-              return item;
-            }),
-          }),
+          updater: (oldData) => updatePostOptimistic(oldData, body),
+          isInfiniteData: true,
         },
         {
           queryKey: keys.mePosts(),
-          updater: (old: any) => ({
-            ...old,
-            data: (old?.data ?? []).map((item: any) => {
-              if (item?.id === postId)
-                return updatePostOptimistic(item, "multiple");
-              return item;
-            }),
-          }),
+          updater: (oldData) => updatePostOptimistic(oldData, body),
         },
       ];
     },
   });
-  // const request = useAxiosInterceptor();
-  // const queryClient = useQueryClient();
-
-  // const {
-  //   mutate: updatePost,
-  //   mutateAsync: updatePostAsync,
-  //   ...rest
-  // } = useMutation({
-  //   mutationFn: (v: {
-  //     postId: number;
-  //     data: UpdatePostDataOptions;
-  //     config?: AxiosRequestConfig;
-  //   }) => {
-  //     const formData = getFormData(v.data);
-  //     return request
-  //       .patch(postById(v.postId.toString()), formData, {
-  //         ...v?.config,
-  //         headers: { "Content-Type": "multipart/form-data" },
-  //       })
-  //       .then((res) => res.data as ApiResponseT<null>)
-  //       .catch((err) => Promise.reject(err?.response?.data));
-  //   },
-  //   onMutate: async (v) => {
-  //     const title = v?.data?.title;
-  //     const content = v?.data?.content;
-  //     const images = v?.data?.images ?? [];
-  //     await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
-  //     await queryClient.cancelQueries({ queryKey: keys.posts });
-  //     await queryClient.cancelQueries({ queryKey: keys.mePosts() });
-
-  //     const post = queryClient.getQueryData(keys.postById(v.postId));
-  //     const posts = queryClient.getQueryData(keys.posts);
-  //     const myPosts = queryClient.getQueryData(keys.mePosts());
-
-  //     const updatePostOptimistic = (old: any, type: "single" | "multiple") => {
-  //       if (type === "single")
-  //         return {
-  //           ...old,
-  //           data: {
-  //             ...old?.data,
-  //             title: title ? title : old?.title,
-  //             content: content ? content : old?.content,
-  //             images:
-  //               images?.length > 0
-  //                 ? images.map((item) => ({ src: URL.createObjectURL(item) }))
-  //                 : old?.content,
-  //           },
-  //         };
-  //       return {
-  //         ...old,
-  //         title: title ? title : old?.title,
-  //         content: content ? content : old?.content,
-  //         images:
-  //           images?.length > 0
-  //             ? images.map((item) => ({ src: URL.createObjectURL(item) }))
-  //             : old?.content,
-  //       };
-  //     };
-
-  //     queryClient.setQueryData(keys.postById(v.postId), (old: any) =>
-  //       updatePostOptimistic(old, "single")
-  //     );
-
-  //     queryClient.setQueryData(keys.posts, (old: any) => ({
-  //       ...old,
-  //       data: (old?.data ?? []).map((item: any) => {
-  //         if (item?.id === v.postId)
-  //           return updatePostOptimistic(item, "multiple");
-  //         return item;
-  //       }),
-  //     }));
-
-  //     queryClient.setQueryData(keys.mePosts(), (old: any) => ({
-  //       ...old,
-  //       data: (old?.data ?? []).map((item: any) => {
-  //         if (item?.id === v.postId)
-  //           return updatePostOptimistic(item, "multiple");
-  //         return item;
-  //       }),
-  //     }));
-
-  //     return { post, posts, myPosts, postId: v.postId };
-  //   },
-  //   onError: (err, v, context) => {
-  //     queryClient.setQueryData(
-  //       keys.postById(context?.postId ?? -1),
-  //       context?.post
-  //     );
-  //     queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-  //     queryClient.setQueryData(keys.posts, context?.posts);
-  //   },
-  //   onSettled: (d, e, v) => {
-  //     queryClient.invalidateQueries(keys.postById(v.postId));
-  //     queryClient.invalidateQueries(keys.posts);
-  //     queryClient.invalidateQueries(keys.mePosts());
-  //   },
-  // });
-
-  const updatePostCb = useCallback(
-    ({ postId, data }: { postId: number; data: UpdatePostOptions }) =>
-      updatePost({
-        body: { postId, ...data },
-        params: { postId },
-        formData: true,
-      }),
-    [updatePost]
-  );
-  const updatePostAsyncCb = useCallback(
-    ({ postId, data }: { postId: number; data: UpdatePostOptions }) =>
-      updatePostAsync({
-        body: { postId, ...data },
-        params: { postId },
-        formData: true,
-      }),
-    [updatePostAsync]
-  );
 
   return {
-    updatePost: updatePostCb,
-    updatePostAsync: updatePostAsyncCb,
+    updatePost,
+    updatePostAsync,
     ...rest,
   };
 };
 
+const deletePostOptimistic = (oldData: InfinitePost, postId: number) =>
+  produce(oldData, (draft) => {
+    if (draft?.pages) {
+      draft.pages.forEach((p, pi) => {
+        p.data.forEach((d, di) => {
+          if (d.id === postId) {
+            draft.pages[pi].data = draft.pages[pi].data.filter(
+              (item) => item.id !== postId
+            );
+            draft.pages[pi].pagination.total_records -= 1;
+            draft.pages[pi].pagination.result_count -= 1;
+          }
+        });
+      });
+    }
+  });
+
 export const useDeletePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
-    mutate: deletePost,
-    mutateAsync: deletePostAsync,
+    optimistic: deletePost,
+    optimisticAsync: deletePostAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
-      return request
-        .delete(postById(v.postId.toString()), v?.config)
-        .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["search"] });
-    },
-    onMutate: async (v) => {
-      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
-      await queryClient.cancelQueries({ queryKey: keys.posts });
-      await queryClient.cancelQueries({ queryKey: keys.mePosts() });
-      await queryClient.cancelQueries({ queryKey: keys.meAccount() });
-
-      const myAccount = queryClient.getQueryData(keys.meAccount());
-      const post = queryClient.getQueryData(keys.postById(v.postId));
-      const posts = queryClient.getQueryData(keys.posts);
-      const myPosts = queryClient.getQueryData(keys.mePosts());
-
-      const deletePostOptimistic = (old: any, type: "single" | "multiple") => {
-        if (type === "single") return null;
-        return old?.filter((item: any) => item?.id !== v.postId);
-      };
-
-      queryClient.setQueryData(keys.meAccount(), (old: any) => ({
-        ...old,
-        data: {
-          ...old?.data,
-          posts: {
-            ...old?.data?.posts,
-            total:
-              (old?.data?.posts?.total ?? 0) - 1 === -1
-                ? 0
-                : (old?.data?.posts?.total ?? 0) - 1,
-          },
+  } = useOptimistic<undefined, { postId: number }>({
+    baseUrl: basePostRoutes() + "/:postId",
+    method: "delete",
+    invalidateTags: (v) => [["search"]],
+    optimisticUpdater: (v) => {
+      const postId = Number(v.params?.postId);
+      return [
+        {
+          queryKey: keys.postById(postId),
+          updater: <OD extends PostResponse | undefined>(oldData: OD): OD =>
+            produce(oldData, (draft) => {
+              if (draft?.data.id === postId) {
+                draft = undefined as any;
+              }
+            }),
         },
-      }));
-
-      queryClient.setQueryData(keys.postById(v.postId), (old: any) =>
-        deletePostOptimistic(old, "single")
-      );
-      queryClient.setQueryData(keys.posts, (old: any) => ({
-        ...old,
-        data: old?.data?.filter((item: any) =>
-          deletePostOptimistic(item, "multiple")
-        ),
-      }));
-      queryClient.setQueryData(keys.mePosts(), (old: any) => ({
-        ...old,
-        data: old?.data?.filter((item: any) =>
-          deletePostOptimistic(item, "multiple")
-        ),
-      }));
-
-      return { post, myPosts, posts, postId: v.postId };
-    },
-    onError: (err, v, context) => {
-      queryClient.setQueryData(
-        keys.postById(context?.postId ?? -1),
-        context?.post
-      );
-      queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-      queryClient.setQueryData(keys.posts, context?.posts);
-    },
-    onSettled: (d, v, ctx) => {
-      queryClient.invalidateQueries({ queryKey: keys.postById(ctx.postId) });
-      queryClient.invalidateQueries({ queryKey: keys.posts });
-      queryClient.invalidateQueries({ queryKey: keys.mePosts() });
+        {
+          queryKey: keys.posts,
+          updater: (oldData) => deletePostOptimistic(oldData, postId),
+        },
+        {
+          queryKey: keys.mePosts(),
+          updater: (oldData) => deletePostOptimistic(oldData, postId),
+        },
+        {
+          queryKey: keys.meAccount(),
+          updater: <OD extends ApiResponseT<UserAccount>>(oldData: OD): OD =>
+            produce(oldData, (draft) => {
+              if (draft.data) {
+                const totalPost = draft.data.posts.total;
+                draft.data.posts.total += totalPost > 0 ? -1 : 0;
+                draft.data.posts.postIds = draft.data.posts.postIds.filter(
+                  (id) => id !== postId
+                );
+              }
+            }),
+        },
+      ];
     },
   });
 
   return { deletePost, deletePostAsync, ...rest };
 };
 
+const updateLikePost = <OD extends InfinitePost>(
+  oldData: OD,
+  postId: number
+): OD =>
+  produce(oldData, (draft) => {
+    if (draft?.pages) {
+      draft.pages.forEach((p, pi) => {
+        if (p?.data) {
+          p.data.forEach((post, poi) => {
+            if (post.id === postId) {
+              draft.pages[pi].data[poi].total_likes += 1;
+              draft.pages[pi].data[poi].isLiked = true;
+            }
+          });
+        }
+      });
+    }
+  });
+
+const updateUnlikePost = <OD extends InfinitePost>(
+  oldData: OD,
+  postId: number
+): OD =>
+  produce(oldData, (draft) => {
+    if (draft?.pages) {
+      draft.pages.forEach((p, pi) => {
+        if (p?.data) {
+          p.data.forEach((post, poi) => {
+            if (post.id === postId) {
+              const totalLikes = draft.pages[pi].data[poi].total_likes;
+              if (totalLikes > 0) {
+                draft.pages[pi].data[poi].total_likes -= 1;
+              }
+              draft.pages[pi].data[poi].isLiked = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
 export const useLikePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
-    mutate: likePost,
-    mutateAsync: likePostAsync,
+    optimistic: likePost,
+    optimisticAsync: likePostAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
-      return request
-        .post(postLikesByPostId(v.postId.toString()), undefined, v?.config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["search"] });
-    },
-    onMutate: async (v) => {
-      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
-      await queryClient.cancelQueries({ queryKey: keys.posts });
-      await queryClient.cancelQueries({ queryKey: keys.mePosts() });
-
-      const post = queryClient.getQueryData(keys.postById(v.postId));
-      const posts = queryClient.getQueryData(keys.posts);
-      const myPosts = queryClient.getQueryData(keys.mePosts());
-
-      queryClient.setQueryData(keys.posts, (old: any) => {
-        return {
-          ...old,
-          data: (old?.data ?? []).map((item: any) => {
-            if (item.id === v.postId) {
-              return { ...item, total_likes: item?.total_likes ?? 0 + 1 };
-            }
-            return item;
+  } = useOptimistic<undefined, { postId: number }>({
+    baseUrl: basePostRoutes() + "/:postId/likes",
+    method: "post",
+    optimisticUpdater(v) {
+      const postId = Number(v.params?.postId)!;
+      return [
+        {
+          queryKey: keys.mePosts(),
+          isInfiniteData: true,
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.posts,
+          isInfiniteData: true,
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.followedUsersPost(),
+          isInfiniteData: true,
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.postById(postId),
+          updater: <OD extends ApiResponseT<PostExtended>>(oldData: OD): OD =>
+            produce(oldData, (draft) => {
+              if (draft?.data) {
+                draft.data.total_likes += 1;
+                draft.data.isLiked = true;
+              }
+            }),
+        },
+        {
+          queryKey: keys.postIsLiked(postId),
+          updater: <OD extends ApiResponseT<boolean>>(oldData: OD): OD => ({
+            ...oldData,
+            data: true,
           }),
-        };
-      });
-
-      queryClient.setQueryData(keys.postById(v.postId), (old: any) => {
-        return {
-          ...old,
-          data: { ...old?.data, total_likes: old?.total_likes ?? 0 + 1 },
-        };
-      });
-
-      queryClient.setQueryData(keys.mePosts(), (old: any) => {
-        return {
-          ...old,
-          data: (old?.data ?? []).map((post: any) => {
-            if (post.id === v.postId) {
-              return { ...post, total_likes: post?.total_likes ?? 0 + 1 };
-            }
-            return post;
-          }),
-        };
-      });
-
-      return { post, postId: v.postId, posts, myPosts };
-    },
-    onError: (err, v, context) => {
-      queryClient.setQueryData(
-        keys.postById(context?.postId ?? -1),
-        context?.post
-      );
-      queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-      queryClient.setQueryData(keys.posts, context?.posts);
-    },
-    onSettled: (d, e, v) => {
-      queryClient.invalidateQueries(keys.postById(v.postId));
-      queryClient.invalidateQueries(keys.posts);
-      queryClient.invalidateQueries(keys.mePosts());
+        },
+      ];
     },
   });
 
@@ -414,95 +286,104 @@ export const useLikePost = () => {
 };
 
 export const useUnlikePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
   const {
-    mutate: unlikePost,
-    mutateAsync: unlikePostAsync,
+    optimistic: unlikePost,
+    optimisticAsync: unlikePostAsync,
     ...rest
-  } = useMutation({
-    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
-      return request
-        .delete(postLikesByPostId(v.postId.toString()), v?.config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["search"] });
-    },
-    onMutate: async (v) => {
-      await queryClient.cancelQueries({ queryKey: keys.postById(v.postId) });
-      await queryClient.cancelQueries({ queryKey: keys.posts });
-      await queryClient.cancelQueries({ queryKey: keys.mePosts() });
-
-      const post = queryClient.getQueryData(keys.postById(v.postId));
-      const posts = queryClient.getQueryData(keys.posts);
-      const myPosts = queryClient.getQueryData(keys.mePosts());
-
-      queryClient.setQueryData(keys.posts, (old: any) => ({
-        ...old,
-        data: (old?.data ?? [])?.map((item: any) => {
-          if (item.id === v.postId) {
-            return {
-              ...item,
-              total_likes:
-                item?.total_likes ?? 0 - 1 === -1
-                  ? 0
-                  : item?.total_likes ?? 0 - 1,
-            };
-          }
-          return item;
-        }),
-      }));
-
-      queryClient.setQueryData(keys.postById(v.postId), (old: any) => ({
-        ...old,
-        data: {
-          ...old?.data,
-          total_likes:
-            old?.total_likes ?? 0 - 1 === -1 ? 0 : old?.total_likes ?? 0 - 1,
+  } = useOptimistic<undefined, { postId: number }>({
+    baseUrl: basePostRoutes() + "/:postId/likes",
+    method: "delete",
+    optimisticUpdater(v) {
+      const postId = Number(v.params?.postId)!;
+      return [
+        {
+          queryKey: keys.mePosts(),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
         },
-      }));
-
-      queryClient.setQueryData(keys.mePosts(), (old: any) => {
-        return {
-          ...old,
-          data: (old?.data ?? []).map((post: any) => {
-            if (post.id === v.postId) {
-              return {
-                ...post,
-                total_likes:
-                  post?.total_likes ?? 0 - 1 === -1
-                    ? 0
-                    : post?.total_likes ?? 0 - 1,
-              };
-            }
-            return post;
+        {
+          queryKey: keys.savedPosts(),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.followedUsersPost(),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.postById(postId),
+          updater: <OD extends ApiResponseT<PostExtended>>(oldData: OD): OD =>
+            produce(oldData, (draft) => {
+              if (draft?.data) {
+                if (draft.data.total_likes > 0) {
+                  draft.data.total_likes -= 1;
+                }
+                draft.data.isLiked = false;
+              }
+            }),
+        },
+        {
+          queryKey: keys.postIsLiked(postId),
+          updater: <OD extends ApiResponseT<boolean>>(oldData: OD): OD => ({
+            ...oldData,
+            data: false,
           }),
-        };
-      });
-
-      return { post, postId: v.postId, posts, myPosts };
-    },
-    onError: (err, v, context) => {
-      queryClient.setQueryData(
-        keys.postById(context?.postId ?? -1),
-        context?.post
-      );
-      queryClient.setQueryData(keys.mePosts(), context?.myPosts);
-      queryClient.setQueryData(keys.posts, context?.posts);
-    },
-    onSettled: (d, e, v) => {
-      queryClient.invalidateQueries(keys.postById(v.postId));
-      queryClient.invalidateQueries(keys.mePosts());
-      queryClient.invalidateQueries(keys.posts);
+        },
+      ];
     },
   });
 
   return { unlikePost, unlikePostAsync, ...rest };
 };
 
+export const useSavePost = () => {
+  const {
+    optimistic: savePost,
+    optimisticAsync: savePostAsync,
+    ...rest
+  } = useOptimistic<{ postId: number }>({
+    baseUrl: mySavedPostsRoute(),
+    method: "post",
+    optimisticUpdater: (v) => {
+      const postId = Number(v.body?.postId);
+      return [
+        {
+          queryKey: keys.postIsSaved(postId),
+          updater: (oldData) => ({ ...oldData, data: true }),
+        },
+      ];
+    },
+    invalidateTags: (v) => [keys.savedPosts()],
+  });
+
+  return { savePost, savePostAsync, ...rest };
+};
+
+export const useDeleteSavedPost = () => {
+  const {
+    optimistic: deleteSavedPost,
+    optimisticAsync: deleteSavedPostAsync,
+    ...rest
+  } = useOptimistic<undefined, { postId: number }>({
+    baseUrl: mySavedPostsRoute() + "/:postId",
+    method: "delete",
+    optimisticUpdater: (v) => {
+      const postId = Number(v.params?.postId);
+      return [
+        {
+          queryKey: keys.postIsSaved(postId),
+          updater: (oldData) => ({ ...oldData, data: false }),
+        },
+      ];
+    },
+    invalidateTags: (v) => [keys.savedPosts()],
+  });
+
+  return { deleteSavedPost, deleteSavedPostAsync, ...rest };
+};
+
+// NU
 export const useDeletepostImages = () => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
@@ -526,6 +407,7 @@ export const useDeletepostImages = () => {
   return { deleteAllPostImages, deleteAllPostImagesAsync, ...rest };
 };
 
+// NU
 export const useDeletePostImage = () => {
   const request = useAxiosInterceptor();
   const queryClient = useQueryClient();
@@ -554,96 +436,4 @@ export const useDeletePostImage = () => {
   });
 
   return { deletePostImage, deletePostImageAsync, ...rest };
-};
-
-export const useSavePost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
-  const {
-    mutate: savePost,
-    mutateAsync: savePostAsync,
-    ...rest
-  } = useMutation({
-    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
-      return request
-        .post(mySavedPostsRoute(), { postId: v.postId }, v?.config)
-        .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: [...keys.posts, "saved"] });
-    },
-    onMutate: async (v) => {
-      const key = [...keys.posts, "saved", v.postId];
-      await queryClient.cancelQueries(key.slice());
-      const postIsSaved = queryClient.getQueryData(key.slice());
-
-      queryClient.setQueryData(key.slice(), (old: any) => ({
-        ...old,
-        data: true,
-      }));
-
-      return { postIsSaved };
-    },
-    onSettled: (data, err, v) => {
-      queryClient.invalidateQueries({
-        queryKey: [...keys.posts, "saved", v.postId],
-      });
-    },
-    onError: (err, v, ctx) => {
-      queryClient.setQueryData(
-        [...keys.posts, "saved", v.postId],
-        ctx?.postIsSaved
-      );
-    },
-  });
-
-  return { savePost, savePostAsync, ...rest };
-};
-
-export const useDeleteSavedPost = () => {
-  const request = useAxiosInterceptor();
-  const queryClient = useQueryClient();
-
-  const {
-    mutate: deleteSavedPost,
-    mutateAsync: deleteSavedPostAsync,
-    ...rest
-  } = useMutation({
-    mutationFn: (v: { postId: number; config?: AxiosRequestConfig }) => {
-      return request
-        .delete(mySavedPost(v.postId), v?.config)
-        .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data));
-    },
-    onSuccess: (d, v) => {
-      queryClient.invalidateQueries({ queryKey: [...keys.posts, "saved"] });
-    },
-    onMutate: async (v) => {
-      const key = [...keys.posts, "saved", v.postId];
-      await queryClient.cancelQueries(key.slice());
-      const postIsSaved = queryClient.getQueryData(key.slice());
-
-      queryClient.setQueryData(key.slice(), (old: any) => ({
-        ...old,
-        data: false,
-      }));
-
-      return { postIsSaved };
-    },
-    onSettled: (data, err, v) => {
-      queryClient.invalidateQueries({
-        queryKey: [...keys.posts, "saved", v.postId],
-      });
-    },
-    onError: (err, v, ctx) => {
-      queryClient.setQueryData(
-        [...keys.posts, "saved", v.postId],
-        ctx?.postIsSaved
-      );
-    },
-  });
-
-  return { deleteSavedPost, deleteSavedPostAsync, ...rest };
 };

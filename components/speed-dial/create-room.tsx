@@ -18,7 +18,7 @@ export default function CreateRoomSpeedDial({
 
   return (
     <SpeedDial
-      className={clsx("fixed bottom-16 right-4", className)}
+      className={clsx("fixed bottom-16 md:bottom-4 right-4", className)}
       onAction={(key) => {
         switch (key) {
           case "group-add": {

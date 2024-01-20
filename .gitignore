@@ -26,7 +26,6 @@ yarn-error.log*
 
 # local env files
 .env*.local
-
 # vercel
 .vercel
 
@@ -37,3 +36,4 @@ next-env.d.ts
 .vscode/
 .env
 types/blj.ts
+legend.txt

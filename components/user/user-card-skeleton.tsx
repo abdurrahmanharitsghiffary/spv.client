@@ -1,4 +1,5 @@
-import { Card, CardBody, CardProps } from "@nextui-org/card";
+import { Card, CardBody, CardProps, CardFooter } from "@nextui-org/card";
+import { Avatar } from "@nextui-org/avatar";
 import { Skeleton } from "@nextui-org/skeleton";
 import clsx from "clsx";
 import React from "react";
@@ -27,6 +28,22 @@ export default function UserCardSkeleton({
           </div>
         </div>
       </CardBody>
+    </Card>
+  );
+}
+
+export function UserCardSquareSkeleton({ className }: { className?: string }) {
+  const cl = clsx("w-[130px] bg-transparent h-auto p-2", className);
+
+  return (
+    <Card className={cl} shadow="none" radius="md">
+      <CardBody className="flex flex-col gap-1 p-0 w-full items-center truncate max-w-full">
+        <Avatar showFallback className="w-full h-auto aspect-square" />
+        <Skeleton className="rounded-medium w-[70%] h-3 mt-2 mx-auto" />
+      </CardBody>
+      <CardFooter className="py-2">
+        <Skeleton className="rounded-medium w-full h-unit-6" />
+      </CardFooter>
     </Card>
   );
 }

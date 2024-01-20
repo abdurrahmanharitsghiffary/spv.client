@@ -14,6 +14,8 @@ import { useConfirm } from "@/stores/confirm-store";
 import { toast } from "react-toastify";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { urlBase } from "@/lib/endpoints";
+import { TypographyH3 } from "@/components/ui/typography";
+import { DISCARD_CHANGE_CONFIRM_PROPS } from "@/lib/consts";
 
 function ChangePasswordModal() {
   const {
@@ -64,6 +66,11 @@ function ChangePasswordModal() {
     );
   };
 
+  const handleCancel = async () => {
+    await confirm(DISCARD_CHANGE_CONFIRM_PROPS);
+    reset();
+  };
+
   return (
     <ModalLayoutV2
       isOpen={isOpen}
@@ -73,7 +80,7 @@ function ChangePasswordModal() {
       }}
       footer={
         <div className="flex gap-2">
-          <Button onClick={() => reset()}>Cancel</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
           <Button type="submit" color="primary" form="changepasswordform">
             Submit
           </Button>
@@ -85,6 +92,7 @@ function ChangePasswordModal() {
         className="flex p-4 px-0 flex-col gap-4"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <TypographyH3 className="!text-base">Change password</TypographyH3>
         <InputPassword
           variant="bordered"
           label="Current password"

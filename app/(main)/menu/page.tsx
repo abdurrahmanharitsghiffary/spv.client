@@ -2,7 +2,7 @@
 import { Listbox, ListboxItem, ListboxSection } from "@nextui-org/listbox";
 import { Avatar } from "@nextui-org/avatar";
 import React from "react";
-import { BsBookmark, BsChat, BsPostcard } from "react-icons/bs";
+import { BsBookmark, BsChat } from "react-icons/bs";
 import { FiLogOut, FiMoon, FiSettings, FiUser, FiUserX } from "react-icons/fi";
 import { useGetMyAccountInfo } from "@/lib/api/account/query";
 import { TypographyMuted } from "@/components/ui/typography";
@@ -39,7 +39,7 @@ type ListboxWithSectionItem = {
 };
 
 export default function MenuPage() {
-  const { myAccountInfo, isLoading, isSuccess } = useGetMyAccountInfo();
+  const { resp, isLoading, isSuccess } = useGetMyAccountInfo();
   const onOpen = useShowChangePasswordModal();
   const setSession = useSetSession();
   const { setTheme, theme } = useTheme();
@@ -82,7 +82,7 @@ export default function MenuPage() {
           title: "Delete",
         });
 
-        if (choice && myAccountInfo?.data?.provider === "GOOGLE") {
+        if (choice && resp?.data?.provider === "GOOGLE") {
           const choice2 = await confirm({
             confirmLabel: "Delete",
             confirmColor: "danger",
@@ -202,7 +202,7 @@ export default function MenuPage() {
     },
   ];
 
-  if (myAccountInfo?.data?.provider !== null) {
+  if (resp?.data?.provider !== null) {
     if (
       (items as any)?.[1]?.section?.items &&
       (items as any)?.[1]?.section?.items?.length > 0
@@ -223,8 +223,8 @@ export default function MenuPage() {
         <div className="w-fit">
           <Avatar
             className="dark:group-hover:bg-default-300 dark:transition-all"
-            src={myAccountInfo?.data?.profile?.avatarImage?.src ?? ""}
-            name={myAccountInfo?.data?.username}
+            src={resp?.data?.profile?.avatarImage?.src ?? ""}
+            name={resp?.data?.username}
           />
         </div>
         <div className="flex flex-col gap-2 w-[70%]">
@@ -236,7 +236,7 @@ export default function MenuPage() {
           ) : (
             isSuccess && (
               <>
-                <TypographyMuted>{`${myAccountInfo?.data?.firstName} ${myAccountInfo?.data?.lastName}`}</TypographyMuted>
+                <TypographyMuted>{`${resp?.data?.firstName} ${resp?.data?.lastName}`}</TypographyMuted>
                 <p className="text-[0.75rem]">View profile</p>
               </>
             )
@@ -244,14 +244,14 @@ export default function MenuPage() {
         </div>
       </Link>
       <div className="w-full px-2">
-        {isSuccess && !myAccountInfo?.data?.verified ? (
+        {isSuccess && !resp?.data?.verified ? (
           <div className="py-2 flex flex-col gap-2">
             <TypographyMuted>
               Account is not verified. pls verify your account
             </TypographyMuted>
             <SendVerifyButton
               className="w-fit"
-              email={myAccountInfo?.data?.email ?? ""}
+              email={resp?.data?.email ?? ""}
             />
           </div>
         ) : null}
@@ -279,6 +279,7 @@ export default function MenuPage() {
                 {/* @ts-ignore */}
                 {(item: ListboxItem) => (
                   <ListboxItem
+                    textValue={item.label}
                     key={item.key ?? ""}
                     color={item.key.includes("delete") ? "danger" : "default"}
                     className={item.key.includes("delete") ? "text-danger" : ""}
@@ -292,6 +293,8 @@ export default function MenuPage() {
             );
           return (
             <ListboxItem
+              // @ts-ignore
+              textValue={item.label}
               key={item.key ?? ""}
               color={item.key.includes("delete") ? "danger" : "default"}
               className={item.key.includes("delete") ? "text-danger" : ""}

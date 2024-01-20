@@ -4,7 +4,6 @@ import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Recorder from "../../recorder";
 import { CreateChatSchema, createChatSchema } from "@/lib/zod-schema/chat";
-import FileButton from "../../input/file-btn";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { useCreateMessage } from "@/lib/api/messages/mutation";
@@ -19,6 +18,9 @@ import ImageChip from "../../image/image-chip";
 import { TypographyMuted } from "@/components/ui/typography";
 import { Checkbox } from "@nextui-org/react";
 import clsx from "clsx";
+import FileButton from "@/components/input/file-button";
+import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
+import ImageFileButton from "@/components/input/image-file-button";
 
 export default function ChatForm() {
   const { chatId } = useParams();
@@ -64,16 +66,7 @@ export default function ChatForm() {
     });
   }, [session, socket, chatId]);
 
-  // The problem is when user is typing and the other user is also typing.
-  // Example: User A is typing, and so is User B.
-  // User A starts typing and stops; the timeout is set to 4000ms.
-  // Then, 1s later, User B starts typing. However, User A's timeout will be executed after 3s.
-  // User B is still typing, but after 3s, User A's timeout is executed.
-  // Consequently, the typing animation on User A for User B will be stopped before User B's timeout is executed.
-  // However, it will be shown again because User B is still typing.
-
   const onUserTyping = (data: any) => {
-    // Fixing problem by clearing other user timeout, i am genius 😎😎😎
     if (data.userId !== session?.id) {
       clearTimeout(timeRef.current);
     }
@@ -118,11 +111,12 @@ export default function ChatForm() {
   const onSubmit: SubmitHandler<CreateChatSchema> = async (data) => {
     try {
       await createMessageAsync({
-        data: {
+        body: {
           chatRoomId: Number(chatId),
           message: data.chat ?? "",
           images: data.images,
         },
+        formData: true,
       });
     } catch (err: any) {
       let message = err?.message;
@@ -134,9 +128,6 @@ export default function ChatForm() {
     }
   };
   const images: File[] = useWatch({ control, name: "images" });
-  // const handleImageReset = useCallback(() => {
-  //   setValue("images", []);
-  // }, []);
 
   const handleResultChange = (result: string | null | undefined) => {
     if (!result) return null;
@@ -156,7 +147,7 @@ export default function ChatForm() {
   };
 
   return (
-    <ChatFormLayout className={chatId && "sm:left-[300px] lg:left-[400px]"}>
+    <ChatFormLayout>
       {images.length > 0 && (
         <div className="p-2 border-t-1 flex flex-col gap-2 border-divider">
           <TypographyMuted>
@@ -208,7 +199,7 @@ export default function ChatForm() {
             name="images"
             control={control}
             render={({ field: { onChange } }) => (
-              <FileButton
+              <ImageFileButton
                 multiple
                 onChange={(e) => {
                   onChange(Array.from(e.target?.files ?? []));
@@ -222,3 +213,19 @@ export default function ChatForm() {
     </ChatFormLayout>
   );
 }
+
+// acceptedFiles={[
+//   ...(ACCEPTED_IMAGE_TYPES as any),
+//   // "application/pdf",
+//   // "application/vnd.ms-excel",
+//   // "application/vnd.rar",
+//   // "application/zip",
+//   // "image/jpg",
+//   // "image/png",
+//   // "image/jpeg",
+//   // "image/webp",
+//   // "application/msword",
+//   // "text/plain",
+//   // "video/3gpp",
+//   // "video/ogg",
+// ]}

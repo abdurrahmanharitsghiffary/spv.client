@@ -10,6 +10,7 @@ export const keys = {
   comment: ["comment"] as const,
   user: ["user"] as const,
   chat: ["chat"] as const,
+  messageById: (messageId: number) => ["message", "single", messageId] as const,
   chatByRoomId: (roomId: number) => ["chat", roomId] as const,
   messagebyRoomId: (roomId: number) => ["message", roomId] as const,
   participantByRoomId: (roomId: number) => ["participant", roomId] as const,
@@ -32,10 +33,14 @@ export const keys = {
     [...keys.commentById(commentId), "isliked"] as const,
   postLikes: (postId: number) => [...keys.postById(postId), "likes"] as const,
   postComments: (postId: number) =>
-    [...keys.postById(postId), "comments"] as const,
+    [...keys.comment, ...keys.postById(postId)] as const,
   postById: (postId: number) => [...keys.post, postId] as const,
-  postByUserId: (userId: number) => [...keys.post, userId, "users"] as const,
-  followedUsersPost: () => [...keys.post, "following"] as const,
+  postByUserId: (userId: number) => [...keys.posts, userId, "users"] as const,
+  postIsLiked: (postId: number) =>
+    [...keys.postById(postId), "isLiked"] as const,
+  postIsSaved: (postId: number) => [...keys.posts, "isSaved", postId] as const,
+  savedPosts: () => [...keys.posts, "saved"] as const,
+  followedUsersPost: () => [...keys.posts, "following"] as const,
   userById: (userId: number) => [...keys.user, userId] as const,
   userFollowers: (userId: number) =>
     [...keys.userById(userId), "followers"] as const,

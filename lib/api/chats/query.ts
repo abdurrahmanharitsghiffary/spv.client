@@ -4,6 +4,7 @@ import { keys } from "@/lib/queryKey";
 import { useInfinite, useQ } from "../hooks";
 import { baseChatRoutes, chatById } from "@/lib/endpoints";
 import { ChatRoom, ChatRoomParticipant } from "@/types/chat";
+import { OffsetPaging } from "@/types";
 
 export const useGetChatRoomById = (roomId: number, enabled: boolean = true) => {
   const { data: chatRoom, ...rest } = useQ<ChatRoom>({
@@ -17,12 +18,17 @@ export const useGetChatRoomById = (roomId: number, enabled: boolean = true) => {
 
 export const useGetParticipantsByRoomId = (
   roomId: number,
-  query: { limit?: string; offset?: string } = { limit: "5", offset: "0" }
+  query: OffsetPaging = { limit: 5, offset: 0 }
 ) => {
+  const q = {
+    limit: query.limit?.toString() ?? "5",
+    offset: query.offset?.toString() ?? "0",
+  };
+
   const { data: participants, ...rest } = useInfinite<ChatRoomParticipant>({
     query,
     url: chatById(roomId.toString()) + "/participants",
-    queryKey: [...keys.participantByRoomId(roomId), query],
+    queryKey: [...keys.participantByRoomId(roomId), q],
   });
 
   return { participants, ...rest };

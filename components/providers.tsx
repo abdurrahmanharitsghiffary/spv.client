@@ -10,6 +10,7 @@ import ToastProvider from "@/components/toastify-container";
 import EditPostProvider from "@/context/edit-post-context";
 import SocketProvider from "@/context/socket-context";
 import { NextUIProvider } from "@/context/nextui-provider";
+import HistoryProvider from "@/context/history-provider";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
             <ImagePreviewProvider>
               <EditPostProvider>
                 <NextThemesProvider {...themeProps}>
-                  {children}
+                  <HistoryProvider>{children}</HistoryProvider>
                 </NextThemesProvider>
               </EditPostProvider>
               <ToastProvider />

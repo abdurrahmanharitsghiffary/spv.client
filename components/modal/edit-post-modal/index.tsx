@@ -22,8 +22,13 @@ import {
   InputWithControl,
   TextareaWithControl,
 } from "@/components/input/input-with-control";
+import ModalLayoutV2 from "../layoutV2";
+import { useConfirm } from "@/stores/confirm-store";
+import { DISCARD_CHANGE_CONFIRM_PROPS, saveChangesProps } from "@/lib/consts";
+import CancelButton from "@/components/button/reset-button";
 
 function EditPostModal() {
+  const confirm = useConfirm();
   const postId = useGetSelectedPostId();
   const { post } = useGetPostById(postId);
   const {
@@ -58,7 +63,8 @@ function EditPostModal() {
   }, [isSubmitSuccessful]);
 
   const onSubmit: SubmitHandler<UpdatePostSchema> = async (data) => {
-    await updatePostAsync({ postId, data });
+    await confirm(saveChangesProps("post"));
+    await updatePostAsync({ params: { postId }, body: data, formData: true });
   };
 
   const handleCloseClick = useCallback(
@@ -76,31 +82,15 @@ function EditPostModal() {
   );
 
   return (
-    <ModalLayout
+    <ModalLayoutV2
       isOpen={isOpen}
       onClose={() => {
         reset();
         onClose();
       }}
-      header={<Divider className="w-full" />}
-      classNames={{
-        wrapper: "h-full",
-        header: "p-0 h-[64px] items-end",
-        footer: "p-4",
-      }}
-      wrapperClassNames={{
-        closeButton: "left-2 top-[12px]",
-      }}
-      closeButton={
-        <IconButton>
-          <BiChevronLeft />
-        </IconButton>
-      }
-      size="full"
-      placement="center"
       footer={
         <div className="flex gap-2">
-          <Button onClick={() => reset()}>Cancel</Button>
+          <CancelButton onReset={reset} />
           <Button type="submit" form="edit-post-form" color="primary">
             Save changes
           </Button>
@@ -118,10 +108,6 @@ function EditPostModal() {
           placeholder="Enter your new title..."
           control={control}
           name="title"
-          // isInvalid={title?.message ? true : false}
-          // errorMessage={title?.message}
-          // color={title?.message ? "danger" : "default"}
-          // {...register("title")}
         />
         <TextareaWithControl
           minRows={4}
@@ -129,10 +115,6 @@ function EditPostModal() {
           placeholder="Write your new thought..."
           control={control}
           name="content"
-          // isInvalid={content?.message ? true : false}
-          // color={content?.message ? "danger" : "default"}
-          // errorMessage={content?.message}
-          // {...register("content")}
         />
         {imagesErrors?.message && (
           <TypographyMuted className="text-danger !text-[0.75rem]">
@@ -158,7 +140,13 @@ function EditPostModal() {
                 className="opacity-0 z-[10] absolute inset-0"
                 id="edit_post_images"
                 onChange={(e) => {
-                  onChange(Array.from(e?.target?.files ?? []));
+                  console.log(e.target.files, "FileList");
+                  const files: File[] = [];
+                  Array.from(e.target?.files ?? []).forEach((img) => {
+                    files.push(img);
+                  });
+                  console.log(files, "Files");
+                  onChange(files);
                 }}
                 multiple={true}
               />
@@ -166,7 +154,7 @@ function EditPostModal() {
           />
         </Button>
       </form>
-    </ModalLayout>
+    </ModalLayoutV2>
   );
 }
 

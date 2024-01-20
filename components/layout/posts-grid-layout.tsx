@@ -8,7 +8,7 @@ export default function PostsGridLayout({
   className?: string;
   children: React.ReactNode;
 }) {
-  const cl = clsx("flex flex-col pt-5 w-full gap-2 pb-16", className);
+  const cl = clsx("flex flex-col pt-5 w-full gap-2", className);
 
   return <div className={cl}>{children}</div>;
 }

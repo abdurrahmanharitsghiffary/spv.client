@@ -9,7 +9,7 @@ import React, {
 import { BsCardImage } from "react-icons/bs";
 import InputFile from "./file";
 
-const FileButton = forwardRef(
+const ImageFileButton = forwardRef(
   (
     {
       color,
@@ -75,6 +75,6 @@ const FileButton = forwardRef(
   }
 );
 
-FileButton.displayName = "FileButton";
+ImageFileButton.displayName = "ImageFileButton";
 
-export default FileButton;
+export default ImageFileButton;

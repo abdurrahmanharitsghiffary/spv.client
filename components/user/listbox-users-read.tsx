@@ -14,6 +14,7 @@ export default function ListboxUsersRead({
 }) {
   return (
     <Listbox
+      aria-label="users"
       emptyContent={""}
       className="p-0"
       classNames={{ list: "gap-2" }}
@@ -21,6 +22,7 @@ export default function ListboxUsersRead({
     >
       {(user) => (
         <ListboxItem
+          textValue={user?.fullName!}
           key={user?.id}
           endContent={
             (user as UserChatRead)?.readedAt && (

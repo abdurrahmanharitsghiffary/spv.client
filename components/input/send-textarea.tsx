@@ -5,8 +5,8 @@ import { Button } from "@nextui-org/button";
 import { BiSend } from "react-icons/bi";
 import clsx from "clsx";
 import { FieldValues, UseControllerProps } from "react-hook-form";
-import { useIsSSR } from "@react-aria/ssr";
 import { Input, TextAreaProps } from "@nextui-org/input";
+import { useIsSSR } from "@react-aria/ssr";
 
 export default function SendTextarea<T extends FieldValues>({
   isShowSendButton,

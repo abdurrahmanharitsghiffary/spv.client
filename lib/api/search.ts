@@ -1,33 +1,31 @@
 "use client";
 
-import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { SearchAllData, SearchOptions } from "@/types";
 import { PostExtended } from "@/types/post";
-import { ApiPagingObjectResponse } from "@/types/response";
 import { UserAccountPublic } from "@/types/user";
-import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { keys } from "../queryKey";
 import { searchRoute } from "../endpoints";
+import { useInfinite } from "./hooks";
 
 export const useGetSearchResult = (
   options: SearchOptions,
   config?: AxiosRequestConfig
 ) => {
-  const request = useAxiosInterceptor();
+  const q = {
+    ...options,
+    limit: (options.limit ?? 10).toString() ?? "20",
+    offset: (options.offset ?? 0).toString() ?? "0",
+  };
 
-  const { data: searchResult, ...rest } = useQuery<
-    ApiPagingObjectResponse<
-      UserAccountPublic[] | PostExtended[] | SearchAllData
-    >
+  const { data: resp, ...rest } = useInfinite<
+    UserAccountPublic | PostExtended | SearchAllData
   >({
     queryKey: keys.search(options),
-    queryFn: () =>
-      request
-        .get(searchRoute(options), config)
-        .then((res) => res.data)
-        .catch((err) => Promise.reject(err?.response?.data)),
+    url: searchRoute(options),
+    config,
+    query: q,
   });
 
-  return { searchResult, ...rest };
+  return { resp, ...rest };
 };

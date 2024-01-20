@@ -20,7 +20,7 @@ export default function UnblockButton({
       confirmLabel: "Confirm",
       confirmColor: "primary",
     });
-    await unblockAsync({ userId });
+    await unblockAsync({ params: { userId } });
   };
 
   return (

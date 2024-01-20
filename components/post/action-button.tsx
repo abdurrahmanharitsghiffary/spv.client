@@ -30,9 +30,9 @@ export default function PostActionButton({
       <Tooltip content="Like">
         <Button
           onClick={() => {
-            if (!postId && postId !== 0) return null;
-            if (isLiked?.data) return unlikePost({ postId: postId });
-            return likePost({ postId: postId });
+            if ((!postId && postId !== 0) || isPreview) return null;
+            if (isLiked?.data) return unlikePost({ params: { postId } });
+            return likePost({ params: { postId } });
           }}
         >
           {isLiked?.data ? (

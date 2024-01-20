@@ -58,7 +58,7 @@ const publicItems: (isLiked?: boolean, isSaved?: boolean) => DropdownProps[] = (
   isSaved
 ) => [
   ...baseItems(isLiked, isSaved),
-  { key: "report", label: "Report post", icon: <GoReport /> },
+  { key: "report-delete", label: "Report post", icon: <GoReport /> },
 ];
 
 const items: (isLiked?: boolean, isSaved?: boolean) => DropdownProps[] = (
@@ -109,14 +109,15 @@ function PostPublicDropdown({ postId }: { postId: number }) {
           notifyToast("Copied to clipboard!");
           return null;
         } else if (key === "like") {
-          if (isLiked?.data) return await unlikePostAsync({ postId });
-          return await likePostAsync({ postId });
+          if (isLiked?.data)
+            return await unlikePostAsync({ params: { postId } });
+          return await likePostAsync({ params: { postId } });
         } else if (key === "save") {
           if (isSaved?.data) {
-            return deleteSavedPostAsync({ postId });
+            return deleteSavedPostAsync({ params: { postId } });
           }
-          return savePostAsync({ postId });
-        } else if (key === "report") return notifyToast("Cooming soon!");
+          return savePostAsync({ body: { postId } });
+        } else if (key === "report-delete") return notifyToast("Cooming soon!");
       }}
     >
       <Button isIconOnly variant="light" radius="full">
@@ -153,17 +154,18 @@ function PostPrivateDropdown({ postId }: { postId: number }) {
             confirmColor: "danger",
             confirmLabel: "Delete",
           });
-          await deletePostAsync({ postId });
+          await deletePostAsync({ params: { postId } });
         } else if (key === "edit") {
           showEditForm(postId);
         } else if (key === "save") {
           if (isSaved?.data) {
-            return deleteSavedPostAsync({ postId });
+            return deleteSavedPostAsync({ params: { postId } });
           }
-          return savePostAsync({ postId });
+          return savePostAsync({ body: { postId } });
         } else if (key === "like") {
-          if (isLiked?.data) return await unlikePostAsync({ postId });
-          return await likePostAsync({ postId });
+          if (isLiked?.data)
+            return await unlikePostAsync({ params: { postId } });
+          return await likePostAsync({ params: { postId } });
         }
       }}
     >

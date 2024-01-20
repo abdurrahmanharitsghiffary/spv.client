@@ -5,18 +5,24 @@ import ChatMenuTrigger from "@/components/menu/chat-menu/trigger";
 import { TypographyLarge, TypographyMuted } from "@/components/ui/typography";
 import { useSocket } from "@/hooks/use-socket";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
+import { keys } from "@/lib/queryKey";
 import { Socket_Event } from "@/lib/socket-event";
 import { useSession } from "@/stores/auth-store";
-import { TypingUser } from "@/types";
+import { TypingUser, UpdateRoom } from "@/types";
+import { ChatRoom } from "@/types/chat";
+import { ApiPagingObjectResponse } from "@/types/response";
 import { Avatar } from "@nextui-org/avatar";
 import { Badge } from "@nextui-org/badge";
 import { Skeleton } from "@nextui-org/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { produce } from "immer";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { MdGroups } from "react-icons/md";
 
 export default function ChatHeader({ router }: { router: AppRouterInstance }) {
+  const queryClient = useQueryClient();
   const { chatId } = useParams();
   const socket = useSocket();
   const [typingUser, setTypingUser] = useState<TypingUser>(null);
@@ -34,13 +40,26 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
     setTypingUser(null);
   };
 
+  const onUpdateRoom = (data: UpdateRoom) => {
+    if (data.updating === "details" && data.data.id === Number(chatId)) {
+      queryClient.setQueryData<ApiPagingObjectResponse<ChatRoom>>(
+        keys.chatByRoomId(Number(chatId)),
+        produce((draft) => {
+          if (draft?.data) draft.data = data.data;
+        })
+      );
+    }
+  };
+
   useEffect(() => {
     if (!socket) return;
     socket.on(Socket_Event.USER_TYPING, onUserTyping);
     socket.on(Socket_Event.USER_TYPING_END, onUserTypingEnd);
+    socket.on(Socket_Event.UPDATE_ROOM, onUpdateRoom);
     return () => {
       socket.off(Socket_Event.USER_TYPING, onUserTyping);
       socket.off(Socket_Event.USER_TYPING_END, onUserTypingEnd);
+      socket.off(Socket_Event.UPDATE_ROOM, onUpdateRoom);
     };
   }, [socket]);
 
@@ -62,7 +81,7 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
     typingUser.chatId === Number(chatId);
 
   return (
-    <div className="flex justify-start items-center">
+    <div className="flex items-center w-full justify-between">
       <BackButton router={router} />
 
       <div className="flex gap-3 items-center w-full px-2">

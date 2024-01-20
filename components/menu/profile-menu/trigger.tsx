@@ -13,7 +13,7 @@ export default function ProfileMenuTrigger({
   const { onOpen } = useProfileMenuActions();
   const cl = clsx("", className);
   return (
-    <IconButton onClick={onOpen} className={cl}>
+    <IconButton onClick={onOpen} variant="solid" radius="md" className={cl}>
       <FiMoreVertical />
     </IconButton>
   );

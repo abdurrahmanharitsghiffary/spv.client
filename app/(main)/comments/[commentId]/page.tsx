@@ -8,6 +8,7 @@ import { useGetComment } from "@/lib/api/comments/query";
 import SingleCommentSkeleton from "@/components/comment/single-comment-skeleton";
 import CommentSkeleton from "@/components/comment/skeleton";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
+import CommentBacklink from "@/components/comment/comment-back-link";
 
 export default function CommentPage({
   params = { commentId: "-1" },
@@ -22,13 +23,14 @@ export default function CommentPage({
 
   return (
     <>
+      <CommentBacklink postId={comment?.data?.postId} />
       {isLoading ? (
         <SingleCommentSkeleton />
       ) : (
         isSuccess && <SingleComment comment={comment?.data ?? null} />
       )}
       <Divider />
-      <div className="flex flex-col justify-center items-start p-4 pb-0 w-full">
+      <div className="flex flex-col justify-center items-start p-4 w-full">
         {isLoading
           ? [1, 2, 3].map((item) => <CommentSkeleton key={item} />)
           : isSuccess &&

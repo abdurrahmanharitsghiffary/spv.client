@@ -1,10 +1,10 @@
 import { CardBody } from "@nextui-org/card";
 import React from "react";
 import { TypographyH4 } from "../ui/typography";
-import PostContent from "./post-content";
 import Link from "next/link";
 import { PostExtended } from "@/types/post";
 import Gallery from "../image/gallery";
+import TextWithLimit from "../text-with-limit";
 
 export default function PostCardBody({
   isPostPage,
@@ -26,12 +26,12 @@ export default function PostCardBody({
       {isPostPage || isPreview ? (
         <div>
           <TypographyH4>{title}</TypographyH4>
-          <PostContent content={content} />
+          <TextWithLimit text={content} />
         </div>
       ) : (
         <Link href={`/posts/${postId}`}>
           <TypographyH4>{title}</TypographyH4>
-          <PostContent content={content} />
+          <TextWithLimit text={content} />
         </Link>
       )}
       <Gallery images={postImages ?? []} />

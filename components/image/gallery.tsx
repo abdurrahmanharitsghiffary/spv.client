@@ -68,7 +68,7 @@ export default function Gallery({
               ></div>
               {!isSSR && (
                 <span
-                  className="absolute inset-0 z-30 text-lg font-semibold text-white text-center justify-center items-center flex"
+                  className="absolute bg-overlay/60 inset-0 z-30 text-lg font-semibold text-white text-center justify-center items-center flex"
                   onClick={() => showGallery(images)}
                 >
                   {images.slice(i + 1).length}+

@@ -12,7 +12,7 @@ export default function MenuLayout({
   return (
     <ChangePasswordProvider>
       <DeleteAccountProvider>
-        <div className="w-full pt-2 pb-[48px] relative">{children}</div>
+        <div className="w-full pt-2 md:pb-0 relative">{children}</div>
         <DeleteAccountModal />
         <ChangePasswordModal />
       </DeleteAccountProvider>

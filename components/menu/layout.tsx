@@ -3,10 +3,9 @@ import React, { useCallback, useState } from "react";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import clsx from "clsx";
-import { useIsMd, useIsSm } from "@/hooks/use-media-query";
+import { useIsSm } from "@/hooks/use-media-query";
 import { BiChevronRight } from "react-icons/bi";
 import IconButton from "../button/icon-button";
-import { TypographyLarge, TypographyMuted } from "../ui/typography";
 import { Avatar } from "@nextui-org/avatar";
 import Progress from "../progress";
 import { toast } from "react-toastify";
@@ -18,6 +17,7 @@ export type MenuItems = {
   icon?: React.JSX.Element;
 };
 
+const TIMEOUT_DELAY = 5000;
 const getOffset = (offset: number, minus?: boolean) => {
   const MAX_OFFSET = 12;
 
@@ -55,7 +55,7 @@ export default function MenuLayout({
   isLoading?: boolean;
   shouldToastWhenActionError?: boolean;
   items?: MenuItems[];
-  title?: string;
+  title?: React.ReactNode;
   description?: string;
   onAction: (key: React.Key) => void;
   onClose: () => void;
@@ -63,9 +63,7 @@ export default function MenuLayout({
   avatar?: string;
 }) {
   const isSm = useIsSm();
-
   const BP = isSm;
-
   const [velocity, setVelocity] = useState<number>(0);
   const [offsetHeight, setOffsetHeight] = useState<number>(0);
 
@@ -92,13 +90,10 @@ export default function MenuLayout({
   ) => {
     const dividedOffsetHeight = offsetHeight / 6;
     const dragLimit = offsetHeight - dividedOffsetHeight;
+    const isShouldClosed =
+      (BP && info.offset.x > dragLimit) || (!BP && info.offset.y > dragLimit);
 
-    if (BP && info.offset.x > dragLimit) {
-      return onClose();
-    }
-    if (!BP && info.offset.y > dragLimit) {
-      return onClose();
-    }
+    if (isShouldClosed) onClose();
     if (!BP) setVelocity(info.velocity.y);
   };
 
@@ -185,25 +180,22 @@ export default function MenuLayout({
                 ></motion.span>
               </div>
             )}
-            <div className="flex items-center gap-3 px-4 py-2">
+            <div className="flex items-center gap-2 px-4 py-2">
               {avatar !== undefined && (
                 <Avatar
                   src={avatar ?? ""}
                   name={description ?? ""}
                   showFallback
+                  className="flex-shrink-0"
                 />
               )}
-              <div className="flex flex-col gap-1 justify-center items-start">
-                {title && (
-                  <TypographyLarge className="!text-base">
-                    {title}
-                  </TypographyLarge>
-                )}
-                {description && (
-                  <TypographyMuted className="!text-sm">
-                    {description}
-                  </TypographyMuted>
-                )}
+              <div className="w-full flex flex-col items-start justify-center truncate mr-auto flex-auto">
+                <div className="flex-1 text-small font-normal truncate max-w-full">
+                  {title ?? ""}
+                </div>
+                <span className="w-full text-tiny text-foreground-500 max-w-full">
+                  {description}
+                </span>
               </div>
             </div>
             <Listbox
@@ -216,7 +208,7 @@ export default function MenuLayout({
               {(item) => (
                 <ListboxItem
                   key={item.key}
-                  aria-label={item.label}
+                  textValue={item.label}
                   color={item.key.includes("delete") ? "danger" : "default"}
                   startContent={
                     <IconWrapper

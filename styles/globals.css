@@ -20,7 +20,7 @@ input[class*="!bg-transparent"] {
 
 @keyframes fadeIn {
   0% {
-    transform: scale(0);
+    transform: scale(0.8);
     opacity: 0;
   }
   100% {
@@ -32,18 +32,50 @@ input[class*="!bg-transparent"] {
 @keyframes fadeOut {
   0% {
     opacity: 1;
+  }
+  70% {
     transform: scale(1);
   }
   100% {
+    transform: scale(0.8);
     opacity: 0;
-    transform: scale(0);
   }
 }
 
 .fadein {
-  animation: fadeIn 0.3s ease-in;
+  animation: fadeIn 0.1s ease-in-out both;
 }
 
 .fadeout {
-  animation: fadeOut 0.3s ease-out;
+  animation: fadeOut 0.3s ease-in-out both;
+}
+
+@keyframes rightToLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toBottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+.righttoleft {
+  animation: rightToLeft 0.3s ease-in-out both;
+}
+
+.tobottom {
+  animation: toBottom 0.3s ease-in-out both;
 }

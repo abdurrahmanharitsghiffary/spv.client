@@ -1,22 +1,21 @@
 import BackButton from "@/components/button/back-button";
-import SearchButton from "@/components/button/search-button";
-import ProfileMenuTrigger from "@/components/menu/profile-menu/trigger";
-import UserMenuTrigger from "@/components/menu/user-menu/trigger";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import ChatHeader from "./chat";
 
-export interface NavItemsAction {
+export interface NavItem {
   keys?: string[];
-  key: string;
-  action: ((router: AppRouterInstance) => React.JSX.Element) | null;
+  items: (
+    router: AppRouterInstance
+  ) => { key: string; element: React.ReactNode }[];
   style?: React.CSSProperties | undefined;
   className?: string;
+  isShowEndContent?: boolean;
 }
 
-export const navActionItems: NavItemsAction[] = [
+export const navItems: NavItem[] = [
   {
-    key: "back-button",
     keys: [
+      "/group/:groupId",
       "/comments/:commentId",
       "/posts/saved",
       "/posts/:postId",
@@ -24,49 +23,28 @@ export const navActionItems: NavItemsAction[] = [
       "/users/:userId/following",
       "/chats",
       "/users/blocked",
-      "group/:groupId",
     ],
-    action: (router) => <BackButton router={router} />,
+    items: (router) => [
+      { key: "bck-btn", element: <BackButton router={router} /> },
+    ],
   },
   {
-    key: "search-button",
-    className: "justify-end",
-    keys: ["/menu"],
-    action(router) {
-      return (
-        <>
-          <SearchButton />
-        </>
-      );
-    },
+    keys: ["/chats/:chatId"],
+    items: (router) => [
+      { key: "chat-header", element: <ChatHeader router={router} /> },
+    ],
+    isShowEndContent: false,
   },
-  {
-    key: "null-items",
-    keys: ["/search"],
-    action: null,
-  },
-  {
-    key: "/users/:userId",
-    className: "justify-between",
-    action: (router: AppRouterInstance) => (
-      <>
-        <BackButton router={router} />
-        <UserMenuTrigger />
-      </>
-    ),
-  },
-  {
-    key: "/profile",
-    className: "justify-between",
-    action: (router: AppRouterInstance) => (
-      <>
-        <BackButton router={router} />
-        <ProfileMenuTrigger />
-      </>
-    ),
-  },
-  {
-    key: "/chats/:chatId",
-    action: (router: AppRouterInstance) => <ChatHeader router={router} />,
-  },
+  // {
+  //   key: "/group/:groupId",
+  //   className: "justify-between",
+  //   action(router) {
+  //     return (
+  //       <>
+  //         <BackButton router={router} />
+  //         <GroupMenuTrigger />
+  //       </>
+  //     );
+  //   },
+  // },
 ];

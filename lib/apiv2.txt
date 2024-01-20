@@ -1034,7 +1034,7 @@ export const useUpdateComment = () => {
 export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: myAccountInfo, ...rest } = useQuery<ApiResponseT<UserAccount>>({
+  const { data: resp, ...rest } = useQuery<ApiResponseT<UserAccount>>({
     queryKey: keys.meAccount(),
     queryFn: () =>
       request
@@ -1043,7 +1043,7 @@ export const useGetMyAccountInfo = (config?: AxiosRequestConfig) => {
         .catch((err) => Promise.reject(err?.response?.data)),
   });
 
-  return { myAccountInfo, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetMyChats = (
@@ -1434,7 +1434,7 @@ export const useGetSearchResult = (
 ) => {
   const request = useAxiosInterceptor();
 
-  const { data: searchResult, ...rest } = useQuery<
+  const { data: resp, ...rest } = useQuery<
     ApiPagingObjectResponse<UserAccountPublic[] | PostExtended[]>
   >({
     queryKey: keys.search(options),
@@ -1445,7 +1445,7 @@ export const useGetSearchResult = (
         .catch((err) => Promise.reject(err?.response?.data)),
   });
 
-  return { searchResult, ...rest };
+  return { resp, ...rest };
 };
 
 // search(options: SearchOptions, config?: AxiosRequestConfig) {

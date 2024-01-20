@@ -23,7 +23,7 @@ export default function Author({
         />
         <div className="flex flex-col truncate">
           <p className="truncate">{author?.fullName}</p>
-          <p className="text-tiny truncate text-foreground">
+          <p className="text-tiny truncate text-foreground-500">
             {author?.username}
           </p>
         </div>

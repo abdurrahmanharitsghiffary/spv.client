@@ -4,7 +4,7 @@ import { ButtonProps, SlotsToClasses } from "@nextui-org/react";
 import { useCallback } from "react";
 import { create } from "zustand";
 
-type ConfirmState = {
+export type ConfirmState = {
   closeVariant?: ButtonProps["variant"];
   closeColor?: ButtonProps["color"];
   closeLabel?: string;

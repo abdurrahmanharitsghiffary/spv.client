@@ -32,6 +32,7 @@ import { useShowEditPost } from "@/hooks/use-edit-post";
 import { useConfirm } from "@/stores/confirm-store";
 import { MdOutlineInfo } from "react-icons/md";
 import { usePostLikeModalActions } from "@/stores/post-likes-modal-store";
+import { baseClientURL, url } from "@/lib/consts";
 
 export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
@@ -39,8 +40,12 @@ export default function PostMenu() {
   const { onOpen } = usePostLikeModalActions();
   const session = useSession();
   const selectedPost = useGetSelectedPost();
-  const { isLiked } = useGetPostIsLiked(selectedPost?.id ?? -1);
-  const { isSaved } = useGetPostIsSaved(selectedPost?.id ?? -1);
+  const { isLiked, isLoading: isLoadILik } = useGetPostIsLiked(
+    selectedPost?.id ?? -1
+  );
+  const { isSaved, isLoading: isLoadISav } = useGetPostIsSaved(
+    selectedPost?.id ?? -1
+  );
   const { savePostAsync } = useSavePost();
   const { deleteSavedPostAsync } = useDeleteSavedPost();
   const { likePostAsync } = useLikePost();
@@ -77,7 +82,7 @@ export default function PostMenu() {
 
   const publicItems: DropdownProps[] = [
     ...baseItems,
-    { key: "report", label: "Report post", icon: <GoReport /> },
+    { key: "report-delete", label: "Report post", icon: <GoReport /> },
   ];
 
   const items: DropdownProps[] = [
@@ -101,17 +106,17 @@ export default function PostMenu() {
         return null;
       }
       case "copy": {
-        await navigator.clipboard.writeText(
-          postById(selectedPost?.id?.toString() ?? "")
-        );
+        await navigator.clipboard.writeText(url(`/posts/${selectedPost?.id}`));
         notifyToast("Copied to clipboard!");
         return null;
       }
       case "like": {
         if (!selectedPost) return null;
         if (isLiked?.data)
-          return await unlikePostAsync({ postId: selectedPost?.id });
-        return await likePostAsync({ postId: selectedPost?.id });
+          return await unlikePostAsync({
+            params: { postId: selectedPost?.id },
+          });
+        return await likePostAsync({ params: { postId: selectedPost?.id } });
       }
       case "save": {
         if (!selectedPost) return null;
@@ -122,11 +127,11 @@ export default function PostMenu() {
             confirmColor: "danger",
             confirmLabel: "Delete",
           });
-          return deleteSavedPostAsync({ postId: selectedPost?.id });
+          return deleteSavedPostAsync({ params: { postId: selectedPost?.id } });
         }
-        return savePostAsync({ postId: selectedPost?.id });
+        return savePostAsync({ body: { postId: selectedPost?.id } });
       }
-      case "report":
+      case "report-delete":
         return notifyToast("Cooming soon!");
       case "delete": {
         if (!isAuthored || !selectedPost) return null;
@@ -136,7 +141,7 @@ export default function PostMenu() {
           confirmColor: "danger",
           confirmLabel: "Delete",
         });
-        await deletePostAsync({ postId: selectedPost?.id });
+        await deletePostAsync({ params: { postId: selectedPost?.id } });
       }
       case "edit": {
         if (!isAuthored || !selectedPost) return null;
@@ -149,6 +154,7 @@ export default function PostMenu() {
 
   return (
     <MenuLayout
+      isLoading={isLoadILik || isLoadISav}
       onAction={handleMenuActions}
       isOpen={isOpen}
       shouldToastWhenActionError

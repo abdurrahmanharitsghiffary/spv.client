@@ -1,5 +1,11 @@
 "use client";
-import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import {
   Grid,
@@ -98,18 +104,19 @@ const SearchGrid = ({
 export default function GiphyGrid() {
   const isMd = useIsMd();
   const [width, setWidth] = useState(0);
-
+  const conRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
+    const element = conRef.current;
     {
-      if (window) setWidth(window.innerWidth);
+      if (element) setWidth(element.getBoundingClientRect().width);
     }
-  }, []);
+  }, [conRef]);
 
   const setGif = useShowModalGif();
 
   return (
-    <>
-      <Tabs className="px-2 sticky top-0 w-full bg-content1 py-2 z-[102]">
+    <div className="w-full max-w-full" ref={conRef}>
+      <Tabs className="px-2 sticky top-0 w-full max-w-full bg-content1 py-2 z-[102]">
         <Tab key="search" title="Search">
           <SearchExperience>
             <SearchGrid mq={isMd} onGifClick={setGif} width={width} />
@@ -150,7 +157,7 @@ export default function GiphyGrid() {
           />
         </Tab>
       </Tabs>
-    </>
+    </div>
   );
 }
 

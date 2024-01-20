@@ -2,9 +2,7 @@
 import React from "react";
 import { TypographyH4 } from "../ui/typography";
 import { useGetParticipantsByRoomId } from "@/lib/api/chats/query";
-import UserCardSkeleton from "../user/user-card-skeleton";
 import { Skeleton } from "@nextui-org/skeleton";
-import ChatParticipant from "../chat/chat-participant";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 import UserListboxLoading from "../loading/user-listbox-loading";

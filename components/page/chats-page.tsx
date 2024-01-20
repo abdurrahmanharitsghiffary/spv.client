@@ -1,6 +1,5 @@
 "use client";
-import ChatDisplay from "@/components/chat/chat-display";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSocket } from "@/hooks/use-socket";
 import { Socket_Event } from "@/lib/socket-event";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +8,6 @@ import { useGetMyAssociatedChatRooms } from "@/lib/api/account/query";
 import CreateRoomModal from "@/components/modal/create-room-modal";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import CreateGroupModal from "@/components/modal/create-group-modal";
-import UserCardSkeleton from "@/components/user/user-card-skeleton";
 import CreateRoomSpeedDial from "@/components/speed-dial/create-room";
 import InputSearch from "@/components/input/search";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
@@ -21,15 +19,13 @@ import { ApiPagingObjectResponse } from "@/types/response";
 import UserListboxLoading from "../loading/user-listbox-loading";
 import ChatListbox from "../chat/chat-listbox";
 import { MdOutlineSearchOff } from "react-icons/md";
-import {
-  deletePagingData,
-  prependPagingData,
-  updatePagingData,
-} from "@/lib/api/utils";
 import { useParams } from "next/navigation";
 import clsx from "clsx";
 import CreateRoomButton from "../button/create-room-button";
 import { useSession } from "@/stores/auth-store";
+import { removeDuplicates } from "@/lib/remove-duplicates";
+import { produce } from "immer";
+import { Immer } from "@/lib/api/utils";
 
 type InfiniteRoomPaging = InfiniteData<ApiPagingObjectResponse<ChatRoom[]>>;
 
@@ -41,9 +37,7 @@ export default function ChatsPage() {
   const {
     chatRooms,
     isSuccess,
-    infiniteData,
     isFetchNextNotAvailable,
-    hasNextPage,
     isFetching,
     isLoading,
     fetchNextPage,
@@ -52,88 +46,126 @@ export default function ChatsPage() {
   const socket = useSocket();
   const queryClient = useQueryClient();
 
+  const rooms = useMemo(
+    () => removeDuplicates(chatRooms?.data ?? [], "id"),
+    [chatRooms?.data]
+  );
+
   const onJoinChatRoom = async (joinedRoom: ChatRoom) => {
-    queryClient.setQueriesData<InfiniteRoomPaging>(keys.meChats(), (oldData) =>
-      prependPagingData(oldData, joinedRoom)
+    // this is also correct
+    queryClient.setQueriesData<InfiniteRoomPaging>(
+      keys.meChats(),
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages = draft.pages.filter((p) => p !== undefined);
+
+          if (draft.pages?.[0]) {
+            draft.pages[0].data.unshift(joinedRoom);
+            draft.pages[0].pagination.total_records += 1;
+            draft.pages[0].pagination.result_count += 1;
+            draft.pages[0].pagination.limit += 1;
+          }
+        }
+      })
     );
-    queryClient.invalidateQueries({ queryKey: keys.meChats() });
   };
 
   const onReceiveMessage = async (createdMessage: Chat) => {
+    // No Problem, this correct
+    const isNotAuthored = createdMessage.author.id !== session?.id;
     queryClient.setQueriesData<InfiniteRoomPaging>(
       keys.meChats(),
-      (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((p, i) => {
-            if (!p) return p;
-            return {
-              ...p,
-              data: p.data.map((c) => {
-                if (c.id === createdMessage.roomId) {
-                  return {
-                    ...c,
-                    messages: [createdMessage, ...c.messages],
-                    unreadMessages: {
-                      total:
-                        c.unreadMessages.total +
-                        (createdMessage?.author?.id !== session?.id ? 1 : 0),
-                    },
-                  };
-                }
-                return c;
-              }),
-            };
-          }),
-        };
-      }
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((p, pi) => {
+            p.data.forEach((cht, ci) => {
+              if (cht.id === createdMessage.roomId) {
+                draft.pages[pi].data[ci].messages.unshift(createdMessage);
+                if (isNotAuthored)
+                  draft.pages[pi].data[ci].unreadMessages.total += 1;
+              }
+            });
+          });
+        }
+      })
     );
   };
 
   const onReadedMessage = (data: UserChatRead & { roomId: number }) => {
+    // when some user reading message we do not other user also reading the message (decrement unreadMessages total count)
+    if (data.id !== session?.id) return;
     queryClient.setQueriesData<InfiniteRoomPaging>(
       keys.meChats(),
-      (oldData) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          pages: oldData.pages.map((p) => {
-            if (!p) return p;
-            return {
-              ...p,
-              data: p.data.map((c) => {
-                if (c.id === data.roomId) {
-                  return {
-                    ...c,
-                    unreadMessages: {
-                      ...c.unreadMessages,
-                      total: c.unreadMessages.total - 1,
-                    },
-                  };
-                }
-                return c;
-              }),
-            };
-          }),
-        };
-      }
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((p, pi) => {
+            p.data.forEach((msg, mi) => {
+              if (msg.id === data.roomId) {
+                draft.pages[pi].data[mi].unreadMessages.total -= 1;
+              }
+            });
+          });
+        }
+      })
     );
   };
 
-  const onLeaveRoom = (roomId: number) => {
-    queryClient.setQueriesData<InfiniteRoomPaging>(keys.meChats(), (oldData) =>
-      deletePagingData(oldData, roomId, "id")
-    );
+  const onLeaveRoom = (data: { roomId: number; userId: number }) => {
+    const { userId, roomId } = data;
+    if (userId === session?.id) {
+      queryClient.setQueriesData<InfiniteRoomPaging>(
+        keys.meChats(),
+        produce((draft) => {
+          if (draft?.pages) {
+            draft.pages.forEach((p, pi) => {
+              p.data.forEach((cht) => {
+                if (cht.id === roomId) {
+                  draft.pages[pi].data = p.data.filter((d) => d.id !== roomId);
+                  draft.pages[pi].pagination.result_count -= 1;
+                  draft.pages[pi].pagination.total_records -= 1;
+                }
+              });
+            });
+          }
+        })
+      );
+    } else if (userId !== session?.id) {
+      queryClient.setQueriesData<InfiniteRoomPaging>(
+        keys.meChats(),
+        produce((draft) => {
+          if (draft?.pages) {
+            draft.pages.forEach((p, pi) => {
+              p.data.forEach((cht, i) => {
+                if (cht.id === roomId) {
+                  if (p.data[i].participants) {
+                    draft.pages[pi].data[i].participants.users = p.data[
+                      i
+                    ].participants.users.filter((user) => user.id !== userId);
+                    draft.pages[pi].data[i].participants.total -= 1;
+                  }
+                }
+              });
+            });
+          }
+        })
+      );
+    }
   };
 
   const onUpdateRoom = (updatedRoom: UpdateRoom) => {
+    console.log(updatedRoom, "Updating Room");
     if (updatedRoom.updating === "details") {
       queryClient.setQueriesData<InfiniteRoomPaging>(
         keys.meChats(),
-        (oldData) => updatePagingData(oldData, updatedRoom.data, "id")
+        (oldData) => Immer.updatePagingData(oldData, updatedRoom.data, "id")
       );
     }
+  };
+
+  const onDeletingRoom = (roomId: number) => {
+    queryClient.setQueriesData<InfiniteRoomPaging>(keys.meChats(), (oldData) =>
+      Immer.deletePagingData(oldData, roomId, "id")
+    );
   };
 
   const { ref } = useFetchNextPageObserver({
@@ -144,12 +176,14 @@ export default function ChatsPage() {
 
   useEffect(() => {
     if (!socket) return;
+    socket.on(Socket_Event.DELETE_ROOM, onDeletingRoom);
     socket.on(Socket_Event.JOIN_ROOM, onJoinChatRoom);
     socket.on(Socket_Event.LEAVE_ROOM, onLeaveRoom);
     socket.on(Socket_Event.UPDATE_ROOM, onUpdateRoom);
     socket.on(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
     socket.on(Socket_Event.READED_MESSAGE, onReadedMessage);
     return () => {
+      socket.off(Socket_Event.DELETE_ROOM, onDeletingRoom);
       socket.off(Socket_Event.JOIN_ROOM, onJoinChatRoom);
       socket.off(Socket_Event.LEAVE_ROOM, onLeaveRoom);
       socket.off(Socket_Event.UPDATE_ROOM, onUpdateRoom);
@@ -163,7 +197,7 @@ export default function ChatsPage() {
   return (
     <div
       className={clsx(
-        "w-full flex flex-col gap-1 pt-3 pb-16",
+        "w-full flex flex-col gap-1 pt-3",
         chatId &&
           "sm:max-w-[300px] hidden sm:flex lg:max-w-[400px] fixed top-0 border-r-1 border-divider max-w-[70px] bottom-0 z-[101] !pb-3 bg-background scrollbar-hide left-0"
       )}
@@ -219,7 +253,7 @@ export default function ChatsPage() {
         {isLoading ? (
           <UserListboxLoading showDivider />
         ) : (
-          isSuccess && <ChatListbox chats={chatRooms?.data ?? []} />
+          isSuccess && <ChatListbox chats={rooms} />
         )}
         {isFetchingNextPage && (
           <Spinner color="primary" className="my-4 mx-auto" />

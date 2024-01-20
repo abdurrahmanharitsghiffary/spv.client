@@ -16,7 +16,7 @@ import { FiEdit } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
-import { useUpdateGroupChatOptimistic } from "@/lib/api/chats/mutation";
+import { useUpdateGroupChat } from "@/lib/api/chats/mutation";
 import {
   useEditGroupActions,
   useEditGroupIsOpen,
@@ -27,9 +27,13 @@ import {
 } from "@/components/input/input-with-control";
 import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useParams } from "next/navigation";
-import UserGroupList from "@/components/user/user-group-list";
 import { TypographyLarge } from "@/components/ui/typography";
 import UserGroupLists from "@/components/user/user-group-lists";
+import { ParticipantsField } from "@/types";
+import { MdGroup } from "react-icons/md";
+import { useConfirm } from "@/stores/confirm-store";
+import { DISCARD_CHANGE_CONFIRM_PROPS, saveChangesProps } from "@/lib/consts";
+import CancelButton from "@/components/button/reset-button";
 
 const editGroupSchema = z.object({
   participants: z.any().array().optional(),
@@ -44,9 +48,10 @@ const editGroupSchema = z.object({
 type EditGroupSchema = z.infer<typeof editGroupSchema>;
 
 export default function EditGroupModal() {
+  const confirm = useConfirm();
   const { groupId } = useParams();
   const { chatRoom } = useGetChatRoomById(Number(groupId));
-  const { updateGroupChatAsync } = useUpdateGroupChatOptimistic();
+  const { updateGroupChatAsync } = useUpdateGroupChat();
   const {
     formState: { isSubmitSuccessful, errors },
     handleSubmit,
@@ -109,11 +114,15 @@ export default function EditGroupModal() {
   );
 
   const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
+    await confirm(saveChangesProps("group"));
     await toast.promise(
       updateGroupChatAsync({
         body: {
           image: data?.image,
-          participants: data?.participants ?? [],
+          participants: (data?.participants ?? []).map((p) => ({
+            id: p.id,
+            role: p.role,
+          })) as ParticipantsField[],
           title: data?.title,
           description: data?.description,
         },
@@ -138,17 +147,22 @@ export default function EditGroupModal() {
 
   const file = watch("image");
   const groupPictureSrc = useMemo(
-    () => (file ? URL.createObjectURL(file) : ""),
-    [file]
+    () =>
+      file ? URL.createObjectURL(file) : chatRoom?.data?.picture?.src ?? "",
+    [file, chatRoom?.data?.picture?.src]
   );
+
   return (
     <ModalLayoutV2
       isOpen={isOpen}
       onClose={handleClose}
       footer={
-        <Button type="submit" color="primary" form="create_group_form">
-          Submit
-        </Button>
+        <div className="flex gap-2">
+          <CancelButton onReset={reset} />
+          <Button type="submit" form="edit_group_form" color="primary">
+            Save changes
+          </Button>
+        </div>
       }
     >
       {errors?.participants?.message && (
@@ -158,18 +172,16 @@ export default function EditGroupModal() {
       )}
       <form
         className="p-4 px-0 flex flex-col gap-6 max-w-lg"
-        id="create_group_form"
+        id="edit_group_form"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="w-fit h-fit mx-auto flex flex-col gap-4 justify-center items-center">
           <TypographyLarge>Group picture</TypographyLarge>
           <Avatar
-            fallback={
-              <div className="p-4 w-[80px] h-[80px] aspect-square">
-                <BsCardImage className="w-full h-full aspect-square" />
-              </div>
-            }
+            fallback={<MdGroup size={40} />}
             src={groupPictureSrc}
+            showFallback
+            isBordered
             className="w-[120px] h-[120px] aspect-square"
           />
 

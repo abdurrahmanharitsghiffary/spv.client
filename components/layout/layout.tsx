@@ -24,7 +24,7 @@ export default function Layout({
       <div
         className={clsx(
           "flex w-full flex-col items-center text-start justify-center relative max-w-lg",
-          chatId && "max-w-none"
+          chatId && "!max-w-none"
         )}
       >
         {children}

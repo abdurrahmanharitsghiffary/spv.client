@@ -8,6 +8,7 @@ import { Chat } from "@/types/chat";
 import { Avatar } from "@nextui-org/avatar";
 import { Badge } from "@nextui-org/badge";
 import { useMessageMenuActions } from "@/stores/message-menu-store";
+import TextWithLimit from "../text-with-limit";
 
 const ChatBubble = forwardRef<
   HTMLDivElement,
@@ -94,9 +95,7 @@ const ChatBubble = forwardRef<
               {chat.author.fullName}
             </TypographyMuted>
           )}
-          <TypographyP className="!text-[1rem] !mt-0 break-words">
-            {chat?.message}
-          </TypographyP>
+          <TextWithLimit text={chat?.message ?? ""} />
           {images && images.length > 0 ? (
             <Gallery className="max-w-[270px]" images={images as any} />
           ) : null}

@@ -8,8 +8,8 @@ export default function SearchLayout({
 }) {
   return (
     <>
-      <div className="w-full pt-[42px]">{children}</div>
-      <FabTop className="bottom-16 z-[101]" />
+      <div className="w-full pt-11 md:pt-4 max-w-lg">{children}</div>
+      <FabTop className="bottom-16 md:bottom-4 z-[101]" />
     </>
   );
 }

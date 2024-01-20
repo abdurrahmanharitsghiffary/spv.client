@@ -118,6 +118,7 @@ export type ParticipantsField = { role: "user" | "admin"; id: number };
 
 type URP = {
   updating: "participants";
+  roomId: number;
   data: ChatRoomParticipant[];
 };
 
@@ -128,6 +129,7 @@ type URD = {
 
 type URDEL = {
   updating: "delete-participants";
+  roomId: number;
   data: number[];
 };
 

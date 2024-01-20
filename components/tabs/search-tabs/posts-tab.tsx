@@ -14,6 +14,8 @@ export function PostTabLoading() {
 }
 
 export default function PostsTab({ posts }: { posts: PostExtended[] }) {
+  if (posts.length < 1)
+    return <span className="text-foreground-400 p-4">No post found.</span>;
   return (
     <div className="flex flex-col pt-0 gap-2">
       {(posts ?? []).map((post) => (

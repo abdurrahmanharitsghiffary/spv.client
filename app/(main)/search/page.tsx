@@ -1,6 +1,10 @@
-import React from "react";
+import React, { Suspense } from "react";
 import SearchTabs from "@/components/tabs/search-tabs";
 
 export default function SearchPage() {
-  return <SearchTabs />;
+  return (
+    <Suspense>
+      <SearchTabs />
+    </Suspense>
+  );
 }

@@ -9,6 +9,7 @@ import {
 } from "@nextui-org/modal";
 import { SlotsToClasses } from "@nextui-org/theme";
 import { HTMLMotionProps } from "framer-motion";
+import clsx from "clsx";
 
 export interface ModalLayoutProps {
   id?: string;
@@ -83,6 +84,15 @@ const ModalLayout = forwardRef(
     }: ModalLayoutProps,
     ref: React.Ref<HTMLElement | null>
   ) => {
+    const handleClose = () => {
+      const toastElement: any = document.querySelector(".Toastify");
+      const clickedToast = event?.composedPath()?.includes(toastElement);
+      if (clickedToast) {
+        return;
+      }
+      onClose();
+    };
+
     return (
       <Modal
         motionProps={motionProps}
@@ -95,14 +105,15 @@ const ModalLayout = forwardRef(
         scrollBehavior={scrollBehavior}
         classNames={{
           ...wrapperClassNames,
-          wrapper: wrapperClassNames?.wrapper ?? "" + " z-[201]",
+          wrapper: clsx(wrapperClassNames?.wrapper, "z-[201]"),
+          backdrop: clsx(wrapperClassNames?.backdrop, "z-[201]"),
         }}
         closeButton={closeButton}
         placement={placement}
         className={" my-0 h-auto " + classNames?.wrapper ?? ""}
         size={size ? size : "md"}
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleClose}
       >
         <ModalContent className={classNames?.content ?? ""}>
           <ModalHeader className={classNames?.header ?? ""}>

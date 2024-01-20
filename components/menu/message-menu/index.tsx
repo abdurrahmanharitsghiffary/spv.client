@@ -16,6 +16,8 @@ import { useConfirm } from "@/stores/confirm-store";
 import { useMessageEditDisclosure } from "@/context/message-edit-form-context";
 import { useSession } from "@/stores/auth-store";
 import { useMessageInfoDisclosure } from "@/context/message-info-context";
+import { notifyToast } from "@/lib/toast";
+import { GoReport } from "react-icons/go";
 
 export default function MessageMenu() {
   const isOpen = useMessageMenuIsOpen();
@@ -31,13 +33,12 @@ export default function MessageMenu() {
   const baseItems: MenuItems[] = [
     { key: "info", label: "Message details", icon: <AiFillInfoCircle /> },
     { key: "copy", label: "Copy message", icon: <AiOutlineCopy /> },
-    // { key: "edit", label: "Edit message", icon: <AiOutlineEdit /> },
-    // { key: "delete", label: "Delete message", icon: <BiTrash /> },
   ];
 
   if (session?.id === message?.data?.author?.id) {
     baseItems.push(
       { key: "edit", label: "Edit message", icon: <AiOutlineEdit /> },
+      { key: "report-delete", label: "Report Message", icon: <GoReport /> },
       { key: "delete", label: "Delete message", icon: <BiTrash /> }
     );
   }
@@ -62,7 +63,10 @@ export default function MessageMenu() {
         return;
       }
       case "info": {
-        onDetailClick();
+        return onDetailClick();
+      }
+      default: {
+        return notifyToast("Cooming soon!");
       }
     }
   };

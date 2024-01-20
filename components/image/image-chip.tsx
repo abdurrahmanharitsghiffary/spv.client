@@ -29,7 +29,7 @@ export default function ImageChip({
       </PopoverTrigger>
       <PopoverContent className="w-fit max-w-[90%] sm:max-w-[350px]">
         <div className="p-1 flex flex-col gap-2">
-          <TypographyLarge className="font-semibold text-sm">
+          <TypographyLarge className="font-semibold text-sm px-2">
             {image.name}
           </TypographyLarge>
           <Image
@@ -38,7 +38,7 @@ export default function ImageChip({
             width={95}
             height={95}
             quality={35}
-            className="w-auto h-auto max-w-[120px] rounded-sm"
+            className="w-auto h-auto max-w-[120px] rounded-sm px-2"
           />
           <table className="w-fit border-separate border-spacing-1">
             <tbody>

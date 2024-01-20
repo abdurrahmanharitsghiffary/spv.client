@@ -33,19 +33,23 @@ function ModalGif() {
   const handleCreateComment = () => {
     if (replyId)
       return createReplyComment({
-        imageSrc: gif?.images?.original?.url,
-        comment: "",
-        commentId: replyId,
+        body: {
+          imageSrc: gif?.images?.original?.url,
+          comment: "",
+          commentId: replyId,
+        },
       });
     else if (commentId)
       return createReplyComment({
-        commentId: Number(commentId),
-        imageSrc: gif?.images?.original?.url,
-        comment: "",
+        body: {
+          commentId: Number(commentId),
+          imageSrc: gif?.images?.original?.url,
+          comment: "",
+        },
       });
     else if (postId)
       return createComment({
-        data: {
+        body: {
           comment: "",
           postId: Number(postId),
           imageSrc: gif?.images?.original?.url,
@@ -61,7 +65,7 @@ function ModalGif() {
       classNames={{
         body: "p-0 m-0 shadow-medium",
         wrapper:
-          "z-[102] w-fit h-fit m-0 p-0 bg-opacity-0 rounded-none shadow-none",
+          "z-[103] w-fit h-fit m-0 p-0 bg-opacity-0 rounded-none shadow-none",
         header: "p-0 w-0 h-0",
       }}
       placement="center"

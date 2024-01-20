@@ -26,7 +26,18 @@ export default function SingleComment({
 
   return (
     <div className={cl}>
-      <User user={comment?.user} createdAt={comment?.createdAt} />
+      <div className="w-full flex justify-between items-center">
+        <User user={comment?.user} createdAt={comment?.createdAt} />
+
+        <div className="flex gap-2 justify-between items-center">
+          <CommentLikeButton
+            total={comment?.total_likes ?? 0}
+            commentId={comment?.id}
+          />
+          <CommentMenuTrigger comment={commentId} />
+        </div>
+      </div>
+
       {comment?.image && (
         <ImageWithPreview
           removeWrapper
@@ -36,13 +47,6 @@ export default function SingleComment({
         />
       )}
       {comment?.comment && <TypographyP>{comment?.comment}</TypographyP>}
-      <div className="flex gap-2 justify-between items-center absolute top-0 right-4">
-        <CommentLikeButton
-          total={comment?.total_likes ?? 0}
-          commentId={comment?.id}
-        />
-        <CommentMenuTrigger comment={commentId} />
-      </div>
     </div>
   );
 }

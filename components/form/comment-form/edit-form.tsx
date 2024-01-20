@@ -56,8 +56,12 @@ export default function CommentEditForm({ className }: { className?: string }) {
   const onSubmit: SubmitHandler<CommentEditSchema> = async (data) => {
     if (!selectedComment) return null;
     await updateCommentAsync({
-      commentId: selectedComment?.id,
-      comment: data?.comment,
+      params: {
+        commentId: selectedComment?.id,
+      },
+      body: {
+        comment: data?.comment,
+      },
     });
   };
   const currentComment = watch("comment");
