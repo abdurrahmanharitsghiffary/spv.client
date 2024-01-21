@@ -7,10 +7,6 @@ import { useEffect } from "react";
 
 const instance = axios.create({
   withCredentials: true,
-  headers: {
-    "Access-Control-Allow-Origin": process.env.BASE_WEB_URL,
-    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-  },
 });
 
 export default function useAxiosInterceptor() {
