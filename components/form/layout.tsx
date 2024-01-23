@@ -20,10 +20,11 @@ export default function FormLayout({
   onSubmit: any;
   classNames?: SlotsToClasses<"base" | "body" | "footer" | "header">;
 }) {
-  const style = cn(className, "w-full min-w-[320px] max-w-sm");
+  const style = cn(className, "!shadow-small w-full min-w-[320px] max-w-sm");
 
   return (
     <Card
+      radius="none"
       isBlurred
       className={style}
       as="form"

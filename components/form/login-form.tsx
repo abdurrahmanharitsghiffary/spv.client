@@ -67,7 +67,7 @@ export default function LoginForm() {
           </Button>
           <TextDivider>or</TextDivider>
           <Button
-            className="bg-default-800 text-default"
+            className="bg-default-100 text-default-foreground"
             size="md"
             color="secondary"
             type="button"
