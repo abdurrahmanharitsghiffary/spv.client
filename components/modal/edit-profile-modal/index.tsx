@@ -140,11 +140,6 @@ export default function EditProfileModal() {
     [coverImage, resp?.data?.profile?.coverImage?.src]
   );
 
-  const handleCancel = async () => {
-    await confirm(DISCARD_CHANGE_CONFIRM_PROPS);
-    reset();
-  };
-
   return (
     <ModalLayoutV2
       isOpen={isOpen}
@@ -264,10 +259,6 @@ export default function EditProfileModal() {
           label="Bio"
           control={control}
           name="bio"
-          // isInvalid={bio?.message !== undefined}
-          // errorMessage={bio?.message}
-          // color={bio?.message ? "danger" : "default"}
-          // {...register("bio")}
           placeholder="Enter your new bio"
         />
       </form>

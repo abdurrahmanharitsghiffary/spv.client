@@ -19,6 +19,9 @@ import CommentFormLayout from "./layout";
 import CommentFormWrapper from "./wrapper";
 import CommentFormBody from "./body";
 import SendTextarea from "@/components/input/send-textarea";
+import { toast } from "react-toastify";
+
+const FORM_ID = "comment_edit_form";
 
 export default function CommentEditForm({ className }: { className?: string }) {
   const isOpen = useCommentEditStore((state) => state.isOpen);
@@ -32,10 +35,7 @@ export default function CommentEditForm({ className }: { className?: string }) {
     watch,
     control,
     reset,
-    formState: {
-      errors: { comment: commentErrors },
-      isSubmitSuccessful,
-    },
+    formState: { isSubmitSuccessful },
   } = useForm<CommentEditSchema>({
     resolver: zodResolver(commentEditSchema),
     defaultValues: { comment: "" },
@@ -55,14 +55,20 @@ export default function CommentEditForm({ className }: { className?: string }) {
 
   const onSubmit: SubmitHandler<CommentEditSchema> = async (data) => {
     if (!selectedComment) return null;
-    await updateCommentAsync({
-      params: {
-        commentId: selectedComment?.id,
-      },
-      body: {
-        comment: data?.comment,
-      },
-    });
+    await toast.promise(
+      updateCommentAsync({
+        params: {
+          commentId: selectedComment?.id,
+        },
+        body: {
+          comment: data?.comment,
+        },
+      }),
+      {
+        pending: "Saving changes...",
+        error: "Something went wrong!",
+      }
+    );
   };
   const currentComment = watch("comment");
   const handleSuccessSpeech = (val: string | undefined | null) => {
@@ -82,12 +88,17 @@ export default function CommentEditForm({ className }: { className?: string }) {
       <CommentFormLayout className={clsx("z-[102]", className)}>
         <CommentFormWrapper>
           <Divider />
-          <CommentFormBody as="form" onSubmit={handleSubmit(onSubmit)}>
+          <CommentFormBody
+            as="form"
+            id={FORM_ID}
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <SendTextarea
               placeholder="Write new comment..."
               control={control}
               name="comment"
               isShowSendButton={currentComment as unknown as boolean}
+              ButtonProps={{ form: FORM_ID }}
             />
             <Recorder
               className="text-[1.125rem]"
