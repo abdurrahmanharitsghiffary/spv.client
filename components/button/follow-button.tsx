@@ -7,7 +7,7 @@ import { useGetUserIsFollowed } from "@/lib/api/users/query";
 import { useSession } from "@/stores/auth-store";
 import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";
-import React, { MouseEvent, MouseEventHandler } from "react";
+import React, { MouseEvent } from "react";
 
 export default function FollowButton({
   userId,

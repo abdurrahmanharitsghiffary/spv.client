@@ -179,11 +179,8 @@ export const useDeletePost = () => {
           updater: <OD extends ApiResponseT<UserAccount>>(oldData: OD): OD =>
             produce(oldData, (draft) => {
               if (draft.data) {
-                const totalPost = draft.data.posts.total;
-                draft.data.posts.total += totalPost > 0 ? -1 : 0;
-                draft.data.posts.postIds = draft.data.posts.postIds.filter(
-                  (id) => id !== postId
-                );
+                const totalPost = draft.data.count.posts;
+                draft.data.count.posts += totalPost > 0 ? -1 : 0;
               }
             }),
         },
@@ -205,7 +202,6 @@ const updateLikePost = <OD extends InfinitePost>(
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
               draft.pages[pi].data[poi].total_likes += 1;
-              draft.pages[pi].data[poi].isLiked = true;
             }
           });
         }
@@ -227,7 +223,6 @@ const updateUnlikePost = <OD extends InfinitePost>(
               if (totalLikes > 0) {
                 draft.pages[pi].data[poi].total_likes -= 1;
               }
-              draft.pages[pi].data[poi].isLiked = false;
             }
           });
         }
@@ -267,7 +262,6 @@ export const useLikePost = () => {
             produce(oldData, (draft) => {
               if (draft?.data) {
                 draft.data.total_likes += 1;
-                draft.data.isLiked = true;
               }
             }),
         },
@@ -319,7 +313,6 @@ export const useUnlikePost = () => {
                 if (draft.data.total_likes > 0) {
                   draft.data.total_likes -= 1;
                 }
-                draft.data.isLiked = false;
               }
             }),
         },

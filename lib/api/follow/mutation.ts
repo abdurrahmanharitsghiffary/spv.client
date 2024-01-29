@@ -25,8 +25,7 @@ export const useFollowAccount = () => {
           ): OD =>
             produce(oldData, (draft) => {
               if (draft?.data) {
-                draft.data.followedBy.followerIds.push(uId);
-                draft.data.followedBy.total += 1;
+                draft.data.count.followedBy += 1;
               }
             }),
         },
@@ -59,10 +58,8 @@ export const useUnfollowAccount = () => {
           ): OD =>
             produce(oldData, (draft) => {
               if (draft?.data) {
-                draft.data.followedBy.followerIds =
-                  draft.data.followedBy.followerIds.filter((id) => id !== uId);
-                draft.data.followedBy.total +=
-                  draft.data.followedBy.total > 0 ? -1 : 0;
+                draft.data.count.followedBy +=
+                  draft.data.count.followedBy > 0 ? -1 : 0;
               }
             }),
         },

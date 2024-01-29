@@ -50,7 +50,7 @@ function PostCard(
       <PostCardFooter
         postId={post?.id}
         totalLikes={post?.total_likes ?? 0}
-        totalComments={post?.comments?.total ?? 0}
+        totalComments={post?.total_comments ?? 0}
         isPostPage={isPostPage}
         isPreview={isPreview}
       />
