@@ -49,7 +49,7 @@ import {
   UserFollowerResponse,
   UserFollowingResponse,
 } from "@/types/user";
-import { PostExtended, PostLikeResponse } from "@/types/post";
+import { Post, PostLikeResponse } from "@/types/post";
 import { Comment, CommentLikeResponse } from "@/types/comment";
 import { Chat } from "@/types/chat";
 import { useMemo } from "react";
@@ -339,7 +339,7 @@ export const useGetPosts = (
   const request = useAxiosInterceptor();
 
   const { data: posts, ...rest } = useQuery<
-    ApiPagingObjectResponse<PostExtended[]>
+    ApiPagingObjectResponse<Post[]>
   >({
     queryKey: keys.posts,
     queryFn: () =>
@@ -358,7 +358,7 @@ export const useGetPostByUserId = (
   config?: AxiosRequestConfig
 ) => {
   const { data: posts, ...rest } = useQuery<
-    ApiPagingObjectResponse<PostExtended[]>
+    ApiPagingObjectResponse<Post[]>
   >({
     queryKey: [...keys.posts, userId, query, "users"],
     queryFn: () =>
@@ -374,7 +374,7 @@ export const useGetPostByUserId = (
 export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
   const request = useAxiosInterceptor();
 
-  const { data: post, ...rest } = useQuery<ApiResponseT<PostExtended>>({
+  const { data: post, ...rest } = useQuery<ApiResponseT<Post>>({
     queryKey: keys.postById(postId),
     queryFn: () =>
       request
@@ -393,7 +393,7 @@ export const useGetPostFromFollowedUsers = (
   const request = useAxiosInterceptor();
 
   const { data: followedUsersPost, ...rest } = useQuery<
-    ApiPagingObjectResponse<PostExtended[]>
+    ApiPagingObjectResponse<Post[]>
   >({
     queryKey: keys.posts,
     queryFn: () =>
@@ -1071,7 +1071,7 @@ export const useGetMyPosts = (
   const request = useAxiosInterceptor();
 
   const { data: myPosts, ...rest } = useQuery<
-    ApiPagingObjectResponse<PostExtended[]>
+    ApiPagingObjectResponse<Post[]>
   >({
     queryKey: keys.mePosts(),
     queryFn: () =>
@@ -1435,7 +1435,7 @@ export const useGetSearchResult = (
   const request = useAxiosInterceptor();
 
   const { data: resp, ...rest } = useQuery<
-    ApiPagingObjectResponse<UserAccountPublic[] | PostExtended[]>
+    ApiPagingObjectResponse<UserAccountPublic[] | Post[]>
   >({
     queryKey: keys.search(options),
     queryFn: () =>

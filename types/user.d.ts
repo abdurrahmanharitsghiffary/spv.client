@@ -7,7 +7,6 @@ export interface UserAccountPublic {
   lastName: string;
   fullName: string | null;
   username: string;
-  isFollowed: boolean;
   profile: {
     birthDate: Date | null;
     gender: "male" | "female" | null;
@@ -15,17 +14,10 @@ export interface UserAccountPublic {
     avatarImage: Image;
     coverImage: Image;
   } | null;
-  followedBy: {
-    followerIds: number[];
-    total: number;
-  };
-  following: {
-    followedUserIds: number[];
-    total: number;
-  };
-  posts: {
-    postIds: number[];
-    total: number;
+  count: {
+    posts: number;
+    followedBy: number;
+    following: number;
   };
   createdAt: Date;
   updatedAt: Date;

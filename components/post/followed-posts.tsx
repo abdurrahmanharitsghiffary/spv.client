@@ -2,12 +2,11 @@
 import React from "react";
 import PostsGridLayout from "../layout/posts-grid-layout";
 import PostCard from "./post-card";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import PostCardSkeleton from "./skeleton";
 import { useGetPostFromFollowedUsers } from "@/lib/api/posts/query";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function FollowedPosts() {
   const {
@@ -34,9 +33,7 @@ export default function FollowedPosts() {
         {isLoading
           ? [1, 2].map((item) => <PostCardSkeleton key={item} />)
           : isSuccess &&
-            data.map((post: PostExtended) => (
-              <PostCard post={post} key={post.id} />
-            ))}
+            data.map((post: Post) => <PostCard post={post} key={post.id} />)}
         {isFetchingNextPage && <Spinner className="mx-auto my-4" />}
       </PostsGridLayout>
       <div ref={ref}></div>

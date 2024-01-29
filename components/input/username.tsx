@@ -17,9 +17,7 @@ export default function InputUsername<T extends FieldValues>(
       placeholder="Enter your username"
       className={style}
       {...props}
+      name={props.name ?? "username"}
     />
   );
 }
-
-// InputUsername.displayName = "InputUsername";
-// export default InputUsername;

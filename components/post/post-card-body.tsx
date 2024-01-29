@@ -2,7 +2,7 @@ import { CardBody } from "@nextui-org/card";
 import React from "react";
 import { TypographyH4 } from "../ui/typography";
 import Link from "next/link";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import Gallery from "../image/gallery";
 import TextWithLimit from "../text-with-limit";
 
@@ -19,7 +19,7 @@ export default function PostCardBody({
   title: string;
   content: string;
   postId: number;
-  postImages: PostExtended["images"];
+  postImages: Post["images"];
 }) {
   return (
     <CardBody className="gap-2">

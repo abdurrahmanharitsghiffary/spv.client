@@ -17,7 +17,7 @@ import {
 import { AxiosRequestConfig } from "axios";
 import { useMutate, useOptimistic } from "../hooks";
 import { produce } from "immer";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { UserAccount } from "@/types/user";
 type UpdatePostOptions = {
   content?: string;
@@ -25,8 +25,8 @@ type UpdatePostOptions = {
   images?: File[];
 };
 
-type InfinitePost = InfiniteData<ApiPagingObjectResponse<PostExtended[]>>;
-type PostResponse = ApiResponseT<PostExtended>;
+type InfinitePost = InfiniteData<ApiPagingObjectResponse<Post[]>>;
+type PostResponse = ApiResponseT<Post>;
 
 export const useCreatePost = () => {
   const {
@@ -263,7 +263,7 @@ export const useLikePost = () => {
         },
         {
           queryKey: keys.postById(postId),
-          updater: <OD extends ApiResponseT<PostExtended>>(oldData: OD): OD =>
+          updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
             produce(oldData, (draft) => {
               if (draft?.data) {
                 draft.data.total_likes += 1;
@@ -313,7 +313,7 @@ export const useUnlikePost = () => {
         },
         {
           queryKey: keys.postById(postId),
-          updater: <OD extends ApiResponseT<PostExtended>>(oldData: OD): OD =>
+          updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
             produce(oldData, (draft) => {
               if (draft?.data) {
                 if (draft.data.total_likes > 0) {

@@ -17,6 +17,7 @@ export default function InputEmail<T extends FieldValues>(
       placeholder="Enter your email"
       className={style}
       {...props}
+      name={props.name ?? "email"}
     />
   );
 }

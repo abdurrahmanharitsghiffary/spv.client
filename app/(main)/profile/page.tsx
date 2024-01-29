@@ -35,9 +35,9 @@ export default function ProfilePage() {
   });
 
   const userPosts = myPosts?.data ?? [];
-  const followers = resp?.data?.followedBy?.total ?? 0;
-  const following = resp?.data?.following?.total ?? 0;
-  const totalPost = resp?.data?.posts?.total ?? 0;
+  const followers = resp?.data?.count?.followedBy ?? 0;
+  const following = resp?.data?.count?.following ?? 0;
+  const totalPost = resp?.data?.count?.posts ?? 0;
 
   return (
     <>

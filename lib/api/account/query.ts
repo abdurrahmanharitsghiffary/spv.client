@@ -10,7 +10,7 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { useInfinite, useQ } from "../hooks";
 import { ChatRoom } from "@/types/chat";
 
@@ -54,7 +54,7 @@ export const useGetMyPosts = (
   query: OffsetPaging = { limit: 20, offset: 0 },
   config?: AxiosRequestConfig
 ) => {
-  const { data: myPosts, ...rest } = useInfinite<PostExtended>({
+  const { data: myPosts, ...rest } = useInfinite<Post>({
     query: {
       limit: query?.limit?.toString(),
       offset: query?.offset?.toString(),

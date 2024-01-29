@@ -1,7 +1,7 @@
 import React from "react";
 import User from "../user/user";
 import PostMenuTrigger from "../menu/post-menu/trigger";
-import { PostExtended, PostId } from "@/types/post";
+import { Post, PostId } from "@/types/post";
 import { CardHeader } from "@nextui-org/card";
 import IconButton from "../button/icon-button";
 import { FiMoreVertical } from "react-icons/fi";
@@ -13,7 +13,7 @@ export default function PostCardHeader({
   postId,
 }: {
   createdAt: Date;
-  author: PostExtended["author"] | undefined;
+  author: Post["author"] | undefined;
   isPreview?: boolean;
   postId: PostId;
 }) {

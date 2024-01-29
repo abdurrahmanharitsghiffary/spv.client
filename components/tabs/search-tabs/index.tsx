@@ -7,7 +7,7 @@ import PostsTab, { PostTabLoading } from "./posts-tab";
 import { useGetSearchResult } from "@/lib/api/search";
 import { Key, SearchAllData } from "@/types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { UserAccountPublic } from "@/types/user";
 import Search from "@/components/search";
 
@@ -67,7 +67,7 @@ export default function SearchTabs() {
         />
       </>
     ) : type === "post" ? (
-      <PostsTab posts={data as PostExtended[]} />
+      <PostsTab posts={data as Post[]} />
     ) : (
       <UsersTab users={data as UserAccountPublic[]} />
     );

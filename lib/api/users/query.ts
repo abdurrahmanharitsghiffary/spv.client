@@ -12,12 +12,7 @@ import {
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
 import { ApiResponseT, ApiPagingObjectResponse } from "@/types/response";
-import {
-  UserAccount,
-  UserAccountPublic,
-  UserFollowingResponse,
-  UserSimplified,
-} from "@/types/user";
+import { UserAccount, UserAccountPublic, UserSimplified } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite } from "../hooks";

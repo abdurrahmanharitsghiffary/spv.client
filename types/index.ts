@@ -1,5 +1,5 @@
 import { SVGProps } from "react";
-import { PostExtended } from "./post";
+import { Post } from "./post";
 import { UserAccountPublic } from "./user";
 import { ChatRoom, ChatRoomParticipant } from "./chat";
 
@@ -108,7 +108,7 @@ export type OffsetPagingwithOrder =
 
 export type PaginationData<T> = { data: T; total: number };
 export type SearchAllData = {
-  posts: PaginationData<PostExtended[]>;
+  posts: PaginationData<Post[]>;
   users: PaginationData<UserAccountPublic[]>;
 };
 

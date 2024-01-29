@@ -1,5 +1,5 @@
 import { Image } from "./profile";
-import { UserLike, UserSimplifiedWF } from "./user";
+import { UserSimplifiedWF } from "./user";
 
 export type Post = {
   id: number;
@@ -7,24 +7,10 @@ export type Post = {
   content: string;
   images: (Image & { id: number })[] | null;
   author: UserSimplifiedWF;
-  isLiked: boolean;
-  isBookmarked: boolean;
   total_likes: number;
   createdAt: Date;
   updatedAt: Date;
-};
-
-export type PostExtended = {
-  comments: {
-    ids: number[];
-    total: number;
-  };
-} & Post;
-
-export type PostLikeResponse = {
-  postId: number;
-  likedBy: UserLike[];
-  total: number;
+  total_comments: number;
 };
 
 export type PostId = {

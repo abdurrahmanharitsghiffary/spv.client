@@ -1,6 +1,6 @@
 import PostCard from "@/components/post/post-card";
 import PostCardSkeleton from "@/components/post/skeleton";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import React from "react";
 
 export function PostTabLoading() {
@@ -13,7 +13,7 @@ export function PostTabLoading() {
   );
 }
 
-export default function PostsTab({ posts }: { posts: PostExtended[] }) {
+export default function PostsTab({ posts }: { posts: Post[] }) {
   if (posts.length < 1)
     return <span className="text-foreground-400 p-4">No post found.</span>;
   return (

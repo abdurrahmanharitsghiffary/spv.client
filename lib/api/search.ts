@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchAllData, SearchOptions } from "@/types";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { UserAccountPublic } from "@/types/user";
 import { AxiosRequestConfig } from "axios";
 import { keys } from "../queryKey";
@@ -19,7 +19,7 @@ export const useGetSearchResult = (
   };
 
   const { data: resp, ...rest } = useInfinite<
-    UserAccountPublic | PostExtended | SearchAllData
+    UserAccountPublic | Post | SearchAllData
   >({
     queryKey: keys.search(options),
     url: searchRoute(options),

@@ -1,13 +1,13 @@
 import { Card, CardProps } from "@nextui-org/card";
 import React, { memo } from "react";
 import { Divider } from "@nextui-org/divider";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import PostCardHeader from "./post-card-header";
 import PostCardBody from "./post-card-body";
 import PostCardFooter from "./post-card-footer";
 
 interface PostCardProps {
-  post: PostExtended | undefined;
+  post: Post | undefined;
 }
 
 function PostCard(

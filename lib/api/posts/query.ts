@@ -12,7 +12,7 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { OffsetPaging } from "@/types";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite, useQ } from "../hooks";
 import { UserSimplified } from "@/types/user";
@@ -25,7 +25,7 @@ export const useGetPosts = (
     limit: options?.limit?.toString() ?? "20",
     offset: options?.offset?.toString() ?? "0",
   };
-  const { data: posts, ...rest } = useInfinite<PostExtended>({
+  const { data: posts, ...rest } = useInfinite<Post>({
     url: basePostRoutes(options),
     queryKey: [...keys.posts, options],
     config,
@@ -36,7 +36,7 @@ export const useGetPosts = (
 };
 
 export const useGetPostById = (postId: number, config?: AxiosRequestConfig) => {
-  const { data: post, ...rest } = useQ<PostExtended>({
+  const { data: post, ...rest } = useQ<Post>({
     url: postById(postId.toString()),
     queryKey: keys.postById(postId),
     config,
@@ -58,7 +58,7 @@ export const useGetPostByUserId = (
     offset: query.offset?.toString() ?? "0",
   };
 
-  const { data: posts, ...rest } = useInfinite<PostExtended>({
+  const { data: posts, ...rest } = useInfinite<Post>({
     queryKey: [...keys.posts, userId, q, "users"],
     query: q,
     url: userPost(userId.toString()),
@@ -77,7 +77,7 @@ export const useGetPostFromFollowedUsers = (
     offset: options?.offset?.toString() ?? "0",
   };
 
-  const { data: resp, ...rest } = useInfinite<PostExtended>({
+  const { data: resp, ...rest } = useInfinite<Post>({
     query: q,
     url: followedUserPost(options),
     queryKey: [...keys.followedUsersPost(), options],
@@ -139,7 +139,7 @@ export const useGetMySavedPosts = (
   };
 
   const { data: mySavedPosts, ...rest } = useInfinite<
-    PostExtended & { assignedAt: Date }
+    Post & { assignedAt: Date }
   >({
     url: mySavedPostsRoute(query),
     query: q,

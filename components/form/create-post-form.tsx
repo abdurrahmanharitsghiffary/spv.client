@@ -10,7 +10,7 @@ import {
   createPostValidationSchema,
 } from "@/lib/zod-schema/post";
 import CreatePostImageChip from "./create-post-image-chip";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { useCreatePost } from "@/lib/api/posts/mutation";
 import { toast } from "react-toastify";
 import clsx from "clsx";
@@ -228,7 +228,7 @@ export default function CreatePostForm({
             radius="none"
             isPreview
             className={`rounded-none w-full`}
-            post={post as unknown as PostExtended}
+            post={post as unknown as Post}
           />
         </div>
       )}

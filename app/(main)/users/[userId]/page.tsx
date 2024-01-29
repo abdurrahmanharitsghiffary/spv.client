@@ -14,7 +14,7 @@ import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
 import { useGetPostByUserId } from "@/lib/api/posts/query";
 import { useGetUserById } from "@/lib/api/users/query";
 import { useSession } from "@/stores/auth-store";
-import { PostExtended } from "@/types/post";
+import { Post } from "@/types/post";
 import { Divider } from "@nextui-org/divider";
 import { Spinner } from "@nextui-org/spinner";
 import { useRouter } from "next/navigation";
@@ -80,8 +80,8 @@ export default function UserPage({ params }: { params: { userId: string } }) {
               <ProfileInfo
                 userId={Number(params.userId)}
                 postCount={posts?.pagination?.total_records ?? 0}
-                followedCount={userData?.data?.following?.total ?? 0}
-                followersCount={userData?.data?.followedBy?.total ?? 0}
+                followedCount={userData?.data?.count?.following ?? 0}
+                followersCount={userData?.data?.count?.followedBy ?? 0}
               />
             </div>
             <UserActionButton userId={userData?.data?.id ?? -1} />
@@ -93,7 +93,7 @@ export default function UserPage({ params }: { params: { userId: string } }) {
         {isPostsLoad
           ? [1, 2].map((item) => <PostCardSkeleton key={item} />)
           : isPostsSuccess &&
-            posts?.data?.map((data: PostExtended) => (
+            posts?.data?.map((data: Post) => (
               <PostCard post={data} key={data?.id} />
             ))}
         {isFetchingNextPage && <Spinner className="mt-4" />}
