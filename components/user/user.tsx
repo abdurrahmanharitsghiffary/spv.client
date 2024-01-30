@@ -27,8 +27,8 @@ export default function User({
 
   return (
     <NextUser
-      as={isPreview ? Link : undefined}
-      href={isPreview ? `/users/${user?.id}` : undefined}
+      as={isPreview ? undefined : Link}
+      href={isPreview ? undefined : `/users/${user?.id}`}
       avatarProps={avatarProps}
       name={user?.username}
       classNames={classNames}

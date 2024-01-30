@@ -28,6 +28,7 @@ export default function FormLayout({
       isBlurred
       className={style}
       as="form"
+      shadow="none"
       classNames={classNames}
       onSubmit={onSubmit}
     >

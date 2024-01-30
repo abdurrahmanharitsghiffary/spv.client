@@ -91,7 +91,7 @@ const ChatBubble = forwardRef<
           )}
         >
           {chat?.isGroupChat && (
-            <TypographyMuted className="!text-xs truncate break-words">
+            <TypographyMuted className="!text-xs truncate break-words z-10">
               {chat.author.fullName}
             </TypographyMuted>
           )}

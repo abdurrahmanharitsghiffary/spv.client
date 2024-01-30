@@ -44,7 +44,7 @@ export function InputWithControl<T extends FieldValues>(
 }
 
 export function TextareaWithControl<T extends FieldValues>(
-  props: UseControllerProps<T> & TextAreaProps
+  props: UseControllerProps<T> & TextAreaProps & { shouldShowError?: boolean }
 ) {
   const {
     name: _,
@@ -53,6 +53,7 @@ export function TextareaWithControl<T extends FieldValues>(
     disabled: _3,
     rules: _4,
     shouldUnregister: _5,
+    shouldShowError = true,
     ...rest
   } = props;
 
@@ -64,9 +65,17 @@ export function TextareaWithControl<T extends FieldValues>(
 
   return (
     <Textarea
-      isInvalid={errors[name]?.message !== undefined}
-      errorMessage={errors[name]?.message?.toString()}
-      color={errors[name]?.message ? "danger" : "default"}
+      isInvalid={shouldShowError ? errors[name]?.message !== undefined : false}
+      errorMessage={
+        shouldShowError ? errors[name]?.message?.toString() : undefined
+      }
+      color={
+        shouldShowError
+          ? errors[name]?.message
+            ? "danger"
+            : "default"
+          : "default"
+      }
       {...rest}
       name={name}
       onBlur={onBlur}

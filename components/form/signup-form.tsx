@@ -23,7 +23,7 @@ export default function SignUpForm() {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignUpValidationSchema>({
     resolver: zodResolver(signUpValidationSchema),
     defaultValues: {
@@ -37,6 +37,7 @@ export default function SignUpForm() {
   });
 
   const onSubmit: SubmitHandler<SignUpValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
     const { gender, ...rest } = data;
     const transformedData = {
       ...rest,

@@ -27,16 +27,20 @@ import {
   InputWithControl,
   TextareaWithControl,
 } from "@/components/input/input-with-control";
-import { DISCARD_CHANGE_CONFIRM_PROPS, saveChangesProps } from "@/lib/consts";
+import { saveChangesProps } from "@/lib/consts";
 import { useConfirm } from "@/stores/confirm-store";
 import CancelButton from "@/components/button/reset-button";
+import { useCreatePost } from "@/lib/api/posts/mutation";
+import { useSession } from "@/stores/auth-store";
 
 export default function EditProfileModal() {
   const confirm = useConfirm();
+  const { createPostAsync } = useCreatePost();
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { updateAccountAsync } = useUpdateMyAccountInfo();
   const { resp, isSuccess } = useGetMyAccountInfo();
+  const session = useSession();
 
   const {
     handleSubmit,
@@ -44,6 +48,7 @@ export default function EditProfileModal() {
     control,
     formState: {
       isSubmitSuccessful,
+      isSubmitting,
       errors: { gender, profileImage: pIErr, coverImage: cIErr },
     },
   } = useForm<EditProfileValidationSchema>({
@@ -73,6 +78,7 @@ export default function EditProfileModal() {
 
   const { onClose, isOpen } = useEditProfileControls();
   const onSubmit: SubmitHandler<EditProfileValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
     await confirm(saveChangesProps("profile"));
     await toast.promise(
       updateAccountAsync({
@@ -104,11 +110,25 @@ export default function EditProfileModal() {
         body: { image: data.profileImage },
         formData: true,
       });
+      await createPostAsync({
+        body: {
+          content: `${session?.fullName ?? ""} updated their profile picture`,
+          images: [data.profileImage],
+        },
+        formData: true,
+      });
     }
     if (data?.coverImage) {
       await updateCoverImageAsync({
         formData: true,
         body: { image: data.coverImage },
+      });
+      await createPostAsync({
+        body: {
+          content: `${session?.fullName ?? ""} updated their cover image`,
+          images: [data.coverImage],
+        },
+        formData: true,
       });
     }
   };

@@ -11,7 +11,6 @@ import { useParams } from "next/navigation";
 import { useMutate, useOptimistic } from "../hooks";
 
 type CreateReplyCommentData = {
-  commentId: number;
   comment: string;
   image?: File;
   imageSrc?: string;

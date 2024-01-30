@@ -40,6 +40,7 @@ export default function CommentForm({
   spacerClassName?: string;
 }) {
   const replyId = useGetSelectedCommentReplyId();
+  console.log(replyId, "Reply id");
   const replyUsername = useGetSelectedCommentReplyUsername() ?? "";
   const resetReply = useResetReplyValue();
   const { postId, commentId } = useParams();
@@ -51,7 +52,7 @@ export default function CommentForm({
     watch,
     control,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm<CreateCommentSchema>({
     resolver: zodResolver(createCommentSchema),
     defaultValues: { image: null, comment: "" },
@@ -83,12 +84,15 @@ export default function CommentForm({
   const fieldIsError = errors.comment?.message ? true : false;
 
   const onSubmit: SubmitHandler<CreateCommentSchema> = async (data) => {
+    if (isSubmitting) return null;
     try {
       await (replyId || commentId
         ? createReplyCommentAsync({
             body: {
               comment: data.comment,
               image: data?.image,
+            },
+            params: {
               commentId: replyId ?? Number(commentId),
             },
             formData: true,
@@ -158,6 +162,7 @@ export default function CommentForm({
               control={control}
               isShowSendButton={(currentComment || file) as unknown as boolean}
               name="comment"
+              shouldShowError={false}
               placeholder="Write your comment..."
               id="cm9ti2pt"
               autoFocus

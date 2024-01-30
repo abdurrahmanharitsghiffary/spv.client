@@ -35,7 +35,7 @@ export default function ChatMenu() {
           return router.push(`/users/${user?.[0]?.id}`);
         }
         case "group": {
-          return router.push(`/group/${chatId}`);
+          return router.push(`/groups/${chatId}`);
         }
       }
     },

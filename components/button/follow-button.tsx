@@ -15,7 +15,7 @@ export default function FollowButton({
   ...rest
 }: ButtonProps & { userId: number }) {
   const session = useSession();
-  const { isFollowed } = useGetUserIsFollowed(userId);
+  const { isFollowed, isSuccess } = useGetUserIsFollowed(userId);
   const { followAccount } = useFollowAccount();
   const { unfollowAccount } = useUnfollowAccount();
   const handleFollow = (e: MouseEvent<HTMLButtonElement>) => {
@@ -28,14 +28,18 @@ export default function FollowButton({
 
   if (session?.id === userId) return null;
 
-  return (
-    <Button
-      className={clsx("font-semibold", className)}
-      color={isFollowed?.data ? "default" : "primary"}
-      {...rest}
-      onClick={handleFollow}
-    >
-      {isFollowed?.data ? "Unfollow" : "Follow"}
-    </Button>
-  );
+  if (isSuccess) {
+    return (
+      <Button
+        className={clsx("font-semibold", className)}
+        color={isFollowed?.data ? "default" : "primary"}
+        {...rest}
+        onClick={handleFollow}
+      >
+        {isFollowed?.data ? "Unfollow" : "Follow"}
+      </Button>
+    );
+  } else {
+    return null;
+  }
 }

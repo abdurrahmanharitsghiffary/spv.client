@@ -23,7 +23,7 @@ export default function CommentPage({
 
   return (
     <>
-      <CommentBacklink postId={comment?.data?.postId} />
+      <CommentBacklink className="pt-4" postId={comment?.data?.postId} />
       {isLoading ? (
         <SingleCommentSkeleton />
       ) : (

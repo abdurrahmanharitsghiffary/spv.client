@@ -40,6 +40,7 @@ function EditPostModal() {
     formState: {
       errors: { images: imagesErrors },
       isSubmitSuccessful,
+      isSubmitting,
     },
   } = useForm<UpdatePostSchema>({
     resolver: zodResolver(updatePostSchema),
@@ -63,6 +64,7 @@ function EditPostModal() {
   }, [isSubmitSuccessful]);
 
   const onSubmit: SubmitHandler<UpdatePostSchema> = async (data) => {
+    if (isSubmitting) return null;
     await confirm(saveChangesProps("post"));
     await updatePostAsync({ params: { postId }, body: data, formData: true });
   };

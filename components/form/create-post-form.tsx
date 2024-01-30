@@ -42,7 +42,7 @@ export default function CreatePostForm({
     control,
     setValue,
     reset,
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm<CreatePostValidationSchema>({
     defaultValues: { images: [], content: "", title: "" },
     resolver: zodResolver(createPostValidationSchema),
@@ -57,8 +57,9 @@ export default function CreatePostForm({
     }));
   }, [images]);
 
-  const onSubmit: SubmitHandler<CreatePostValidationSchema> = (data) =>
-    toast.promise(createPostAsync({ body: data, formData: true }), {
+  const onSubmit: SubmitHandler<CreatePostValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
+    await toast.promise(createPostAsync({ body: data, formData: true }), {
       success: {
         render({ data }) {
           return "Post successfully created";
@@ -72,6 +73,7 @@ export default function CreatePostForm({
         autoClose: 1500,
       },
     });
+  };
 
   useEffect(() => {
     if (isSubmitSuccessful) {

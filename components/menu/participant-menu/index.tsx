@@ -64,6 +64,10 @@ export default function ParticipantMenu() {
       }
       case "grant": {
         if (!selectedParticipant) return;
+        await confirm({
+          title: "Promote",
+          body: "Promote this user to admin?",
+        });
         await addParticipantsAsync({
           body: {
             participants: [{ id: selectedParticipant.data.id, role: "admin" }],

@@ -34,7 +34,7 @@ export default function ChatEditForm() {
     setValue,
     control,
     watch,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, isSubmitting },
     reset,
   } = useForm<MessageEditSchema>({
     resolver: zodResolver(messageEditSchema),
@@ -61,6 +61,7 @@ export default function ChatEditForm() {
   };
 
   const onSubmit: SubmitHandler<MessageEditSchema> = async (data) => {
+    if (isSubmitting) return null;
     await toast.promise(
       editMessageAsync({ body: data, params: { messageId } })
         .then((res) => res)

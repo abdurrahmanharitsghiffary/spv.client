@@ -18,8 +18,6 @@ import ImageChip from "../../image/image-chip";
 import { TypographyMuted } from "@/components/ui/typography";
 import { Checkbox } from "@nextui-org/react";
 import clsx from "clsx";
-import FileButton from "@/components/input/file-button";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/zod-schema/image";
 import ImageFileButton from "@/components/input/image-file-button";
 
 export default function ChatForm() {
@@ -30,7 +28,7 @@ export default function ChatForm() {
   const timeRef = useRef<NodeJS.Timeout | undefined>();
   const session = useSession();
   const {
-    formState: { errors, isSubmitSuccessful },
+    formState: { errors, isSubmitSuccessful, isSubmitting },
     control,
     reset,
     handleSubmit,
@@ -109,6 +107,7 @@ export default function ChatForm() {
   }, [isSubmitSuccessful, handleTypingEnd]);
 
   const onSubmit: SubmitHandler<CreateChatSchema> = async (data) => {
+    if (isSubmitting) return null;
     try {
       await createMessageAsync({
         body: {

@@ -14,7 +14,6 @@ import {
   useProfileMenuActions,
   useProfileMenuIsOpen,
 } from "@/stores/profile-menu-store";
-import { useLogout } from "@/lib/api/auth";
 import { FiLogOut } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { toast } from "react-toastify";
@@ -24,7 +23,6 @@ export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
   const [file, setFile] = useState<File | null>(null);
   const { onClose } = useProfileMenuActions();
-  const { logoutAsync } = useLogout();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
   const { deleteCoverImageAsync } = useDeleteMyCoverImage();
   const { createPostAsync } = useCreatePost();
@@ -45,14 +43,6 @@ export default function ProfileMenu() {
         closeLabel: "Cancel",
       });
       await deleteCoverImageAsync({});
-    } else if (key === "delete-logout") {
-      await confirm({
-        confirmLabel: "Logout",
-        confirmColor: "danger",
-        body: "Logout from this account?",
-        title: "Logout account",
-      });
-      await logoutAsync();
     }
   };
 
@@ -138,11 +128,6 @@ export default function ProfileMenu() {
             key: "delete",
             label: "Delete cover image",
             icon: <AiOutlineDelete />,
-          },
-          {
-            key: "delete-logout",
-            label: "Logout from account",
-            icon: <FiLogOut />,
           },
         ]}
       />

@@ -35,7 +35,7 @@ export default function CommentEditForm({ className }: { className?: string }) {
     watch,
     control,
     reset,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, isSubmitting },
   } = useForm<CommentEditSchema>({
     resolver: zodResolver(commentEditSchema),
     defaultValues: { comment: "" },
@@ -54,21 +54,15 @@ export default function CommentEditForm({ className }: { className?: string }) {
   }, [isSubmitSuccessful]);
 
   const onSubmit: SubmitHandler<CommentEditSchema> = async (data) => {
-    if (!selectedComment) return null;
-    await toast.promise(
-      updateCommentAsync({
-        params: {
-          commentId: selectedComment?.id,
-        },
-        body: {
-          comment: data?.comment,
-        },
-      }),
-      {
-        pending: "Saving changes...",
-        error: "Something went wrong!",
-      }
-    );
+    if (!selectedComment || isSubmitting) return null;
+    updateCommentAsync({
+      params: {
+        commentId: selectedComment?.id,
+      },
+      body: {
+        comment: data?.comment,
+      },
+    });
   };
   const currentComment = watch("comment");
   const handleSuccessSpeech = (val: string | undefined | null) => {

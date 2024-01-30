@@ -16,8 +16,10 @@ export default function SendTextarea<T extends FieldValues>({
   autoFocus,
   placeholder = "Message",
   ButtonProps,
+  shouldShowError = true,
   ...rest
 }: {
+  shouldShowError?: boolean;
   isShowSendButton?: boolean;
 } & UseControllerProps<T> &
   TextAreaProps & { ButtonProps?: ButtonProps }) {
@@ -36,6 +38,7 @@ export default function SendTextarea<T extends FieldValues>({
         <TextareaWithControl
           placeholder={placeholder}
           label={label}
+          shouldShowError={shouldShowError}
           variant={variant}
           color={color}
           autoFocus={autoFocus}

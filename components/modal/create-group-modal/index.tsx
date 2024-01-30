@@ -47,7 +47,7 @@ type CreateGroupSchema = z.infer<typeof createGroupSchema>;
 export default function CreateGroupModal() {
   const { createGroupChatAsync } = useCreateGroupChat();
   const {
-    formState: { isSubmitSuccessful, errors },
+    formState: { isSubmitSuccessful, errors, isSubmitting },
     handleSubmit,
     control,
     setValue,
@@ -90,6 +90,7 @@ export default function CreateGroupModal() {
   );
 
   const onSubmit: SubmitHandler<CreateGroupSchema> = async (data) => {
+    if (isSubmitting) return null;
     const participants = data.participants.map((participant) => ({
       id: participant.id,
       role: participant.role,

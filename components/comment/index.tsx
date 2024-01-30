@@ -29,15 +29,11 @@ function Comment({
     className ?? ""
   }`;
 
-  // USE MEMO ??
   const commentIds = comment?.replies?.ids ?? [];
 
   const handleReplyClick = (value: React.SetStateAction<boolean>) => {
     setIsShow(value);
   };
-
-  // const onSuccessLoad = useCallback((isSuccess: boolean) => {
-  // }, []);
 
   return (
     <div className="flex gap-2 relative py-2 w-full" ref={containerRef}>
@@ -73,11 +69,7 @@ function Comment({
           username={comment?.user?.username}
         />
         {isShow && commentIds?.length > 0 && (
-          <CommentReplies
-            // onSuccessLoadReply={onSuccessLoad}
-            level={level}
-            commentIds={commentIds}
-          />
+          <CommentReplies level={level} commentIds={commentIds} />
         )}
       </Card>
     </div>
@@ -88,17 +80,11 @@ export default Comment;
 export function CommentReply({
   commentId,
   level,
-}: // onSuccessLoad,
-{
+}: {
   commentId: number;
   level?: number;
-  // onSuccessLoad?: (isSuccess: boolean) => void;
 }) {
   const { isLoading, isSuccess, comment } = useGetComment(commentId);
-
-  // useEffect(() => {
-  //   if (onSuccessLoad && isSuccess) onSuccessLoad(isSuccess);
-  // }, [isSuccess]);
 
   if (isLoading) return <CommentSkeleton level={level} />;
   if (isSuccess)
@@ -109,24 +95,11 @@ export function CommentReply({
 export function CommentReplies({
   commentIds = [],
   level,
-}: // onSuccessLoadReply,
-{
+}: {
   commentIds?: number[];
   level: number;
-  // onSuccessLoadReply?: (isSuccess: boolean) => void;
 }) {
   const [limit, setLimit] = useState(10);
-  // const [isSuccessAll, setIsSuccessAll] = useState<boolean[]>([]);
-  // const isSuccess =
-  //   isSuccessAll.every((val) => val === true) && isSuccessAll.length === limit;
-
-  // useEffect(() => {
-  //   if (onSuccessLoadReply) onSuccessLoadReply(isSuccess);
-  // }, [isSuccess]);
-
-  // const onSuccessLoad = useCallback((isSuccess: boolean) => {
-  //   setIsSuccessAll((c) => [...c, isSuccess]);
-  // }, []);
 
   const isOlderCommentAvailable =
     commentIds.length > 10 && commentIds.length - limit >= 0;

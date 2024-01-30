@@ -24,7 +24,7 @@ function DeleteAccountModal() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, isSubmitting },
     reset,
   } = useForm<PasswordValidationSchema>({
     resolver: zodResolver(passwordValidation),
@@ -47,6 +47,7 @@ function DeleteAccountModal() {
   }, [isSubmitSuccessful]);
 
   const onSubmit: SubmitHandler<PasswordValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
     await toast.promise(
       request
         .delete(urlBase("/me/account"), {

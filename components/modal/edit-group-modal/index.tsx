@@ -53,7 +53,7 @@ export default function EditGroupModal() {
   const { chatRoom } = useGetChatRoomById(Number(groupId));
   const { updateGroupChatAsync } = useUpdateGroupChat();
   const {
-    formState: { isSubmitSuccessful, errors },
+    formState: { isSubmitSuccessful, errors, isSubmitting },
     handleSubmit,
     control,
     setValue,
@@ -114,6 +114,7 @@ export default function EditGroupModal() {
   );
 
   const onSubmit: SubmitHandler<EditGroupSchema> = async (data) => {
+    if (isSubmitting) return null;
     await confirm(saveChangesProps("group"));
     await toast.promise(
       updateGroupChatAsync({

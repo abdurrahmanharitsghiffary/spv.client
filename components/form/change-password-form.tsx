@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import FormLayout from "./layout";
 import { Button } from "@nextui-org/button";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,7 +15,11 @@ import {
 } from "@/lib/zod-schema/auth";
 
 export default function ChangePasswordForm({ token }: { token: string }) {
-  const { handleSubmit, control } = useForm<PasswordValidationSchema>({
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting, isSubmitSuccessful },
+  } = useForm<PasswordValidationSchema>({
     resolver: zodResolver(passwordValidationSchema),
     defaultValues: {
       confirmPassword: "",
@@ -24,7 +28,14 @@ export default function ChangePasswordForm({ token }: { token: string }) {
   });
   const router = useRouter();
 
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      router.push("/");
+    }
+  }, [isSubmitSuccessful]);
+
   const onSubmit: SubmitHandler<PasswordValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
     try {
       await toast.promise(
         axios
@@ -41,8 +52,6 @@ export default function ChangePasswordForm({ token }: { token: string }) {
           success: "Password successfully changed",
         }
       );
-
-      router.push("/");
     } catch (err) {}
   };
 

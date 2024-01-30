@@ -22,7 +22,7 @@ function ChangePasswordModal() {
     control,
     handleSubmit,
     reset,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, isSubmitting },
   } = useForm<ChangePasswordValidationSchema>({
     resolver: zodResolver(changePasswordValidationSchema),
     defaultValues: { confirmPassword: "", currentPassword: "", password: "" },
@@ -41,6 +41,7 @@ function ChangePasswordModal() {
   const onSubmit: SubmitHandler<ChangePasswordValidationSchema> = async (
     data
   ) => {
+    if (isSubmitting) return null;
     const choice = await confirm({
       body: "Change your account password?",
       title: "Change password",
@@ -94,21 +95,18 @@ function ChangePasswordModal() {
       >
         <TypographyH3 className="!text-base">Change password</TypographyH3>
         <InputPassword
-          variant="bordered"
           label="Current password"
           placeholder="your current password"
           control={control}
           name="currentPassword"
         />
         <InputPassword
-          variant="bordered"
           label="New password"
           placeholder="Enter your new password"
           control={control}
           name="password"
         />
         <InputPassword
-          variant="bordered"
           label="Confirm"
           placeholder="Enter again your new password"
           control={control}

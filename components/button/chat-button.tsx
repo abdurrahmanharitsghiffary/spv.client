@@ -7,16 +7,17 @@ import { IoChatboxEllipses } from "react-icons/io5";
 
 export default function ChatButton({ ref, ...props }: ButtonProps) {
   return (
-    <IconButton
-      variant="solid"
-      as={Link}
-      className="overflow-visible"
-      href="/chats"
-      {...props}
-    >
-      <MessageBadge>
+    <MessageBadge>
+      <IconButton
+        disableAnimation
+        variant="solid"
+        as={Link}
+        className="overflow-visible"
+        href="/chats"
+        {...props}
+      >
         <IoChatboxEllipses />
-      </MessageBadge>
-    </IconButton>
+      </IconButton>
+    </MessageBadge>
   );
 }

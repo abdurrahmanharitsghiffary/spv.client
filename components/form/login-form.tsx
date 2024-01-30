@@ -24,7 +24,7 @@ export default function LoginForm() {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginValidationSchema>({
     resolver: zodResolver(loginValidationSchema),
     defaultValues: { confirmPassword: "", email: "", password: "" },
@@ -34,6 +34,7 @@ export default function LoginForm() {
   const errorMessage: string = (error as any)?.message ?? null;
 
   const onSubmit: SubmitHandler<LoginValidationSchema> = async (data) => {
+    if (isSubmitting) return null;
     await toast.promise(loginAsync(data), {
       error: {
         render({ data }) {
