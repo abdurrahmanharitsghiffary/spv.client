@@ -57,7 +57,7 @@ export default function CommentLikesModal() {
       </div>
       <Divider />
       {totalLikes > 0 && (
-        <TypographyH3 className="!text-base !font-normal px-4">
+        <TypographyH3 className="!text-base px-4">
           Liked by ({totalLikes})
         </TypographyH3>
       )}

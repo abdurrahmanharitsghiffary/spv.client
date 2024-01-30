@@ -9,7 +9,7 @@ export default function PostParamsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="w-full rounded-sm shadow-none mx-0 pb-0 pt-2">
+    <Card className="w-full min-h-[100dvh] rounded-sm shadow-none mx-0 pb-0">
       {children}
       <CommentForm />
       <CommentEditForm />

@@ -53,6 +53,9 @@ export default function SendTextarea<T extends FieldValues>({
       )}
       {isShowSendButton && (
         <Button
+          onPointerDown={(e) => {
+            e.preventDefault();
+          }}
           type="submit"
           variant="light"
           radius="full"

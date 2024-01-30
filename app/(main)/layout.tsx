@@ -23,7 +23,10 @@ export default function MainLayout({
   return (
     <EditProfileProvider>
       <Navbar />
-      <main className="pb-14 md:pb-0 pt-14 min-h-[100dvh] container mx-auto max-w-7xl flex-grow">
+      <main
+        id="main-container"
+        className="pb-14 md:pb-0 pt-14 min-h-[100dvh] container mx-auto max-w-7xl flex-grow"
+      >
         <Layout>{children}</Layout>
       </main>
       <Giphy />

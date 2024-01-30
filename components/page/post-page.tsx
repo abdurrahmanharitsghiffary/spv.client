@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import PostCard from "../post/post-card";
 import { Divider } from "@nextui-org/divider";
 import Comment from "../comment";
@@ -30,12 +30,21 @@ export default function PostPage({ postId }: { postId: string }) {
     isFetching,
   });
 
+  useEffect(() => {
+    const element = document.getElementById("main-container");
+    if (!element) return;
+    element.classList.remove("pt-14");
+    return () => {
+      element.classList.add("pt-14");
+    };
+  }, []);
+
   const comments = postComments?.data ?? [];
 
   useNotFoundRedirect(error, isError, postId === "-1" || postId === undefined);
 
   return (
-    <>
+    <div className="pt-16 w-full h-full">
       {isLoading ? (
         <PostCardSkeleton />
       ) : (
@@ -54,6 +63,6 @@ export default function PostPage({ postId }: { postId: string }) {
         {isFetchingNextPage && <Spinner className="my-4" />}
         <div className="w-full" ref={ref}></div>
       </div>
-    </>
+    </div>
   );
 }
