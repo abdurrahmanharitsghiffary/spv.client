@@ -36,15 +36,19 @@ function ModalGif() {
         body: {
           imageSrc: gif?.images?.original?.url,
           comment: "",
+        },
+        params: {
           commentId: replyId,
         },
       });
     else if (commentId)
       return createReplyComment({
         body: {
-          commentId: Number(commentId),
           imageSrc: gif?.images?.original?.url,
           comment: "",
+        },
+        params: {
+          commentId: Number(commentId),
         },
       });
     else if (postId)
