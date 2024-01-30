@@ -49,7 +49,7 @@ const ChatBubble = forwardRef<
   return (
     <div
       ref={ref}
-      className="flex w-full gap-4"
+      className="flex w-full gap-4 z-10"
       style={{ flexDirection: !isRecipient ? "row-reverse" : "row" }}
     >
       {chat?.isGroupChat && (
@@ -91,7 +91,7 @@ const ChatBubble = forwardRef<
           )}
         >
           {chat?.isGroupChat && (
-            <TypographyMuted className="!text-xs truncate break-words z-10">
+            <TypographyMuted className="!text-xs truncate break-words">
               {chat.author.fullName}
             </TypographyMuted>
           )}
