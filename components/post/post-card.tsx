@@ -22,7 +22,6 @@ function PostCard(
   } rounded-none w-full dark:border-t-0 border-b-1 last:border-b-0 dark:border-b-0 border-divider shadow-none`;
   const title = post?.title ?? "";
   const content = post?.content ?? "";
-  console.log("Re rendered");
   // USE MEMO ??
   const images = post?.images ?? [];
   // USE MEMO ??

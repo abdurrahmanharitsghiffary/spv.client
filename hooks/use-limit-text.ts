@@ -72,39 +72,3 @@ const getCharLength = (text: string, maxFontPerRows: number): number => {
   }
   return charLength;
 };
-
-// const getTextContent = ({isShowMore =false,maxFontPerRows,text,max = 300,maxShowed=270}:{maxShowed?:number,text: string, maxFontPerRows: number, max?:number, isShowMore?:boolean}) => {
-//   const newText = eol.lf(text);
-//   let textContent = ""
-//   let charLength = 0;
-//   let filledRows = 0;
-//   const isExceedLimit = textContent.length > max
-
-//   for (let i of newText) {
-//     if (filledRows >= maxFontPerRows) {
-//       filledRows = 0;
-//     }
-//     if (encodeURIComponent(i) === encodeURIComponent("\n")) {
-//       charLength += maxFontPerRows - filledRows;
-//       filledRows += maxFontPerRows - filledRows;
-//     } else {
-//       charLength += 1;
-//       filledRows += 1;
-//     }
-//     textContent += i
-
-//     if(isExceedLimit) {
-//       if(isShowMore) {
-
-//       } else {
-//         if(charLength >= maxShowed){
-
-//         }
-//       }
-
-//     }
-
-//   }
-
-//   return { length: charLength, textContent };
-// };

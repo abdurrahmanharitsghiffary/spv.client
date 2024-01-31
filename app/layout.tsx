@@ -12,11 +12,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html className="h-full" lang="en" suppressHydrationWarning>
       <head />
       <body
         className={clsx(
-          "min-h-[100dvh] bg-background font-sans antialiased relative flex flex-col",
+          "min-h-full h-full bg-background font-sans antialiased relative flex flex-col",
           fontSans.variable
         )}
       >

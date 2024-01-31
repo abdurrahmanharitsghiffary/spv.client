@@ -20,7 +20,6 @@ export default function useFetchNextPageObserver({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isObserving, setIsObserving] = useState(false);
-  console.log(isObserving, "isObserving");
   useEffect(() => {
     const element: HTMLDivElement | undefined | null = ref?.current;
     const observer = new IntersectionObserver(

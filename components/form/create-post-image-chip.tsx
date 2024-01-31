@@ -14,8 +14,6 @@ function CreatePostImageChip({
   className?: string;
   wrapperClassName?: string;
 }) {
-  console.log("Re Rendered");
-
   if (!images || (images?.length ?? 0) === 0) return null;
 
   return (
