@@ -49,7 +49,7 @@ const ChatBubble = forwardRef<
   return (
     <div
       ref={ref}
-      className="flex w-full gap-4 z-10"
+      className="flex w-full gap-4"
       style={{ flexDirection: !isRecipient ? "row-reverse" : "row" }}
     >
       {chat?.isGroupChat && (
@@ -83,7 +83,7 @@ const ChatBubble = forwardRef<
       >
         <div
           className={clsx(
-            "p-2 px-4 flex flex-col gap-2 max-w-full",
+            "p-2 px-4 flex flex-col gap-2 max-w-full z-[1]",
             isRecipient
               ? "bg-default-200 rounded-r-medium rounded-bl-medium self-start"
               : "bg-default-100 rounded-l-medium rounded-br-medium self-end",
