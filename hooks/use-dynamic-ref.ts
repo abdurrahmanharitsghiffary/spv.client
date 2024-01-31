@@ -10,7 +10,7 @@ export const useDynamicRef = <T extends HTMLElement>(
 
   const refCb = useCallback(
     (node: T) => {
-      setRef({ current: node });
+      if (node) setRef((c) => ({ ...c, current: node }));
     },
     [deps]
   );

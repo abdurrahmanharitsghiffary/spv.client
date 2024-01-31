@@ -10,10 +10,13 @@ import PostCardSkeleton from "../post/skeleton";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 import { useNotFoundRedirect } from "@/hooks/use-not-found-redirect";
+import { useIsSSR } from "@react-aria/ssr";
+import clsx from "clsx";
 
 export default function PostPage({ postId }: { postId: string }) {
   const { post, isLoading, isSuccess, isError, error, fetchStatus } =
     useGetPostById(Number(postId));
+  const isSSR = useIsSSR();
   const {
     postComments,
     isFetching,
@@ -44,7 +47,7 @@ export default function PostPage({ postId }: { postId: string }) {
   useNotFoundRedirect(error, isError, postId === "-1" || postId === undefined);
 
   return (
-    <div className="pt-16 w-full h-full">
+    <div className={clsx("w-full h-full", !isSSR ? "pt-16" : "pt-2")}>
       {isLoading ? (
         <PostCardSkeleton />
       ) : (
