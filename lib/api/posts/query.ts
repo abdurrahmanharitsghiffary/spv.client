@@ -59,7 +59,7 @@ export const useGetPostByUserId = (
   };
 
   const { data: posts, ...rest } = useInfinite<Post>({
-    queryKey: [...keys.posts, userId, "users", q],
+    queryKey: [...keys.postByUserId(userId), q],
     query: q,
     url: userPost(userId.toString()),
     config,

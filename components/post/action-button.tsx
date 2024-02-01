@@ -24,15 +24,22 @@ export default function PostActionButton({
 }) {
   const { likePostAsync } = useLikePost();
   const { unlikePostAsync } = useUnlikePost();
-  const { isLiked } = useGetPostIsLiked(postId);
+  const { isLiked, isSuccess } = useGetPostIsLiked(postId);
 
   const handlePostLike = async () => {
-    if ((!postId && postId !== 0) || isPreview || isLiked?.data === undefined)
+    if (
+      (!postId && postId !== 0) ||
+      isPreview ||
+      isLiked?.data === undefined ||
+      !isSuccess
+    )
       return null;
-    if (isLiked.data) {
+    if (isLiked.data === true) {
       await unlikePostAsync({ params: { postId } });
+      return;
     } else {
       await likePostAsync({ params: { postId } });
+      return;
     }
   };
 

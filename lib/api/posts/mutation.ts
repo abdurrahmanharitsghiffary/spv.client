@@ -19,6 +19,7 @@ import { useMutate, useOptimistic } from "../hooks";
 import { produce } from "immer";
 import { Post } from "@/types/post";
 import { UserAccount } from "@/types/user";
+import { useParams } from "next/navigation";
 type UpdatePostOptions = {
   content?: string;
   title?: string;
@@ -196,13 +197,11 @@ const updateLikePost = <OD extends InfinitePost>(
   postId: number
 ): OD =>
   produce(oldData, (draft) => {
-    console.log(oldData, "Liked Post");
     if (draft?.pages) {
       draft.pages.forEach((p, pi) => {
         if (p?.data) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
-              console.log(oldData.pages[pi].data[poi], "Updated liked post");
               draft.pages[pi].data[poi].total_likes += 1;
             }
           });
@@ -216,13 +215,11 @@ const updateUnlikePost = <OD extends InfinitePost>(
   postId: number
 ): OD =>
   produce(oldData, (draft) => {
-    console.log(oldData, "Unliked Post");
     if (draft?.pages) {
       draft.pages.forEach((p, pi) => {
         if (p?.data) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
-              console.log(oldData.pages[pi].data[poi], "Updated ul post");
               const totalLikes = draft.pages[pi].data[poi].total_likes;
               if (totalLikes > 0) {
                 draft.pages[pi].data[poi].total_likes -= 1;
@@ -235,6 +232,8 @@ const updateUnlikePost = <OD extends InfinitePost>(
   });
 
 export const useLikePost = () => {
+  const { userId } = useParams();
+  const uId = Number(userId);
   const {
     optimistic: likePost,
     optimisticAsync: likePostAsync,
@@ -252,6 +251,22 @@ export const useLikePost = () => {
         },
         {
           queryKey: keys.posts,
+          isInfiniteData: true,
+          queryFilters: { exact: true },
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.postByUserId(uId),
+          isInfiniteData: true,
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.followedUsersPost(),
+          isInfiniteData: true,
+          updater: (oldData) => updateLikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.savedPosts(),
           isInfiniteData: true,
           updater: (oldData) => updateLikePost(oldData, postId),
         },
@@ -279,6 +294,8 @@ export const useLikePost = () => {
 };
 
 export const useUnlikePost = () => {
+  const { userId } = useParams();
+  const uId = Number(userId);
   const {
     optimistic: unlikePost,
     optimisticAsync: unlikePostAsync,
@@ -297,13 +314,24 @@ export const useUnlikePost = () => {
         {
           queryKey: keys.posts,
           isInfiniteData: true,
+          queryFilters: { exact: true },
           updater: (oldData) => updateUnlikePost(oldData, postId),
         },
-        // {
-        //   queryKey: keys.followedUsersPost(),
-        //   isInfiniteData: true,
-        //   updater: (oldData) => updateUnlikePost(oldData, postId),
-        // },
+        {
+          queryKey: keys.postByUserId(uId),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.followedUsersPost(),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
+        },
+        {
+          queryKey: keys.savedPosts(),
+          isInfiniteData: true,
+          updater: (oldData) => updateUnlikePost(oldData, postId),
+        },
         {
           queryKey: keys.postById(postId),
           updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>

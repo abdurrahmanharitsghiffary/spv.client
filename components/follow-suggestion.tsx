@@ -7,13 +7,11 @@ import UserCardSquare from "./user/user-card-square";
 import { TypographyH4 } from "./ui/typography";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
-import { UserCardSquareSkeleton } from "./user/user-card-skeleton";
 import IconButton from "./button/icon-button";
 import { FiX } from "react-icons/fi";
 
 export default function FollowSuggestion() {
   const [isShow, setIsShow] = useState(true);
-  console.log(isShow, "Is show");
   const {
     resp,
     isFetchNextNotAvailable,

@@ -38,7 +38,8 @@ export const keys = {
   postByUserId: (userId: number) => [...keys.posts, userId, "users"] as const,
   postIsLiked: (postId: number) =>
     [...keys.postById(postId), "isLiked"] as const,
-  postIsSaved: (postId: number) => [...keys.posts, "isSaved", postId] as const,
+  postIsSaved: (postId: number) =>
+    [...keys.postById(postId), "isSaved"] as const,
   savedPosts: () => [...keys.posts, "saved"] as const,
   followedUsersPost: () => [...keys.posts, "following"] as const,
   userById: (userId: number) => [...keys.user, userId] as const,

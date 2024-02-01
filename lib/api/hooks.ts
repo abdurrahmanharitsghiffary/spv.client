@@ -2,6 +2,7 @@
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
 import {
+  QueryFilters,
   QueryKey,
   SetDataOptions,
   useInfiniteQuery,
@@ -203,9 +204,7 @@ export const useOptimistic = <T, P = any, TB = any>({
   optimisticUpdater,
   invalidateTags,
   transformBody,
-  invalidatesOnSettled = true,
 }: {
-  invalidatesOnSettled?: boolean;
   method: MutationMethod;
   baseUrl: string;
   transformBody?: (body: T) => TB;
@@ -224,6 +223,7 @@ export const useOptimistic = <T, P = any, TB = any>({
   }) => {
     isInfiniteData?: boolean;
     queryKey: QueryKey;
+    queryFilters?: QueryFilters;
     updater: (oldData: any) => any;
     options?: SetDataOptions | undefined;
   }[];
@@ -278,39 +278,63 @@ export const useOptimistic = <T, P = any, TB = any>({
         .catch((err) => Promise.reject(err?.response?.data));
     },
     onMutate: async (v) => {
-      const ctx: { key: QueryKey; data: any }[] = [];
+      const ctx: {
+        key: QueryKey;
+        data: any;
+        isInfiniteData?: boolean;
+        qFilters?: QueryFilters;
+      }[] = [];
 
       await Promise.all(
         optimisticUpdater(v).map(async (opt) => {
           await queryClient.cancelQueries({ queryKey: opt.queryKey });
         })
       );
-
       optimisticUpdater(v).forEach((opt) => {
-        ctx.push({
-          key: opt.queryKey,
-          data: queryClient.getQueryData(opt.queryKey),
-        });
+        const queryData = opt.isInfiniteData
+          ? queryClient.getQueriesData({
+              ...opt.queryFilters,
+              queryKey: opt.queryKey,
+            })
+          : queryClient.getQueryData(opt.queryKey);
+
         if (opt.isInfiniteData) {
-          return (
-            queryClient.setQueriesData(opt.queryKey, (old: unknown) =>
-              opt.updater(old)
-            ),
+          ctx.push({
+            key: opt.queryKey,
+            qFilters: opt.queryFilters,
+            data: queryData,
+            isInfiniteData: true,
+          });
+          queryClient.setQueriesData(
+            { ...opt?.queryFilters, queryKey: opt.queryKey },
+            (old: unknown) => opt.updater(old),
+            opt.options
+          );
+        } else {
+          ctx.push({
+            key: opt.queryKey,
+            data: queryData,
+          });
+          queryClient.setQueryData(
+            opt.queryKey,
+            (old: unknown) => opt.updater(old),
             opt.options
           );
         }
-        queryClient.setQueryData(
-          opt.queryKey,
-          (old: unknown) => opt.updater(old),
-          opt.options
-        );
       });
 
       return ctx;
     },
     onError: (err, v, context) => {
       context?.forEach((ctx) => {
-        queryClient.setQueryData(ctx.key, ctx.data);
+        if (ctx.isInfiniteData) {
+          queryClient.setQueriesData(
+            { ...ctx.qFilters, queryKey: ctx.key },
+            ctx.data?.[0]?.[1]
+          );
+        } else {
+          queryClient.setQueryData(ctx.key, ctx.data);
+        }
       });
     },
     onSuccess: (d, v) => {
@@ -329,3 +353,154 @@ export const useOptimistic = <T, P = any, TB = any>({
 
   return { optimistic, optimisticAsync, ...rest };
 };
+
+// export const useOptimistic = <T, P = any, TB = any>({
+//   method,
+//   baseUrl,
+//   optimisticUpdater,
+//   invalidateTags,
+//   transformBody,
+// }: {
+//   method: MutationMethod;
+//   baseUrl: string;
+//   transformBody?: (body: T) => TB;
+//   invalidateTags?: (v: {
+//     body?: T;
+//     formData?: boolean;
+//     params?: Record<string, string | number> | P;
+//     config?: AxiosRequestConfig;
+//   }) => QueryKey[];
+//   optimisticUpdater: (v: {
+//     body?: T;
+//     query?: Record<string, string>;
+//     formData?: boolean;
+//     params?: Record<string, string | number> | P;
+//     config?: AxiosRequestConfig;
+//   }) => {
+//     isInfiniteData?: boolean;
+//     queryKey: QueryKey;
+//     updater: (oldData: any) => any;
+//     options?: SetDataOptions | undefined;
+//   }[];
+// }) => {
+//   const request = useAxiosInterceptor();
+//   const queryClient = useQueryClient();
+
+//   const {
+//     mutate: optimistic,
+//     mutateAsync: optimisticAsync,
+//     ...rest
+//   } = useMutation({
+//     mutationFn: (v: {
+//       query?: Record<string, string>;
+//       body?: T;
+//       formData?: boolean;
+//       params?: Record<string, string | number>;
+//       config?: AxiosRequestConfig;
+//     }) => {
+//       let body = transformBody ? transformBody(v?.body as T) : v?.body;
+
+//       const config: AxiosRequestConfig = {
+//         ...v?.config,
+//         headers: {
+//           ...v?.config?.headers,
+//         },
+//       };
+
+//       let newUrl = new URL(baseUrl);
+//       for (let [key, value] of Object.entries(v?.params ?? {})) {
+//         newUrl.href = newUrl.href.replaceAll(`:${key}`, value.toString());
+//       }
+
+//       for (let [key, value] of Object.entries(v?.query ?? {})) {
+//         newUrl.searchParams.set(key, value);
+//       }
+
+//       if (v?.formData) {
+//         config.headers!["Content-Type"] = "multipart/form-data";
+//       }
+
+//       if (["delete"].includes(method)) {
+//         return request[method](newUrl.href, {
+//           ...config,
+//           data: { ...config.data, ...body },
+//         })
+//           .then((res) => res.data)
+//           .catch((err) => Promise.reject(err?.response?.data));
+//       }
+//       return request[method](newUrl.href, body, config)
+//         .then((res) => res.data)
+//         .catch((err) => Promise.reject(err?.response?.data));
+//     },
+//     onMutate: async (v) => {
+//       const ctx: { key: QueryKey; data: any; isInfiniteData?: boolean }[] = [];
+
+//       await Promise.all(
+//         optimisticUpdater(v).map(async (opt) => {
+//           await queryClient.cancelQueries({ queryKey: opt.queryKey });
+//         })
+//       );
+
+//       optimisticUpdater(v).forEach((opt) => {
+//         const queryData = opt.isInfiniteData
+//           ? queryClient.getQueriesData(opt.queryKey)
+//           : queryClient.getQueryData(opt.queryKey);
+
+//         if (opt.isInfiniteData) {
+//           ctx.push({
+//             key: opt.queryKey,
+//             data: queryData,
+//             isInfiniteData: true,
+//           });
+//           queryClient.setQueriesData(
+//             opt.queryKey,
+//             (old: unknown) => {
+//               return opt.updater(old);
+//             },
+//             opt.options
+//           );
+//         } else {
+//           ctx.push({
+//             key: opt.queryKey,
+//             data: queryData,
+//           });
+//           queryClient.setQueryData(
+//             opt.queryKey,
+//             (old: unknown) => {
+//               return opt.updater(old);
+//             },
+//             opt.options
+//           );
+//         }
+//       });
+
+//       return ctx;
+//     },
+//     onError: (err, v, context) => {
+//       console.log("IS ERROR\n\n\n\n\n");
+//       context?.forEach((ctx) => {
+//         if (ctx.isInfiniteData) {
+//           const iData = ctx.data?.[0]?.[1];
+//           console.log("infinite Data", iData);
+//           queryClient.setQueriesData(ctx.key, iData);
+//         } else {
+//           queryClient.setQueryData(ctx.key, ctx.data);
+//         }
+//       });
+//     },
+//     onSuccess: (d, v) => {
+//       if (invalidateTags) {
+//         invalidateTags(v).forEach((tag) => {
+//           queryClient.invalidateQueries({ queryKey: tag });
+//         });
+//       }
+//     },
+//     onSettled: (d, e, v) => {
+//       optimisticUpdater(v).forEach((opt) => {
+//         queryClient.invalidateQueries({ queryKey: opt.queryKey });
+//       });
+//     },
+//   });
+
+//   return { optimistic, optimisticAsync, ...rest };
+// };
