@@ -19,7 +19,7 @@ export default function ListboxUsers({
       aria-label="users"
       items={users}
       className="p-2"
-      classNames={{ list: "gap-4" }}
+      classNames={{ list: "gap-4", emptyContent: "text-sm" }}
       emptyContent={emptyContent}
     >
       {(item) => (

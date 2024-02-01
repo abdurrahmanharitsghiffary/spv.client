@@ -59,7 +59,7 @@ export const useGetPostByUserId = (
   };
 
   const { data: posts, ...rest } = useInfinite<Post>({
-    queryKey: [...keys.posts, userId, q, "users"],
+    queryKey: [...keys.posts, userId, "users", q],
     query: q,
     url: userPost(userId.toString()),
     config,
@@ -115,11 +115,10 @@ export const useGetPostIsLiked = (
   config?: AxiosRequestConfig
 ) => {
   const { data: isLiked, ...rest } = useQ<boolean>({
-    queryKey: keys.postIsLiked(postId),
+    queryKey: keys.postIsLiked(Number(postId)),
     url: postIsLiked(postId?.toString()),
     config,
     qConfig: {
-      keepPreviousData: true,
       enabled: postId !== -1 && postId !== undefined,
     },
   });

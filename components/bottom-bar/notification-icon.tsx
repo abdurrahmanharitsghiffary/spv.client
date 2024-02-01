@@ -26,8 +26,7 @@ export default function NotificationIcon({ isActive }: { isActive?: boolean }) {
   };
 
   const onReadNotification = (c: Notification) => {
-    console.log(c, "readed notification");
-    if (count - 1 > -1) setCount(count - 1);
+    setCount(count - 1);
   };
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function NotificationIcon({ isActive }: { isActive?: boolean }) {
       socket.off(Socket_Event.COUNT_NOTIFICATION, onReceiveNotiCount);
       socket.off(Socket_Event.READED_NOTIFICATION, onReadNotification);
     };
-  }, [socket]);
+  }, [socket, count]);
 
   return (
     <Badge

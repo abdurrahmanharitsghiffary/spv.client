@@ -22,19 +22,24 @@ export default function PostActionButton({
   totalLikes: number;
   isPreview?: boolean;
 }) {
-  const { likePost } = useLikePost();
-  const { unlikePost } = useUnlikePost();
+  const { likePostAsync } = useLikePost();
+  const { unlikePostAsync } = useUnlikePost();
   const { isLiked } = useGetPostIsLiked(postId);
+
+  const handlePostLike = async () => {
+    if ((!postId && postId !== 0) || isPreview || isLiked?.data === undefined)
+      return null;
+    if (isLiked.data) {
+      await unlikePostAsync({ params: { postId } });
+    } else {
+      await likePostAsync({ params: { postId } });
+    }
+  };
+
   return (
     <ButtonGroup fullWidth variant="light">
       <Tooltip content="Like">
-        <Button
-          onClick={() => {
-            if ((!postId && postId !== 0) || isPreview) return null;
-            if (isLiked?.data) return unlikePost({ params: { postId } });
-            return likePost({ params: { postId } });
-          }}
-        >
+        <Button onClick={handlePostLike}>
           {isLiked?.data ? (
             <FiThumbsUp color="hsl(var(--nextui-primary) / var(--nextui-primary-opacity, var(--tw-text-opacity)))" />
           ) : (

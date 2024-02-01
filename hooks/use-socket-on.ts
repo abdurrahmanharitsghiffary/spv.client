@@ -14,5 +14,5 @@ export const useSocketOn = <T>(event: SOCKETEVENT, cb: (data: T) => void) => {
     return () => {
       socket.off(event, cb);
     };
-  }, [socket, event]);
+  }, [socket, cb]);
 };

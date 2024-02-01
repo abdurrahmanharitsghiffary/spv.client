@@ -11,7 +11,6 @@ import {
 } from "@tanstack/react-query";
 import { AxiosRequestConfig } from "axios";
 import { useMemo } from "react";
-import { getFormData } from "../getFormData";
 
 type MutationMethod = "post" | "patch" | "delete" | "put";
 
@@ -39,9 +38,9 @@ export const useQ = <T>({
 
   const q = useQuery<ApiResponseT<T>>({
     queryKey: query ? [...(queryKey ?? []), query] : queryKey,
-    queryFn: () =>
+    queryFn: ({ signal }) =>
       request
-        .get(newUrl.href, config)
+        .get(newUrl.href, { ...config, signal })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
     ...qConfig,
@@ -82,9 +81,9 @@ export const useInfinite = <T>({
     ...rest
   } = useInfiniteQuery<ApiPagingObjectResponse<T[]>>({
     queryKey: queryKey,
-    queryFn: ({ pageParam }) =>
+    queryFn: ({ pageParam, signal }) =>
       request
-        .get(pageParam ? pageParam : reqUrl.href, config)
+        .get(pageParam ? pageParam : reqUrl.href, { ...config, signal })
         .then((res) => res.data)
         .catch((err) => Promise.reject(err?.response?.data)),
     getNextPageParam: (res) => res?.pagination?.next ?? undefined,
@@ -198,14 +197,15 @@ export const useMutate = <T, P = {}>({
   return { mutate, mutateAsync, ...rest };
 };
 
-// UNSTABLE
 export const useOptimistic = <T, P = any, TB = any>({
   method,
   baseUrl,
   optimisticUpdater,
   invalidateTags,
   transformBody,
+  invalidatesOnSettled = true,
 }: {
+  invalidatesOnSettled?: boolean;
   method: MutationMethod;
   baseUrl: string;
   transformBody?: (body: T) => TB;
@@ -282,7 +282,7 @@ export const useOptimistic = <T, P = any, TB = any>({
 
       await Promise.all(
         optimisticUpdater(v).map(async (opt) => {
-          await queryClient.cancelQueries(opt.queryKey);
+          await queryClient.cancelQueries({ queryKey: opt.queryKey });
         })
       );
 
