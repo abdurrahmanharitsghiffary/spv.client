@@ -22,9 +22,9 @@ export default function PostActionButton({
 }) {
   const { likePostAsync } = useLikePost();
   const { unlikePostAsync } = useUnlikePost();
-  const { resp, isSuccess } = useGetPostIsLiked(postId);
+  const { resp, isSuccess, isLoading } = useGetPostIsLiked(postId);
   const isLiked = resp?.data?.isLiked;
-  console.log(resp, "Response");
+  const total_likes = resp?.data?.total_likes ?? 0;
   const handlePostLike = async () => {
     if (
       (!postId && postId !== 0) ||
@@ -42,6 +42,8 @@ export default function PostActionButton({
     }
   };
 
+  console.log(isLoading, "Is Loading");
+
   return (
     <ButtonGroup fullWidth variant="light">
       <Tooltip content="Like">
@@ -51,7 +53,7 @@ export default function PostActionButton({
           ) : (
             <FiThumbsUp />
           )}
-          {resp?.data?.total_likes ?? 0}
+          {total_likes}
         </Button>
       </Tooltip>
       <Tooltip content="Comment">
