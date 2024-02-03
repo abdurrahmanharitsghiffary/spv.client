@@ -8,7 +8,11 @@ import {
 } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { CreatePostData } from "@/types";
-import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
+import {
+  ApiPagingObjectResponse,
+  ApiResponseT,
+  IsLikedPostResponse,
+} from "@/types/response";
 import {
   InfiniteData,
   useMutation,
@@ -194,17 +198,26 @@ export const useDeletePost = () => {
 
 const updateLikePost = <OD extends InfinitePost>(
   oldData: OD,
-  postId: number
+  postId: number,
+  isSearchAllType?: boolean
 ): OD =>
   produce(oldData, (draft) => {
     if (draft?.pages) {
       draft.pages.forEach((p, pi) => {
-        if (p?.data) {
+        if (p?.data && !isSearchAllType) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
               draft.pages[pi].data[poi].total_likes += 1;
             }
           });
+        } else if (isSearchAllType) {
+          if ((p as any)?.data?.posts?.data instanceof Array) {
+            (p as any)?.data?.posts?.data?.forEach((d: any, di: number) => {
+              if (d.id === postId) {
+                (draft as any).pages[pi].data.posts.data[di].total_likes += 1;
+              }
+            });
+          }
         }
       });
     }
@@ -212,12 +225,13 @@ const updateLikePost = <OD extends InfinitePost>(
 
 const updateUnlikePost = <OD extends InfinitePost>(
   oldData: OD,
-  postId: number
+  postId: number,
+  isSearchAllType?: boolean
 ): OD =>
   produce(oldData, (draft) => {
     if (draft?.pages) {
       draft.pages.forEach((p, pi) => {
-        if (p?.data) {
+        if (p?.data && !isSearchAllType) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
               const totalLikes = draft.pages[pi].data[poi].total_likes;
@@ -226,14 +240,24 @@ const updateUnlikePost = <OD extends InfinitePost>(
               }
             }
           });
+        } else if (isSearchAllType) {
+          if ((p as any)?.data?.posts?.data instanceof Array) {
+            (p as any)?.data?.posts?.data?.forEach((d: any, di: number) => {
+              if (d.id === postId) {
+                if (
+                  ((draft as any)?.pages?.[pi]?.data?.posts?.data?.[di]
+                    ?.total_likes ?? 0) > 0
+                )
+                  (draft as any).pages[pi].data.posts.data[di].total_likes -= 1;
+              }
+            });
+          }
         }
       });
     }
   });
 
 export const useLikePost = () => {
-  const { userId } = useParams();
-  const uId = Number(userId);
   const {
     optimistic: likePost,
     optimisticAsync: likePostAsync,
@@ -244,47 +268,64 @@ export const useLikePost = () => {
     optimisticUpdater(v) {
       const postId = Number(v.params?.postId)!;
       return [
+        // {
+        //   queryKey: ["search"],
+        //   queryFilters: {
+        //     predicate: (query) =>
+        //       query.queryKey[0] === "search" &&
+        //       ["post", "all"].includes(
+        //         (query.queryKey?.[1] as any)?.type ?? ""
+        //       ),
+        //   },
+        //   isInfiniteData: true,
+        //   updater(oldData) {
+        //     console.log(oldData, "Old Data Search");
+        //     if (oldData?.pages?.[0]?.data instanceof Array) {
+        //       return updateLikePost(oldData, postId);
+        //     }
+        //     return updateLikePost(oldData, postId, true);
+        //   },
+        // },
+        // {
+        //   queryKey: keys.mePosts(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateLikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.postByUserId(uId),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateLikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.followedUsersPost(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateLikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.savedPosts(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateLikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.postById(postId),
+        //   updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
+        //     produce(oldData, (draft) => {
+        //       if (draft?.data) {
+        //         draft.data.total_likes += 1;
+        //       }
+        //     }),
+        // },
         {
-          queryKey: keys.mePosts(),
-          isInfiniteData: true,
-          updater: (oldData) => updateLikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.posts,
-          isInfiniteData: true,
-          queryFilters: { exact: true },
-          updater: (oldData) => updateLikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.postByUserId(uId),
-          isInfiniteData: true,
-          updater: (oldData) => updateLikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.followedUsersPost(),
-          isInfiniteData: true,
-          updater: (oldData) => updateLikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.savedPosts(),
-          isInfiniteData: true,
-          updater: (oldData) => updateLikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.postById(postId),
-          updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
+          queryKey: keys.postIsLiked(postId),
+          updater: <OD extends ApiResponseT<IsLikedPostResponse>>(
+            oldData: OD
+          ): OD =>
             produce(oldData, (draft) => {
-              if (draft?.data) {
+              if (draft.data) {
+                draft.data.isLiked = true;
                 draft.data.total_likes += 1;
               }
             }),
-        },
-        {
-          queryKey: keys.postIsLiked(postId),
-          updater: <OD extends ApiResponseT<boolean>>(oldData: OD): OD => ({
-            ...oldData,
-            data: true,
-          }),
         },
       ];
     },
@@ -294,8 +335,6 @@ export const useLikePost = () => {
 };
 
 export const useUnlikePost = () => {
-  const { userId } = useParams();
-  const uId = Number(userId);
   const {
     optimistic: unlikePost,
     optimisticAsync: unlikePostAsync,
@@ -306,49 +345,67 @@ export const useUnlikePost = () => {
     optimisticUpdater(v) {
       const postId = Number(v.params?.postId)!;
       return [
-        {
-          queryKey: keys.mePosts(),
-          isInfiniteData: true,
-          updater: (oldData) => updateUnlikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.posts,
-          isInfiniteData: true,
-          queryFilters: { exact: true },
-          updater: (oldData) => updateUnlikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.postByUserId(uId),
-          isInfiniteData: true,
-          updater: (oldData) => updateUnlikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.followedUsersPost(),
-          isInfiniteData: true,
-          updater: (oldData) => updateUnlikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.savedPosts(),
-          isInfiniteData: true,
-          updater: (oldData) => updateUnlikePost(oldData, postId),
-        },
-        {
-          queryKey: keys.postById(postId),
-          updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
-            produce(oldData, (draft) => {
-              if (draft?.data) {
-                if (draft.data.total_likes > 0) {
-                  draft.data.total_likes -= 1;
-                }
-              }
-            }),
-        },
+        // {
+        //   queryKey: ["search"],
+        //   queryFilters: {
+        //     predicate: (query) =>
+        //       query.queryKey[0] === "search" &&
+        //       ["post", "all"].includes(
+        //         (query.queryKey?.[1] as any)?.type ?? ""
+        //       ),
+        //   },
+        //   isInfiniteData: true,
+        //   updater(oldData) {
+        //     console.log(oldData, "Old Data Search");
+        //     if (oldData?.pages?.[0]?.data instanceof Array) {
+        //       return updateUnlikePost(oldData, postId);
+        //     }
+        //     return updateUnlikePost(oldData, postId, true);
+        //   },
+        // },
+        // {
+        //   queryKey: keys.mePosts(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateUnlikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.postByUserId(uId),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateUnlikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.followedUsersPost(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateUnlikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.savedPosts(),
+        //   isInfiniteData: true,
+        //   updater: (oldData) => updateUnlikePost(oldData, postId),
+        // },
+        // {
+        //   queryKey: keys.postById(postId),
+        //   updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
+        //     produce(oldData, (draft) => {
+        //       if (draft?.data) {
+        //         if (draft.data.total_likes > 0) {
+        //           draft.data.total_likes -= 1;
+        //         }
+        //       }
+        //     }),
+        // },
         {
           queryKey: keys.postIsLiked(postId),
-          updater: <OD extends ApiResponseT<boolean>>(oldData: OD): OD => ({
-            ...oldData,
-            data: false,
-          }),
+          updater: <OD extends ApiResponseT<IsLikedPostResponse>>(
+            oldData: OD
+          ): OD =>
+            produce(oldData, (draft) => {
+              if (draft.data) {
+                draft.data.isLiked = false;
+                if ((draft.data.total_likes ?? 0) > 0)
+                  draft.data.total_likes -= 1;
+              }
+            }),
         },
       ];
     },

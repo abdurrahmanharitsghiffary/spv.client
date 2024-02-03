@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/dropdown";
-import InputSearch from "../input/search";
 import { TypographyH3 } from "../ui/typography";
 import { Button } from "@nextui-org/button";
 import { BiFilter } from "react-icons/bi";
@@ -25,7 +24,6 @@ import { ApiPagingObjectResponse } from "@/types/response";
 import { produce } from "immer";
 import { Notification } from "@/types/notification";
 import { useSession } from "@/stores/auth-store";
-import { updatePagingData } from "@/lib/api/utils";
 import { useMemo, useState } from "react";
 import { useSocket } from "@/hooks/use-socket";
 import { useClearNotification } from "@/lib/api/notifications/mutation";
@@ -60,14 +58,11 @@ export default function NotificationPage() {
     isFetching,
     fetchNextPage,
     isFetchingNextPage,
-  } = useGetNotifications({ type });
+  } = useGetNotifications({ order_by: type });
   const queryClient = useQueryClient();
   const notifications = useMemo(() => resp?.data ?? [], [resp]);
-
-  const unreadNotifications = useMemo(
-    () => notifications.filter((n) => n.isRead === false),
-    [notifications]
-  );
+  console.log(notifications, "Notifications");
+  console.log(resp, "Response");
 
   const { ref } = useFetchNextPageObserver({
     isDisabled: isFetchNextNotAvailable,
@@ -79,17 +74,27 @@ export default function NotificationPage() {
 
   const handleReadAllClick = () => {
     if (socket && socket.connected) {
-      unreadNotifications.forEach((n) => {
-        socket.emit(Socket_Event.READ_NOTIFICATION, { notificationId: n.id });
-      });
+      socket.emit(Socket_Event.READ_ALL_NOTIFICATION, "hi");
     }
   };
 
-  useSocketOn(Socket_Event.READED_NOTIFICATION, (data: Notification) => {
+  useSocketOn(Socket_Event.READED_ALL_NOTIFICATION, (data: "success") => {
     queryClient.setQueriesData<
       InfiniteData<ApiPagingObjectResponse<Notification[]>>
     >(keys.meNotifications(), (oldData) =>
-      updatePagingData(oldData, data, "id")
+      produce(oldData, (draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((p, pi) => {
+            if (p?.data) {
+              p.data.forEach((n, ni) => {
+                if (!n.isRead) {
+                  draft.pages[pi].data[ni].isRead = true;
+                }
+              });
+            }
+          });
+        }
+      })
     );
   });
 
@@ -113,14 +118,6 @@ export default function NotificationPage() {
       })
     );
   });
-
-  // const handleFilterAction = (key:React.Key) =>{
-  // switch (key) {
-  //   case "new":{
-
-  //   }
-  // }
-  // }
 
   const handleDeleteAction = async (key: React.Key) => {
     switch (key) {

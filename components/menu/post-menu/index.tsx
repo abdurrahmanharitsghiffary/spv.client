@@ -32,7 +32,7 @@ import { useShowEditPost } from "@/hooks/use-edit-post";
 import { useConfirm } from "@/stores/confirm-store";
 import { MdOutlineInfo } from "react-icons/md";
 import { usePostLikeModalActions } from "@/stores/post-likes-modal-store";
-import { baseClientURL, url } from "@/lib/consts";
+import { url } from "@/lib/consts";
 
 export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
@@ -40,9 +40,10 @@ export default function PostMenu() {
   const { onOpen } = usePostLikeModalActions();
   const session = useSession();
   const selectedPost = useGetSelectedPost();
-  const { isLiked, isLoading: isLoadILik } = useGetPostIsLiked(
+  const { resp, isLoading: isLoadILik } = useGetPostIsLiked(
     selectedPost?.id ?? -1
   );
+  const isLiked = resp?.data?.isLiked ?? false;
   const { isSaved, isLoading: isLoadISav } = useGetPostIsSaved(
     selectedPost?.id ?? -1
   );
@@ -60,8 +61,8 @@ export default function PostMenu() {
     { key: "details", label: "See post details", icon: <MdOutlineInfo /> },
     {
       key: "like",
-      label: isLiked?.data ? "Unlike post" : "Like post",
-      icon: isLiked?.data ? (
+      label: isLiked ? "Unlike post" : "Like post",
+      icon: isLiked ? (
         <AiFillHeart className="text-danger" />
       ) : (
         <AiOutlineHeart />
@@ -112,7 +113,7 @@ export default function PostMenu() {
       }
       case "like": {
         if (!selectedPost) return null;
-        if (isLiked?.data)
+        if (isLiked)
           return await unlikePostAsync({
             params: { postId: selectedPost?.id },
           });

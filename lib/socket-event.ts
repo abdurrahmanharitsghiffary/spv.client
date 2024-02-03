@@ -6,6 +6,8 @@ export const Socket_Event = Object.freeze({
   NOTIFY: "notify",
   READ_MESSAGE: "readMessage",
   READED_MESSAGE: "readedMessage",
+  READ_ALL_NOTIFICATION: "readAllNotification",
+  READED_ALL_NOTIFICATION: "readedAllNotification",
   NOTIFICATION: "notification",
   RECEIVE_NOTIFICATION: "receiveNotification",
   RECEIVE_MESSAGE: "receiveMessage",

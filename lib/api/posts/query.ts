@@ -16,6 +16,7 @@ import { Post } from "@/types/post";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite, useQ } from "../hooks";
 import { UserSimplified } from "@/types/user";
+import { IsLikedPostResponse } from "@/types/response";
 
 export const useGetPosts = (
   options?: OffsetPaging,
@@ -114,7 +115,7 @@ export const useGetPostIsLiked = (
   postId: number,
   config?: AxiosRequestConfig
 ) => {
-  const { data: isLiked, ...rest } = useQ<boolean>({
+  const { data: resp, ...rest } = useQ<IsLikedPostResponse>({
     queryKey: keys.postIsLiked(Number(postId)),
     url: postIsLiked(postId?.toString()),
     config,
@@ -123,7 +124,7 @@ export const useGetPostIsLiked = (
     },
   });
 
-  return { isLiked, ...rest };
+  return { resp, ...rest };
 };
 
 export const useGetMySavedPosts = (

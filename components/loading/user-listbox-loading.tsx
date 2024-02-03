@@ -22,7 +22,7 @@ export default function UserListboxLoading({
   listProps?: OmitCommonProps<ListboxProps, "children">;
 }) {
   return (
-    <Listbox aria-label="loading..." className="gap-4" {...listProps}>
+    <Listbox aria-label="loading..." className="gap-6" {...listProps}>
       {items.map((i) => (
         <ListboxItem
           {...listboxUserProps}

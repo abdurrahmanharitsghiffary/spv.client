@@ -7,7 +7,6 @@ export default function PostCardFooter(props: {
   postId: number;
   isPreview?: boolean;
   isPostPage?: boolean;
-  totalLikes: number;
 }) {
   return (
     <CardFooter className="py-2">

@@ -19,6 +19,11 @@ export type ApiPagingObjectResponse<T> = {
   };
 } & ApiResponseT<T>;
 
+export type IsLikedPostResponse = {
+  isLiked: boolean;
+  total_likes: number;
+};
+
 // export type PagingObject<T> = {
 //   status: "success";
 //   code?: number;

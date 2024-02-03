@@ -14,27 +14,26 @@ export default function PostActionButton({
   isPreview,
   postId,
   totalComments,
-  totalLikes,
 }: {
   isPostPage?: boolean;
   postId: number;
   totalComments: number;
-  totalLikes: number;
   isPreview?: boolean;
 }) {
   const { likePostAsync } = useLikePost();
   const { unlikePostAsync } = useUnlikePost();
-  const { isLiked, isSuccess } = useGetPostIsLiked(postId);
-
+  const { resp, isSuccess } = useGetPostIsLiked(postId);
+  const isLiked = resp?.data?.isLiked;
+  console.log(resp, "Response");
   const handlePostLike = async () => {
     if (
       (!postId && postId !== 0) ||
       isPreview ||
-      isLiked?.data === undefined ||
+      isLiked === undefined ||
       !isSuccess
     )
       return null;
-    if (isLiked.data === true) {
+    if (isLiked === true) {
       await unlikePostAsync({ params: { postId } });
       return;
     } else {
@@ -47,12 +46,12 @@ export default function PostActionButton({
     <ButtonGroup fullWidth variant="light">
       <Tooltip content="Like">
         <Button onClick={handlePostLike}>
-          {isLiked?.data ? (
+          {isLiked ? (
             <FiThumbsUp color="hsl(var(--nextui-primary) / var(--nextui-primary-opacity, var(--tw-text-opacity)))" />
           ) : (
             <FiThumbsUp />
           )}
-          {totalLikes ?? 0}
+          {resp?.data?.total_likes ?? 0}
         </Button>
       </Tooltip>
       <Tooltip content="Comment">
