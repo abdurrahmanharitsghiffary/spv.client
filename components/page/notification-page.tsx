@@ -120,19 +120,25 @@ export default function NotificationPage() {
   });
 
   const handleDeleteAction = async (key: React.Key) => {
-    switch (key) {
-      case "1h-delete": {
-        await clearNotificationAsync({ query: { before_timestamp: "1h" } });
-        return;
+    try {
+      switch (key) {
+        case "1h-delete": {
+          await clearNotificationAsync({ query: { before_timestamp: "1h" } });
+          return;
+        }
+        case "1d-delete": {
+          await clearNotificationAsync({ query: { before_timestamp: "1d" } });
+          return;
+        }
+        case "all-delete": {
+          await clearNotificationAsync({});
+          return;
+        }
       }
-      case "1d-delete": {
-        await clearNotificationAsync({ query: { before_timestamp: "1d" } });
-        return;
-      }
-      case "all-delete": {
-        await clearNotificationAsync({});
-        return;
-      }
+    } catch (err) {
+    } finally {
+      if (socket && socket?.connected)
+        socket?.emit(Socket_Event.GET_NOTIFICATION_COUNT);
     }
   };
 

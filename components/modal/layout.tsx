@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import {
   Modal,
   ModalBody,
@@ -10,6 +10,7 @@ import {
 import { SlotsToClasses } from "@nextui-org/theme";
 import { HTMLMotionProps } from "framer-motion";
 import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 export interface ModalLayoutProps {
   id?: string;
@@ -84,6 +85,7 @@ const ModalLayout = forwardRef(
     }: ModalLayoutProps,
     ref: React.Ref<HTMLElement | null>
   ) => {
+    const pathname = usePathname();
     const handleClose = () => {
       const toastElement: any = document.querySelector(".Toastify");
       const clickedToast = event?.composedPath()?.includes(toastElement);
@@ -92,6 +94,12 @@ const ModalLayout = forwardRef(
       }
       onClose();
     };
+
+    useEffect(() => {
+      if (pathname) {
+        handleClose();
+      }
+    }, [pathname]);
 
     return (
       <Modal

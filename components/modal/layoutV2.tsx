@@ -5,7 +5,6 @@ import IconButton from "../button/icon-button";
 import { BiChevronLeft, BiX } from "react-icons/bi";
 import { Divider } from "@nextui-org/divider";
 import clsx from "clsx";
-import { useBodyOverflowHidden } from "@/hooks/use-body-overflow-hidden";
 import { useIsSm } from "@/hooks/use-media-query";
 
 const ModalLayoutV2 = forwardRef(
@@ -23,7 +22,6 @@ const ModalLayoutV2 = forwardRef(
     ref: React.Ref<HTMLElement> | undefined
   ) => {
     const isSm = useIsSm();
-    useBodyOverflowHidden(rest.isOpen);
 
     return (
       <ModalLayout

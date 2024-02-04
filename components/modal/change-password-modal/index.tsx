@@ -96,7 +96,7 @@ function ChangePasswordModal() {
         <TypographyH3 className="!text-base">Change password</TypographyH3>
         <InputPassword
           label="Current password"
-          placeholder="your current password"
+          placeholder="Enter your current password"
           control={control}
           name="currentPassword"
         />

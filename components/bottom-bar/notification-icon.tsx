@@ -1,7 +1,6 @@
 "use client";
 
 import { useSocket } from "@/hooks/use-socket";
-import { useSocketOn } from "@/hooks/use-socket-on";
 import { Socket_Event } from "@/lib/socket-event";
 import { useSession } from "@/stores/auth-store";
 import { useNotificationCount, useSetCount } from "@/stores/count-store";
@@ -15,6 +14,11 @@ export default function NotificationIcon({ isActive }: { isActive?: boolean }) {
   const socket = useSocket();
   const setCount = useSetCount().setCountNotification;
   const session = useSession();
+
+  useEffect(() => {
+    if (!socket || !socket?.connected) return;
+    socket.emit(Socket_Event.GET_NOTIFICATION_COUNT);
+  }, [socket]);
 
   const onNotify = (c: Notification) => {
     if (c.receiverId !== session?.id) return null;

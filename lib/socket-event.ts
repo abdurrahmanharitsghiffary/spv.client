@@ -28,6 +28,7 @@ export const Socket_Event = Object.freeze({
   COUNT_MESSAGE: "countMessage",
   GET_MESSAGE_COUNT: "getMessageCount",
   COUNT_NOTIFICATION: "countNotification",
+  GET_NOTIFICATION_COUNT: "getNotificationCount",
   READ_NOTIFICATION: "readNotification",
   READED_NOTIFICATION: "readedNotification",
 });
