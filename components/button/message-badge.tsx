@@ -17,6 +17,10 @@ export default function MessageBadge({
 
   const setCount = useSetCount().setCountMessage;
 
+  useSocketOn(Socket_Event.COUNT_MESSAGE, (c: number) => {
+    setCount(c);
+  });
+
   useSocketOn(Socket_Event.RECEIVE_MESSAGE, () => {
     setCount(count + 1);
   });
@@ -26,7 +30,7 @@ export default function MessageBadge({
   });
 
   return (
-    <Badge size="md" color="danger" content={content} isInvisible={count === 0}>
+    <Badge size="md" color="danger" content={content} isInvisible={count <= 0}>
       {children}
     </Badge>
   );
