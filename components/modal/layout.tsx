@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useCallback, useEffect } from "react";
 import {
   Modal,
   ModalBody,
@@ -86,14 +86,14 @@ const ModalLayout = forwardRef(
     ref: React.Ref<HTMLElement | null>
   ) => {
     const pathname = usePathname();
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
       const toastElement: any = document.querySelector(".Toastify");
       const clickedToast = event?.composedPath()?.includes(toastElement);
       if (clickedToast) {
         return;
       }
       onClose();
-    };
+    }, []);
 
     useEffect(() => {
       if (pathname) {

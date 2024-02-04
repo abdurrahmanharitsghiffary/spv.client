@@ -13,7 +13,7 @@ function ImagePreview() {
     handleClose();
     setIsError(false);
   };
-
+  console.log(isOpen, "Is Open");
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
   //     setWindowHeight(window.innerHeight ?? 0);
@@ -34,7 +34,6 @@ function ImagePreview() {
   return (
     <ModalLayout
       id="image-preview"
-      key={src}
       wrapperClassNames={{ wrapper: "overflow-hidden z-[202]" }}
       classNames={{
         wrapper:
