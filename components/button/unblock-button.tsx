@@ -1,5 +1,7 @@
 "use client";
+import { useSocket } from "@/hooks/use-socket";
 import { useUnblockUser } from "@/lib/api/users/mutation";
+import { Socket_Event } from "@/lib/socket-event";
 import { useConfirm } from "@/stores/confirm-store";
 import { Button, ButtonProps } from "@nextui-org/button";
 import clsx from "clsx";
@@ -12,6 +14,7 @@ export default function UnblockButton({
 }: ButtonProps & { userId: number }) {
   const { unblockAsync } = useUnblockUser();
   const confirm = useConfirm();
+  const socket = useSocket();
 
   const handleBlocked = async () => {
     await confirm({
@@ -21,6 +24,9 @@ export default function UnblockButton({
       confirmColor: "primary",
     });
     await unblockAsync({ params: { userId } });
+    if (socket && socket.connected) {
+      socket.emit(Socket_Event.GET_MESSAGE_COUNT);
+    }
   };
 
   return (

@@ -17,10 +17,13 @@ import { useParams, useRouter } from "next/navigation";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useConfirm } from "@/stores/confirm-store";
 import { useBlockUser } from "@/lib/api/users/mutation";
+import { useSocket } from "@/hooks/use-socket";
+import { Socket_Event } from "@/lib/socket-event";
 
 export default function UserMenu() {
   const confirm = useConfirm();
   const isOpen = useUserMenuIsOpen();
+  const socket = useSocket();
   const { onClose } = useUserMenuActions();
   const router = useRouter();
   const params = useParams();
@@ -51,6 +54,8 @@ export default function UserMenu() {
         confirmColor: "danger",
       });
       await blockUserAsync({ body: { userId: Number(params.userId ?? -1) } });
+      if (socket && socket.connected)
+        socket.emit(Socket_Event.GET_MESSAGE_COUNT);
     }
   };
 
