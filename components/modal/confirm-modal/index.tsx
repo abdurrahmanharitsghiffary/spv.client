@@ -27,15 +27,18 @@ function ConfirmModal() {
     modalClassNames,
     modalWrapperClassNames,
   } = useConfirmState();
+  const handleClose = () => {
+    onCancel();
+    onClose();
+  };
+
   return (
     <ModalLayout
+      shouldCloseOnUrlChange={false}
       key={body ?? "" + title ?? ""}
       isOpen={isOpen}
       placement="center"
-      onClose={() => {
-        onCancel();
-        onClose();
-      }}
+      onClose={handleClose}
       wrapperClassNames={{ ...modalWrapperClassNames }}
       size={size}
       classNames={{
@@ -48,10 +51,7 @@ function ConfirmModal() {
           <Button
             color={closeColor}
             variant={closeVariant}
-            onClick={() => {
-              onCancel();
-              onClose();
-            }}
+            onClick={handleClose}
           >
             {closeLabel}
           </Button>

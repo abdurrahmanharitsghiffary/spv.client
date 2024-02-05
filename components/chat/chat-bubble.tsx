@@ -28,14 +28,14 @@ const ChatBubble = forwardRef<
     setIsHolded(false);
   };
 
-  const handleMouseDown = () => {
+  const handlePointerDown = () => {
     resetHold();
     holdTimeRef.current = setTimeout(() => {
       setIsHolded(true);
     }, 1000);
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     resetHold();
   };
 
@@ -70,8 +70,8 @@ const ChatBubble = forwardRef<
         </div>
       )}
       <div
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         className={clsx(
           isRecipient
             ? "self-start before:content-[''] before:bg-default-200 before:p-2 before:top-0 before:absolute before:-left-1 before:skew-x-[30deg] before:rounded-tl-md"
@@ -91,11 +91,11 @@ const ChatBubble = forwardRef<
           )}
         >
           {chat?.isGroupChat && (
-            <TypographyMuted className="!text-xs truncate break-words">
+            <TypographyMuted className="!text-xs truncate break-words noselect">
               {chat.author.fullName}
             </TypographyMuted>
           )}
-          <TextWithLimit text={chat?.message ?? ""} />
+          <TextWithLimit text={chat?.message ?? ""} className="noselect" />
           {images && images.length > 0 ? (
             <Gallery className="max-w-[270px]" images={images as any} />
           ) : null}
@@ -103,7 +103,7 @@ const ChatBubble = forwardRef<
         <Timestamp
           className={clsx(
             isRecipient ? "self-start" : "self-end",
-            "!text-[0.688rem]"
+            "!text-[0.688rem] noselect"
           )}
           customDate={chat?.createdAt}
         />

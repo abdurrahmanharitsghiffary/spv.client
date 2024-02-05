@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef, useCallback, useEffect } from "react";
+import React, { forwardRef, useEffect } from "react";
 import {
   Modal,
   ModalBody,
@@ -48,6 +48,7 @@ export interface ModalLayoutProps {
   footer?: string | React.JSX.Element;
   header?: string | React.JSX.Element;
   children: React.ReactNode;
+  shouldCloseOnUrlChange?: boolean;
   size?:
     | "md"
     | "sm"
@@ -66,6 +67,7 @@ export interface ModalLayoutProps {
 const ModalLayout = forwardRef(
   (
     {
+      shouldCloseOnUrlChange = true,
       wrapperClassNames,
       id,
       classNames,
@@ -86,20 +88,21 @@ const ModalLayout = forwardRef(
     ref: React.Ref<HTMLElement | null>
   ) => {
     const pathname = usePathname();
-    const handleClose = useCallback(() => {
+    const handleClose = () => {
       const toastElement: any = document.querySelector(".Toastify");
       const clickedToast = event?.composedPath()?.includes(toastElement);
       if (clickedToast) {
         return;
       }
       onClose();
-    }, []);
+    };
 
     useEffect(() => {
+      if (!shouldCloseOnUrlChange) return;
       if (pathname) {
         handleClose();
       }
-    }, [pathname]);
+    }, [pathname, shouldCloseOnUrlChange]);
 
     return (
       <Modal

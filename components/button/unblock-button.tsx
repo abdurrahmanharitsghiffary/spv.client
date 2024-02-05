@@ -17,12 +17,14 @@ export default function UnblockButton({
   const socket = useSocket();
 
   const handleBlocked = async () => {
+    console.log("Blocked");
     await confirm({
       body: "Are you sure unblock this user?",
       title: "Unblock",
       confirmLabel: "Confirm",
       confirmColor: "primary",
     });
+    console.log("Confirmed");
     await unblockAsync({ params: { userId } });
     if (socket && socket.connected) {
       socket.emit(Socket_Event.GET_MESSAGE_COUNT);
