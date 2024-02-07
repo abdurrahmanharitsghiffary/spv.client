@@ -43,6 +43,8 @@ export const useBlockUser = () => {
     baseUrl: blockUserRoute,
     method: "post",
     invalidateTags: (v) => [
+      keys.counts(["unread_messages"]),
+      keys.counts(["unread_notifications"]),
       keys.userById(Number(v.body?.userId)),
       keys.blockedUsers(),
     ],
@@ -60,6 +62,8 @@ export const useUnblockUser = () => {
     baseUrl: blockUserRoute + "/:userId",
     method: "delete",
     invalidateTags: (v) => [
+      keys.counts(["unread_messages"]),
+      keys.counts(["unread_notifications"]),
       keys.userById(Number(v.params?.userId)),
       keys.blockedUsers(),
     ],

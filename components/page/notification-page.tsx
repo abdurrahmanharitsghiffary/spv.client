@@ -61,8 +61,6 @@ export default function NotificationPage() {
   } = useGetNotifications({ order_by: type });
   const queryClient = useQueryClient();
   const notifications = useMemo(() => resp?.data ?? [], [resp]);
-  console.log(notifications, "Notifications");
-  console.log(resp, "Response");
 
   const { ref } = useFetchNextPageObserver({
     isDisabled: isFetchNextNotAvailable,
@@ -137,8 +135,6 @@ export default function NotificationPage() {
       }
     } catch (err) {
     } finally {
-      if (socket && socket?.connected)
-        socket?.emit(Socket_Event.GET_NOTIFICATION_COUNT);
     }
   };
 

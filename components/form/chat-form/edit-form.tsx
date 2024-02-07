@@ -62,19 +62,11 @@ export default function ChatEditForm() {
 
   const onSubmit: SubmitHandler<MessageEditSchema> = async (data) => {
     if (isSubmitting) return null;
-    await toast.promise(
-      editMessageAsync({ body: data, params: { messageId } })
-        .then((res) => res)
-        .catch((err) => Promise.reject(err)),
-      {
-        error: {
-          render({ data }) {
-            return (data as any)?.message ?? "Something went wrong!";
-          },
-        },
-        pending: "Updating message...",
-      }
-    );
+    try {
+      await editMessageAsync({ body: data, params: { messageId } });
+    } catch (err: any) {
+      toast.error(err?.data ?? "Something went wrong!");
+    }
   };
 
   const handleResultChange = (result: string | null | undefined) => {

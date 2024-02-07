@@ -1,49 +1,51 @@
 "use client";
 
 import { useSocket } from "@/hooks/use-socket";
+import { useGetCounts } from "@/lib/api/count";
+import { keys } from "@/lib/queryKey";
 import { Socket_Event } from "@/lib/socket-event";
 import { useSession } from "@/stores/auth-store";
-import { useNotificationCount, useSetCount } from "@/stores/count-store";
 import { Notification } from "@/types/notification";
 import { Badge } from "@nextui-org/badge";
-import React, { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useCallback, useEffect } from "react";
 import { FiBell } from "react-icons/fi";
 
 export default function NotificationIcon({ isActive }: { isActive?: boolean }) {
-  const count = useNotificationCount();
+  const { resp } = useGetCounts(["unread_notifications"]);
+  const queryClient = useQueryClient();
+  const count = resp?.data?.unreadNotifications ?? 0;
   const socket = useSocket();
-  const setCount = useSetCount().setCountNotification;
   const session = useSession();
 
-  useEffect(() => {
-    if (!socket || !socket?.connected) return;
-    socket.emit(Socket_Event.GET_NOTIFICATION_COUNT);
-  }, [socket]);
+  const onNotify = useCallback(
+    (c: Notification) => {
+      if (c.receiverId !== session?.id) return null;
+      queryClient.invalidateQueries({
+        queryKey: keys.counts(["unread_notifications"]),
+      });
+    },
+    [session, queryClient]
+  );
 
-  const onNotify = (c: Notification) => {
-    if (c.receiverId !== session?.id) return null;
-    setCount(count + 1);
-  };
-
-  const onReceiveNotiCount = (c: number) => {
-    setCount(c);
-  };
-
-  const onReadNotification = (c: Notification) => {
-    setCount(count - 1);
-  };
+  const onReadNotification = useCallback(
+    (c: Notification) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.counts(["unread_notifications"]),
+      });
+    },
+    [queryClient]
+  );
 
   useEffect(() => {
     if (!socket) return;
     socket.on(Socket_Event.NOTIFY, onNotify);
-    socket.on(Socket_Event.COUNT_NOTIFICATION, onReceiveNotiCount);
     socket.on(Socket_Event.READED_NOTIFICATION, onReadNotification);
     return () => {
       socket.off(Socket_Event.NOTIFY, onNotify);
-      socket.off(Socket_Event.COUNT_NOTIFICATION, onReceiveNotiCount);
       socket.off(Socket_Event.READED_NOTIFICATION, onReadNotification);
     };
-  }, [socket, count]);
+  }, [socket, onNotify, onReadNotification]);
 
   return (
     <Badge

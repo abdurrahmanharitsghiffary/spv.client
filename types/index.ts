@@ -148,3 +148,40 @@ export type TypingUserV2 = {
   fullName: string;
   username: string;
 };
+
+export type Counts = {
+  readedMessages?: number;
+  readedNotifications?: number;
+  likedPosts?: number;
+  likedComments?: number;
+  unreadMessages?: number;
+  unreadNotifications?: number;
+  notifications?: number;
+  messages?: number;
+  posts?: number;
+  savedPosts?: number;
+  followers?: number;
+  followedUsers?: number;
+  blockedUsers?: number;
+  chatRooms?: number;
+  participatedGroups?: number;
+  comments?: number;
+};
+
+export type CountType =
+  | "readed_messages"
+  | "readed_notifications"
+  | "liked_posts"
+  | "liked_comments"
+  | "unread_messages"
+  | "unread_notifications"
+  | "notifications"
+  | "messages"
+  | "posts"
+  | "saved_posts"
+  | "followers"
+  | "followed_users"
+  | "blocked_users"
+  | "chat_rooms"
+  | "participated_groups"
+  | "comments";

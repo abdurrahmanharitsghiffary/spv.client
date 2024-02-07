@@ -1,6 +1,7 @@
-import { SearchOptions } from "@/types";
+import { CountType, SearchOptions } from "@/types";
 
 export const keys = {
+  counts: (type?: CountType[]) => ["counts", type] as const,
   posts: ["posts"] as const,
   users: ["users"] as const,
   myInfo: ["myInfo"] as const,

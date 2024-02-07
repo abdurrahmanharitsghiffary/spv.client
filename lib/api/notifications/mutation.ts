@@ -37,6 +37,7 @@ export const useClearNotification = () => {
     ...rest
   } = useOptimistic({
     method: "delete",
+    invalidateTags: (v) => [keys.counts(["unread_notifications"])],
     baseUrl: myNotifications(),
     optimisticUpdater(v) {
       return [

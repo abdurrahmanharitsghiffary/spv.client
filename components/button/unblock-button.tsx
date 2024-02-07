@@ -14,7 +14,6 @@ export default function UnblockButton({
 }: ButtonProps & { userId: number }) {
   const { unblockAsync } = useUnblockUser();
   const confirm = useConfirm();
-  const socket = useSocket();
 
   const handleBlocked = async () => {
     console.log("Blocked");
@@ -26,9 +25,6 @@ export default function UnblockButton({
     });
     console.log("Confirmed");
     await unblockAsync({ params: { userId } });
-    if (socket && socket.connected) {
-      socket.emit(Socket_Event.GET_MESSAGE_COUNT);
-    }
   };
 
   return (

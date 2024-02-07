@@ -42,8 +42,6 @@ export default function PostActionButton({
     }
   };
 
-  console.log(isLoading, "Is Loading");
-
   return (
     <ButtonGroup fullWidth variant="light">
       <Tooltip content="Like">
