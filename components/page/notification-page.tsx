@@ -25,8 +25,10 @@ import { produce } from "immer";
 import { Notification } from "@/types/notification";
 import { useSession } from "@/stores/auth-store";
 import { useMemo, useState } from "react";
-import { useSocket } from "@/hooks/use-socket";
-import { useClearNotification } from "@/lib/api/notifications/mutation";
+import {
+  useClearNotification,
+  useReadNotification,
+} from "@/lib/api/notifications/mutation";
 
 const filterItems = [
   { key: "latest", label: "Newest" },
@@ -68,33 +70,10 @@ export default function NotificationPage() {
     fetchNextPage,
   });
   const session = useSession();
-  const socket = useSocket();
-
-  const handleReadAllClick = () => {
-    if (socket && socket.connected) {
-      socket.emit(Socket_Event.READ_ALL_NOTIFICATION, "hi");
-    }
+  const { readNotificationAsync } = useReadNotification();
+  const handleReadAllClick = async () => {
+    await readNotificationAsync({ body: { ids: "all" } });
   };
-
-  useSocketOn(Socket_Event.READED_ALL_NOTIFICATION, (data: "success") => {
-    queryClient.setQueriesData<
-      InfiniteData<ApiPagingObjectResponse<Notification[]>>
-    >(keys.meNotifications(), (oldData) =>
-      produce(oldData, (draft) => {
-        if (draft?.pages) {
-          draft.pages.forEach((p, pi) => {
-            if (p?.data) {
-              p.data.forEach((n, ni) => {
-                if (!n.isRead) {
-                  draft.pages[pi].data[ni].isRead = true;
-                }
-              });
-            }
-          });
-        }
-      })
-    );
-  });
 
   useSocketOn<Notification>(Socket_Event.NOTIFY, (data) => {
     if (data.receiverId !== session?.id) return null;

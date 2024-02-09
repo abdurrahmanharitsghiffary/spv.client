@@ -16,10 +16,12 @@ import { useConfirm } from "@/stores/confirm-store";
 import InputFile from "@/components/input/file";
 import { toast } from "react-toastify";
 import { zImage } from "@/lib/zod-schema/image";
+import { useIsSm } from "@/hooks/use-media-query";
 
 export default function PhotoProfileMenu() {
   const [file, setFile] = useState<File | null>(null);
   const isOpen = usePhotoProfileMenuIsOpen();
+  const isSm = useIsSm();
   const { onClose } = usePhotoProfileActions();
   const { updateAccountImageAsync } = useUpdateMyAccountImage();
   const { deleteAccountImageAsync } = useDeleteMyAccountImage();
@@ -66,13 +68,13 @@ export default function PhotoProfileMenu() {
         imgSrc: URL.createObjectURL(file),
         imageClassName:
           "w-150 h-150 object-cover rounded-full aspect-square border-2 border-divider",
-        size: "full",
+        size: isSm ? "md" : "full",
         modalClassNames: {
           body: "items-center gap-5",
         },
         modalWrapperClassNames: {
-          wrapper: "sm:!justify-end",
-          base: "!h-full right-0 md:max-w-sm !w-full",
+          wrapper: "sm:!justify-center",
+          base: "!h-full sm:!h-auto right-0 md:max-w-sm !w-full",
         },
       });
       await toast.promise(

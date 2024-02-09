@@ -4,7 +4,11 @@ import { baseCommentRoutes } from "@/lib/endpoints";
 import { keys } from "@/lib/queryKey";
 import { CreateCommentData } from "@/types";
 import { Comment } from "@/types/comment";
-import { ApiPagingObjectResponse, ApiResponseT } from "@/types/response";
+import {
+  ApiPagingObjectResponse,
+  ApiResponseT,
+  IsLikedResponse,
+} from "@/types/response";
 import { InfiniteData } from "@tanstack/react-query";
 import { produce } from "immer";
 import { useParams } from "next/navigation";
@@ -90,62 +94,18 @@ export const useUpdateComment = () => {
   return { updateComment, updateCommentAsync, ...rest };
 };
 
-type InfinitePagingPostComents = InfiniteData<
-  ApiPagingObjectResponse<Comment[]>
->;
-
-const updateCommentLike = <OD extends ApiResponseT<Comment>>(
-  oldData: OD,
-  commentId: number,
-  isLiked: boolean
-): OD =>
-  produce(oldData, (draft) => {
-    if ((draft as unknown as InfinitePagingPostComents)?.pages) {
-      (draft as unknown as InfinitePagingPostComents).pages.forEach((p, pi) => {
-        p.data.forEach((d, di) => {
-          if (d.id === commentId) {
-            (draft as unknown as InfinitePagingPostComents).pages[pi].data[
-              di
-            ].total_likes += isLiked ? 1 : d.total_likes > 0 ? -1 : 0;
-            (draft as unknown as InfinitePagingPostComents).pages[pi].data[
-              di
-            ].isLiked = isLiked;
-          }
-        });
-      });
-    }
-    if (draft?.data) {
-      if (draft.data instanceof Array) {
-        draft.data.forEach((d: Comment, di) => {
-          if (d.id === commentId) {
-            (draft.data as any)[di].total_likes += isLiked
-              ? 1
-              : d.total_likes > 0
-              ? -1
-              : 0;
-            (draft.data as any)[di].isLiked = isLiked;
-          }
-        });
-      } else if (typeof draft.data === "object") {
-        if (draft.data.id === commentId) {
-          draft.data.total_likes += isLiked
-            ? 1
-            : draft.data.total_likes > 0
-            ? -1
-            : 0;
-          draft.data.isLiked = isLiked;
-        }
-      }
-    }
-  });
-
-const updateCommentIsLiked = <OD extends ApiResponseT<boolean>>(
+const updateCommentIsLiked = <OD extends ApiResponseT<IsLikedResponse>>(
   oldData: OD,
   isLiked: boolean
 ): OD =>
   produce(oldData, (draft) => {
     if (draft?.data !== undefined) {
-      draft.data = isLiked;
+      draft.data.isLiked = isLiked;
+      draft.data.total_likes += isLiked
+        ? 1
+        : draft.data.total_likes === 0
+        ? 0
+        : -1;
     }
   });
 
@@ -163,11 +123,6 @@ export const useLikeComment = () => {
         {
           queryKey: keys.commentIsLiked(commentId),
           updater: (oldData) => updateCommentIsLiked(oldData, true),
-        },
-        {
-          queryKey: keys.comment,
-          isInfiniteData: true,
-          updater: (oldData) => updateCommentLike(oldData, commentId, true),
         },
       ];
     },
@@ -191,11 +146,6 @@ export const useUnlikeComment = () => {
         {
           queryKey: keys.commentIsLiked(commentId),
           updater: (oldData) => updateCommentIsLiked(oldData, false),
-        },
-        {
-          queryKey: keys.comment,
-          isInfiniteData: true,
-          updater: (oldData) => updateCommentLike(oldData, commentId, false),
         },
       ];
     },

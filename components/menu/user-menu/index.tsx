@@ -17,8 +17,6 @@ import { useParams, useRouter } from "next/navigation";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useConfirm } from "@/stores/confirm-store";
 import { useBlockUser } from "@/lib/api/users/mutation";
-import { useSocket } from "@/hooks/use-socket";
-import { Socket_Event } from "@/lib/socket-event";
 
 export default function UserMenu() {
   const confirm = useConfirm();
@@ -44,7 +42,7 @@ export default function UserMenu() {
         body: { userId: Number(params.userId ?? -1) },
       });
     } else if (key === "message") {
-      router.push(`/chats/${params.userId ?? -1}`);
+      router.push(`/chats`);
     } else if (key === "block-delete") {
       await confirm({
         body: "Are you sure want to block this user?",

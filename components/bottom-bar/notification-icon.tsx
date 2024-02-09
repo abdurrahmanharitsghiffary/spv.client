@@ -28,24 +28,13 @@ export default function NotificationIcon({ isActive }: { isActive?: boolean }) {
     [session, queryClient]
   );
 
-  const onReadNotification = useCallback(
-    (c: Notification) => {
-      queryClient.invalidateQueries({
-        queryKey: keys.counts(["unread_notifications"]),
-      });
-    },
-    [queryClient]
-  );
-
   useEffect(() => {
     if (!socket) return;
     socket.on(Socket_Event.NOTIFY, onNotify);
-    socket.on(Socket_Event.READED_NOTIFICATION, onReadNotification);
     return () => {
       socket.off(Socket_Event.NOTIFY, onNotify);
-      socket.off(Socket_Event.READED_NOTIFICATION, onReadNotification);
     };
-  }, [socket, onNotify, onReadNotification]);
+  }, [socket, onNotify]);
 
   return (
     <Badge

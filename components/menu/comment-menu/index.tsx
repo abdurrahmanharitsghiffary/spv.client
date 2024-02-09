@@ -38,9 +38,10 @@ export default function CommentMenu() {
   const { onOpen } = useCommentLikeModalActions();
   const comment = useGetSelectedComment();
   const confirm = useConfirm();
-  const { isLiked, isLoading: isLoadIsLiked } = useGetCommentIsLiked(
+  const { resp, isLoading: isLoadIsLiked } = useGetCommentIsLiked(
     comment?.id ?? -1
   );
+  const isLiked = resp?.data?.isLiked ?? false;
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
@@ -50,8 +51,8 @@ export default function CommentMenu() {
     { key: "details", label: "See comment details", icon: <MdOutlineInfo /> },
     {
       key: "like-comment",
-      label: isLiked?.data ? "Unlike comment" : "Like comment",
-      icon: isLiked?.data ? (
+      label: isLiked ? "Unlike comment" : "Like comment",
+      icon: isLiked ? (
         <AiFillHeart className="text-danger" />
       ) : (
         <AiOutlineHeart />
@@ -86,7 +87,7 @@ export default function CommentMenu() {
 
   const handleMenuActions = async (key: React.Key) => {
     if (key === "like-comment" && comment) {
-      if (isLiked?.data)
+      if (isLiked)
         return await unlikeCommentAsync({ params: { commentId: comment?.id } });
       return await likeCommentAsync({ params: { commentId: comment?.id } });
     } else if (key === "delete-report-comment" && !isAuthored) {

@@ -1,7 +1,7 @@
 "use client";
 
-import { myNotifications } from "@/lib/endpoints";
-import { useOptimistic } from "../hooks";
+import { myNotifications, urlBase } from "@/lib/endpoints";
+import { useMutate, useOptimistic } from "../hooks";
 import { keys } from "@/lib/queryKey";
 import { InfiniteData } from "@tanstack/react-query";
 import { ApiPagingObjectResponse } from "@/types/response";
@@ -86,4 +86,21 @@ export const useClearNotification = () => {
   });
 
   return { clearNotification, clearNotificationAsync, ...rest };
+};
+
+export const useReadNotification = () => {
+  const {
+    mutate: readNotification,
+    mutateAsync: readNotificationAsync,
+    ...rest
+  } = useMutate<{ ids: "all" | number[] }>({
+    baseUrl: urlBase("/me/notifications/read"),
+    method: "post",
+    invalidateTags: (v) => [
+      keys.counts(["unread_notifications"]),
+      keys.meNotifications(),
+    ],
+  });
+
+  return { readNotification, readNotificationAsync, ...rest };
 };

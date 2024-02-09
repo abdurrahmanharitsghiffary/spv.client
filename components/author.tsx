@@ -22,7 +22,7 @@ export default function Author({
           src={author?.avatarImage?.src}
         />
         <div className="flex flex-col truncate">
-          <p className="truncate">{author?.fullName}</p>
+          <p className="truncate text-small">{author?.fullName}</p>
           <p className="text-tiny truncate text-foreground-500">
             {author?.username}
           </p>

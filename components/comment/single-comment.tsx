@@ -30,10 +30,7 @@ export default function SingleComment({
         <User user={comment?.user} createdAt={comment?.createdAt} />
 
         <div className="flex gap-2 justify-between items-center">
-          <CommentLikeButton
-            total={comment?.total_likes ?? 0}
-            commentId={comment?.id}
-          />
+          <CommentLikeButton commentId={comment?.id} />
           <CommentMenuTrigger comment={commentId} />
         </div>
       </div>

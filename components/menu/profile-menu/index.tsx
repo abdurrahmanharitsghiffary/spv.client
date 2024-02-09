@@ -14,13 +14,14 @@ import {
   useProfileMenuActions,
   useProfileMenuIsOpen,
 } from "@/stores/profile-menu-store";
-import { FiLogOut } from "react-icons/fi";
 import InputFile from "@/components/input/file";
 import { toast } from "react-toastify";
 import { zImage } from "@/lib/zod-schema/image";
+import { useIsSm } from "@/hooks/use-media-query";
 
 export default function ProfileMenu() {
   const isOpen = useProfileMenuIsOpen();
+  const isSm = useIsSm();
   const [file, setFile] = useState<File | null>(null);
   const { onClose } = useProfileMenuActions();
   const { updateCoverImageAsync } = useUpdateMyCoverImage();
@@ -58,17 +59,17 @@ export default function ProfileMenu() {
       await zImage.parseAsync(file);
       await confirm({
         title: "Change cover image",
-        body: "Save with this image?",
+        body: "Save changes with this image?",
         imgSrc: URL.createObjectURL(file ?? ""),
         imageClassName:
           "h-[180px] w-full bg-default-100 rounded-none max-w-none bg-cover object-cover",
-        size: "full",
+        size: isSm ? "md" : "full",
         modalClassNames: {
           body: "items-center gap-5",
         },
         modalWrapperClassNames: {
-          wrapper: "sm:!justify-end",
-          base: "!h-full right-0 md:max-w-sm !w-full",
+          wrapper: "sm:!justify-center",
+          base: "!h-full sm:!h-auto right-0 md:max-w-sm !w-full",
         },
       });
       await toast.promise(

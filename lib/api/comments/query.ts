@@ -12,6 +12,7 @@ import { Comment } from "@/types/comment";
 import { AxiosRequestConfig } from "axios";
 import { useInfinite, useQ } from "../hooks";
 import { UserSimplified } from "@/types/user";
+import { IsLikedResponse } from "@/types/response";
 
 export const useGetCommentByPostId = (
   postId: number,
@@ -77,12 +78,12 @@ export const useGetCommentIsLiked = (
   commentId: number | undefined,
   config?: AxiosRequestConfig
 ) => {
-  const { data: isLiked, ...rest } = useQ<boolean>({
+  const { data: resp, ...rest } = useQ<IsLikedResponse>({
     url: commentIsLiked((commentId ?? -1).toString()),
     queryKey: keys.commentIsLiked(commentId ?? -1),
     config,
     qConfig: { enabled: commentId !== -1 && commentId !== undefined },
   });
 
-  return { isLiked, ...rest };
+  return { resp, ...rest };
 };

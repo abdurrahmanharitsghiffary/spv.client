@@ -11,7 +11,7 @@ import { CreatePostData } from "@/types";
 import {
   ApiPagingObjectResponse,
   ApiResponseT,
-  IsLikedPostResponse,
+  IsLikedResponse,
 } from "@/types/response";
 import {
   InfiniteData,
@@ -317,7 +317,7 @@ export const useLikePost = () => {
         // },
         {
           queryKey: keys.postIsLiked(postId),
-          updater: <OD extends ApiResponseT<IsLikedPostResponse>>(
+          updater: <OD extends ApiResponseT<IsLikedResponse>>(
             oldData: OD
           ): OD =>
             produce(oldData, (draft) => {
@@ -396,7 +396,7 @@ export const useUnlikePost = () => {
         // },
         {
           queryKey: keys.postIsLiked(postId),
-          updater: <OD extends ApiResponseT<IsLikedPostResponse>>(
+          updater: <OD extends ApiResponseT<IsLikedResponse>>(
             oldData: OD
           ): OD =>
             produce(oldData, (draft) => {

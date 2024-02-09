@@ -12,13 +12,11 @@ export default function CommentHeader({
   username,
   commentId,
   createdAt,
-  totalLikes,
 }: {
   userId: number | undefined;
   username: string | undefined;
   createdAt: Date | undefined;
   commentId: number | undefined;
-  totalLikes: number | undefined;
 }) {
   const comment: CommentId =
     (!commentId && commentId !== 0) || (!userId && userId !== 0)
@@ -43,7 +41,7 @@ export default function CommentHeader({
         </div>
       </NextLink>
       <div className="flex gap-2 items-start justify-end">
-        <CommentLikeButton commentId={commentId} total={totalLikes} />
+        <CommentLikeButton commentId={commentId} />
         <CommentMenuTrigger comment={comment} />
       </div>
     </CardHeader>

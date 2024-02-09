@@ -52,7 +52,6 @@ function Comment({
         <CommentHeader
           commentId={comment?.id}
           createdAt={comment?.createdAt}
-          totalLikes={comment?.total_likes}
           userId={comment?.user?.id}
           username={comment?.user?.username}
         />

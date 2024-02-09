@@ -19,7 +19,7 @@ export type ApiPagingObjectResponse<T> = {
   };
 } & ApiResponseT<T>;
 
-export type IsLikedPostResponse = {
+export type IsLikedResponse = {
   isLiked: boolean;
   total_likes: number;
 };

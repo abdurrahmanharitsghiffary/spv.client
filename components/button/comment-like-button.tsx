@@ -6,19 +6,18 @@ import React from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 export default function CommentLikeButton({
-  total,
   commentId,
 }: {
   commentId: number | undefined;
-  total: number | undefined;
 }) {
-  const { isLiked, isError } = useGetCommentIsLiked(commentId);
+  const { resp, isError } = useGetCommentIsLiked(commentId);
   const { likeComment } = useLikeComment();
   const { unlikeComment } = useUnlikeComment();
+  const isLiked = resp?.data?.isLiked ?? false;
+  const total = resp?.data?.total_likes ?? 0;
   const handleLike = () => {
     if (!commentId) return null;
-    if (isLiked?.data)
-      return unlikeComment({ params: { commentId: commentId } });
+    if (isLiked) return unlikeComment({ params: { commentId: commentId } });
     return likeComment({ params: { commentId } });
   };
 
@@ -33,7 +32,7 @@ export default function CommentLikeButton({
         className="w-unit-6 h-unit-6 min-w-unit-6"
         onClick={handleLike}
       >
-        {isLiked?.data ? (
+        {isLiked ? (
           <AiFillHeart size={16} color="#F31260" />
         ) : (
           <AiOutlineHeart size={16} color="#F31260" />
