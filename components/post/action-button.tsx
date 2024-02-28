@@ -24,7 +24,7 @@ export default function PostActionButton({
   const { unlikePostAsync } = useUnlikePost();
   const { resp, isSuccess, isLoading } = useGetPostIsLiked(postId);
   const isLiked = resp?.data?.isLiked;
-  const total_likes = resp?.data?.total_likes ?? 0;
+  const total_likes = resp?.data?.totalLikes ?? 0;
   const handlePostLike = async () => {
     if (
       (!postId && postId !== 0) ||

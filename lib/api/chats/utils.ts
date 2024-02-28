@@ -77,8 +77,8 @@ export const updateParticipantsData = <OD extends InfiniteParticipantsData>(
         data: [...newParticipants, ...updatedParticipants],
         pagination: {
           ...page.pagination,
-          result_count: page.pagination.result_count + newParticipants.length,
-          total_records: page.pagination.total_records + newParticipants.length,
+          result_count: page.pagination.resultCount + newParticipants.length,
+          total_records: page.pagination.totalRecords + newParticipants.length,
         },
       };
     });

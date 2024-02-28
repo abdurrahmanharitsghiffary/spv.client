@@ -101,9 +101,9 @@ const updateCommentIsLiked = <OD extends ApiResponseT<IsLikedResponse>>(
   produce(oldData, (draft) => {
     if (draft?.data !== undefined) {
       draft.data.isLiked = isLiked;
-      draft.data.total_likes += isLiked
+      draft.data.totalLikes += isLiked
         ? 1
-        : draft.data.total_likes === 0
+        : draft.data.totalLikes === 0
         ? 0
         : -1;
     }

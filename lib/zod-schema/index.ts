@@ -55,6 +55,9 @@ export const zEmail = z
   .string({ required_error: "Email must not be empty." })
   .email({ message: "Invalid email format." });
 
+export const zApplyType = z.enum(["private", "public"]);
+export const zGroupVisibility = z.enum(["private", "public"]);
+
 // export const zLimit = z
 //   .string()
 //   .refine(

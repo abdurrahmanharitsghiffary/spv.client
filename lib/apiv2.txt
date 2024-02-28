@@ -569,7 +569,7 @@ export const useLikePost = () => {
       queryClient.setQueryData(keys.posts, (old: any) =>
         (old?.data ?? []).map((item: any) => {
           if (item.id === v.postId) {
-            return { ...item, total_likes: item?.total_likes ?? 0 + 1 };
+            return { ...item, total_likes: item?.totalLikes ?? 0 + 1 };
           }
           return item;
         })
@@ -579,7 +579,7 @@ export const useLikePost = () => {
         keys.postById(v.postId),
         (old: { total_likes: number } | undefined) => ({
           ...old,
-          total_likes: old?.total_likes ?? 0 + 1,
+          total_likes: old?.totalLikes ?? 0 + 1,
         })
       );
 
@@ -630,9 +630,9 @@ export const useUnlikePost = () => {
             return {
               ...item,
               total_likes:
-                item?.total_likes ?? 0 - 1 === -1
+                item?.totalLikes ?? 0 - 1 === -1
                   ? 0
-                  : item?.total_likes ?? 0 - 1,
+                  : item?.totalLikes ?? 0 - 1,
             };
           }
           return item;
@@ -644,7 +644,7 @@ export const useUnlikePost = () => {
         (old: { total_likes: number } | undefined) => ({
           ...old,
           total_likes:
-            old?.total_likes ?? 0 - 1 === -1 ? 0 : old?.total_likes ?? 0 - 1,
+            old?.totalLikes ?? 0 - 1 === -1 ? 0 : old?.totalLikes ?? 0 - 1,
         })
       );
 
@@ -885,7 +885,7 @@ export const useLikeComment = () => {
         ...old,
         data: {
           ...old?.data,
-          total_likes: old?.data?.total_likes ?? 0 + 1,
+          total_likes: old?.data?.totalLikes ?? 0 + 1,
         },
       }));
       // queryClient.setQueryData(keys.commentLikes(v.commentId), (old:any) => ({
@@ -959,7 +959,7 @@ export const useUnlikeComment = () => {
         ...old,
         data: {
           ...old?.data,
-          total_likes: old?.data?.total_likes ?? (0 - 1 || 0),
+          total_likes: old?.data?.totalLikes ?? (0 - 1 || 0),
         },
       }));
       // queryClient.setQueryData(keys.commentLikes(v.commentId), (old:any) => ({

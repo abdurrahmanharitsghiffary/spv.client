@@ -32,7 +32,7 @@ export const useLogin = () => {
               expires_in: number;
             }>
         )
-        .catch((err) => Promise.reject(err.response.data)),
+        .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (data, v, ctx) => {
       const res = data?.data;
       if (res?.access_token) {
@@ -64,7 +64,7 @@ export const useLogout = () => {
       request
         .post(logoutRoute, {}, { withCredentials: true })
         .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err.response.data)),
+        .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: (data, v, ctx) => {
       setSession(null);
       router.push("/login");
@@ -93,7 +93,7 @@ export const useRegister = () => {
       axios
         .post(signUpRoute, v, { withCredentials: true })
         .then((res) => res.data)
-        .catch((err) => Promise.reject(err)),
+        .catch((err) => Promise.reject(err?.response?.data)),
     onSuccess: () => {
       router.push("/");
       queryClient.invalidateQueries({ queryKey: keys.meAccount() });

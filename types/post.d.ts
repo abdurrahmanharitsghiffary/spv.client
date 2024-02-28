@@ -7,10 +7,10 @@ export type Post = {
   content: string;
   images: (Image & { id: number })[] | null;
   author: UserSimplifiedWF;
-  total_likes: number;
+  totalLikes: number;
   createdAt: Date;
   updatedAt: Date;
-  total_comments: number;
+  totalComments: number;
 };
 
 export type PostId = {

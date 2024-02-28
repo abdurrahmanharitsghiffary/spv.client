@@ -41,7 +41,7 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
   };
 
   const onUpdateRoom = (data: UpdateRoom) => {
-    if (data.updating === "details" && data.data.id === Number(chatId)) {
+    if (data && data.data.id === Number(chatId)) {
       queryClient.setQueryData<ApiPagingObjectResponse<ChatRoom>>(
         keys.chatByRoomId(Number(chatId)),
         produce((draft) => {
@@ -67,7 +67,7 @@ export default function ChatHeader({ router }: { router: AppRouterInstance }) {
 
   const isGroupChat = chatRoomData?.isGroupChat ?? false;
 
-  const user = (chatRoom?.data?.participants.users ?? []).filter(
+  const user = (chatRoom?.data?.participants ?? []).filter(
     (participant) => participant.id !== session?.id
   )?.[0];
 

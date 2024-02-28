@@ -24,7 +24,7 @@ export const prependPagingData = <T = unknown>(
         data: newDatas,
         pagination: {
           ...page?.pagination,
-          total_records: page?.pagination?.total_records + 1,
+          total_records: page?.pagination?.totalRecords + 1,
           result_count: newDatas?.length,
         },
       };
@@ -36,7 +36,7 @@ export const prependPagingData = <T = unknown>(
         data: slicedData,
         pagination: {
           ...page?.pagination,
-          total_records: page?.pagination?.total_records + 1,
+          total_records: page?.pagination?.totalRecords + 1,
           result_count: slicedData?.length,
         },
       };
@@ -66,7 +66,7 @@ export const appendPagingData = <T = unknown>(
         data: newDatas,
         pagination: {
           ...page?.pagination,
-          total_records: page?.pagination?.total_records + 1,
+          total_records: page?.pagination?.totalRecords + 1,
           result_count: newDatas?.length,
         },
       };
@@ -78,7 +78,7 @@ export const appendPagingData = <T = unknown>(
         data: slicedData,
         pagination: {
           result_count: slicedData.length,
-          total_records: page?.pagination?.total_records + 1,
+          total_records: page?.pagination?.totalRecords + 1,
         },
       };
     }
@@ -130,7 +130,7 @@ export const deletePagingData = <T = unknown>(
         data: filteredData,
         pagination: {
           ...p.pagination,
-          total_records: p.pagination.total_records - 1,
+          total_records: p.pagination.totalRecords - 1,
           result_count: filteredData.length,
         },
       };
@@ -170,8 +170,8 @@ export class Immer {
               draft.pages[pi].data = p.data.filter(
                 (t) => (t as any)[idKey] !== dataId
               );
-              draft.pages[pi].pagination.result_count -= 1;
-              draft.pages[pi].pagination.total_records -= 1;
+              draft.pages[pi].pagination.resultCount -= 1;
+              draft.pages[pi].pagination.totalRecords -= 1;
             }
           });
         });

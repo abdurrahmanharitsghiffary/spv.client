@@ -5,7 +5,7 @@ import MenuLayout from "../layout";
 import { useParams } from "next/navigation";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { MdOutlineGroup } from "react-icons/md";
-import { FiEdit, FiTrash } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import { GoReport } from "react-icons/go";
 import {
   useGroupMenuActions,
@@ -16,6 +16,7 @@ import { useGroupJoin } from "@/hooks/use-group-join";
 import { useEditGroupActions } from "@/stores/edit-group-store";
 import { useDeleteGroupChat } from "@/lib/api/chats/mutation";
 import { useConfirm } from "@/stores/confirm-store";
+import { BiTrash } from "react-icons/bi";
 
 export default function GroupMenu() {
   const isOpen = useGroupMenuIsOpen();
@@ -46,7 +47,7 @@ export default function GroupMenu() {
       {
         key: "delete-group",
         label: "Delete group",
-        icon: <FiTrash />,
+        icon: <BiTrash />,
       }
     );
   }

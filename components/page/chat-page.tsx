@@ -75,6 +75,7 @@ export default function ChatPage() {
     setRef({ current: node });
   }, []);
 
+  const statusCode = (error as any)?.statusCode;
   const session = useSession();
   const isInView = useObserver(ref, { threshold: 0.5 });
 
@@ -161,8 +162,8 @@ export default function ChatPage() {
           draft.pages = draft.pages.filter((p) => p !== undefined);
           if (draft?.pages?.[0]) {
             draft.pages[0].data.unshift(createdMessage);
-            draft.pages[0].pagination.total_records += 1;
-            draft.pages[0].pagination.result_count += 1;
+            draft.pages[0].pagination.totalRecords += 1;
+            draft.pages[0].pagination.resultCount += 1;
             draft.pages[0].pagination.limit += 1;
           }
         }
@@ -255,7 +256,7 @@ export default function ChatPage() {
     };
   }, [socket]);
 
-  if ((error as any)?.statusCode === 404) {
+  if (statusCode === 404 || statusCode === 403) {
     return (
       <div className="flex justify-center flex-col gap-2 items-center h-full w-full m-auto">
         <span className="text-foreground">Chat room not found</span>

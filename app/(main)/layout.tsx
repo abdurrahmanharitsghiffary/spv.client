@@ -6,6 +6,7 @@ import CommentMenu from "@/components/menu/comment-menu";
 import GroupMenu from "@/components/menu/group-menu";
 import PostMenu from "@/components/menu/post-menu";
 import UserMenu from "@/components/menu/user-menu";
+import MembershipRequestModal from "@/components/modal/membership-request";
 import CommentLikesModal from "@/components/modal/comment-likes-modal";
 import EditPostModal from "@/components/modal/edit-post-modal";
 import EditProfileModal from "@/components/modal/edit-profile-modal";
@@ -32,6 +33,7 @@ export default function MainLayout({
       <Giphy />
       <ModalGif />
       <UserMenu />
+      <MembershipRequestModal />
       <CommentMenu />
       <ChatMenu />
       <BottomBar />

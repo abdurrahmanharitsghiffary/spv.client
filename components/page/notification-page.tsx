@@ -87,9 +87,9 @@ export default function NotificationPage() {
           console.log(draft.pages, "Draft Pages");
           draft.pages[0].data.unshift(data);
 
-          draft.pages[0].pagination.total_records += 1;
+          draft.pages[0].pagination.totalRecords += 1;
           draft.pages[0].pagination.limit += 1;
-          draft.pages[0].pagination.result_count += 1;
+          draft.pages[0].pagination.resultCount += 1;
           console.log(draft.pages, "Draft Pages new");
         }
       })

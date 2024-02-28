@@ -13,11 +13,11 @@ import { Badge } from "@nextui-org/badge";
 export default function ChatListbox({ chats }: { chats: ChatRoom[] }) {
   const session = useSession();
 
-  const totalUnreadMessages = (chat: ChatRoom) => chat.unreadMessages.total;
+  const totalUnreadMessages = (chat: ChatRoom) => chat.totalUnreadMessages;
   return (
     <Listbox items={chats} className="p-2" hideEmptyContent aria-label="chats">
       {(chat) => {
-        const user = chat.participants?.users?.find(
+        const user = chat.participants?.find(
           (user) => user?.id !== session?.id
         );
         const title = chat.isGroupChat
@@ -79,7 +79,7 @@ export default function ChatListbox({ chats }: { chats: ChatRoom[] }) {
             href={`/chats/${chat?.id}`}
           >
             {title}{" "}
-            {chat.unreadMessages.total > 0 ? (
+            {chat.totalUnreadMessages > 0 ? (
               <Chip color="danger" classNames={{ avatar: "ml-1" }} size="sm">
                 {totalUnreadMessages(chat) > 99
                   ? "99+"

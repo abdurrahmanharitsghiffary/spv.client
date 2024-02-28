@@ -27,7 +27,7 @@ export default function SavedPostsPage() {
   return (
     <PostsGridLayout>
       <TypographyH3 className="px-3 !text-base">
-        Saved posts ({mySavedPosts?.pagination?.total_records ?? 0})
+        Saved posts ({mySavedPosts?.pagination?.totalRecords ?? 0})
       </TypographyH3>
       {isLoading
         ? [1, 2, 3].map((item) => <PostCardSkeleton key={item} />)

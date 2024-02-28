@@ -426,11 +426,11 @@ export const useOptimistic = <T, P = any, TB = any>({
 //           data: { ...config.data, ...body },
 //         })
 //           .then((res) => res.data)
-//           .catch((err) => Promise.reject(err?.response?.data));
+//           .catch((err) => Promise.reject(err?.response?.data?.data));
 //       }
 //       return request[method](newUrl.href, body, config)
 //         .then((res) => res.data)
-//         .catch((err) => Promise.reject(err?.response?.data));
+//         .catch((err) => Promise.reject(err?.response?.data?.data));
 //     },
 //     onMutate: async (v) => {
 //       const ctx: { key: QueryKey; data: any; isInfiniteData?: boolean }[] = [];

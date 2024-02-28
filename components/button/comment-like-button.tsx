@@ -14,7 +14,7 @@ export default function CommentLikeButton({
   const { likeComment } = useLikeComment();
   const { unlikeComment } = useUnlikeComment();
   const isLiked = resp?.data?.isLiked ?? false;
-  const total = resp?.data?.total_likes ?? 0;
+  const total = resp?.data?.totalLikes ?? 0;
   const handleLike = () => {
     if (!commentId) return null;
     if (isLiked) return unlikeComment({ params: { commentId: commentId } });

@@ -41,20 +41,15 @@ export default function PhotoProfileMenu() {
         confirmLabel: "Delete",
         closeLabel: "Cancel",
       });
-      await toast.promise(
-        deleteAccountImageAsync({})
-          .then((res) => res.data)
-          .catch((err) => Promise.reject(err?.response?.data)),
-        {
-          pending: "Changing profile picture...",
-          success: "Profile picture successfully deleted.",
-          error: {
-            render({ data }) {
-              return (data as any)?.message ?? "Something went wrong!";
-            },
+      await toast.promise(deleteAccountImageAsync({}), {
+        pending: "Changing profile picture...",
+        success: "Profile picture successfully deleted.",
+        error: {
+          render({ data }) {
+            return (data as any)?.message ?? "Something went wrong!";
           },
-        }
-      );
+        },
+      });
     }
   };
 
@@ -81,9 +76,7 @@ export default function PhotoProfileMenu() {
         updateAccountImageAsync({
           body: { image: file },
           formData: true,
-        })
-          .then((res) => res)
-          .catch((err) => Promise.reject(err)),
+        }),
         {
           pending: "Changing profile picture...",
           success: "Profile picture successfully changed",

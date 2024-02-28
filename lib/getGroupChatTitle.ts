@@ -7,7 +7,7 @@ export const getGroupChatTitle = (
   const IS_GROUP_CHAT = chatRoom?.isGroupChat ?? false;
   const filteredUser: any = IS_GROUP_CHAT
     ? []
-    : (chatRoom?.participants?.users ?? []).filter(
+    : (chatRoom?.participants ?? []).filter(
         (user) => user.id !== sessionId
       )?.[0];
 

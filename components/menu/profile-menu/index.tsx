@@ -78,9 +78,7 @@ export default function ProfileMenu() {
             image: file,
           },
           formData: true,
-        })
-          .then((res) => res)
-          .catch((err) => Promise.reject(err)),
+        }),
         {
           pending: "Changing cover picture...",
           success: "Cover picture successfully changed",

@@ -34,7 +34,7 @@ export default function CommentPage({
         {isLoading
           ? [1, 2, 3].map((item) => <CommentSkeleton key={item} />)
           : isSuccess &&
-            comment?.data?.replies?.ids?.map((id) => (
+            comment?.data?.replies?.map((id) => (
               <CommentReply commentId={id} key={id} level={0} />
             ))}
       </div>

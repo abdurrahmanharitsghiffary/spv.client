@@ -6,11 +6,10 @@ import { Input, InputProps } from "@nextui-org/input";
 import { Spinner } from "@nextui-org/spinner";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import clsx from "clsx";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useState } from "react";
 import { FiChevronDown, FiChevronUp, FiSearch } from "react-icons/fi";
 import { TypographyMuted } from "../ui/typography";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Avatar } from "@nextui-org/react";
 import { listboxUserProps } from "./listbox-user-props";
 import { getUserSimplified } from "@/lib/getUserSimplified";
 

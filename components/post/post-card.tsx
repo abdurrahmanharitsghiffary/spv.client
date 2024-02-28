@@ -48,7 +48,7 @@ function PostCard(
       <Divider />
       <PostCardFooter
         postId={post?.id}
-        totalComments={post?.total_comments ?? 0}
+        totalComments={post?.totalComments ?? 0}
         isPostPage={isPostPage}
         isPreview={isPreview}
       />

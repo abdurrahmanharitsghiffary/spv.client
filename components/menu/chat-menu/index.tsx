@@ -24,7 +24,7 @@ export default function ChatMenu() {
 
   const isGroupChat = chatRoom?.data?.isGroupChat ?? false;
 
-  const user = chatRoom?.data?.participants?.users?.filter(
+  const user = chatRoom?.data?.participants?.filter(
     (user) => user.id !== session?.id
   );
 

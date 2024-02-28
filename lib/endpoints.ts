@@ -149,6 +149,20 @@ export const chatsByRecipientId = (
     constructUrl([baseChatRoutes, "users", recipientId]),
     entries(query)
   );
+
+// Groups Routes
+export const baseGroupRoutes = urlBase("/groups");
+export const groupById = (groupId: number) =>
+  constructUrl([baseGroupRoutes, groupId.toString()]);
+export const groupAppReq = (groupId: number) =>
+  constructUrl([groupById(groupId), "membership-requests"]);
+
+export const groupApproveOrRejectAppReq = (
+  groupId: number,
+  userId: number,
+  type: "approve" | "reject"
+) => constructUrl([groupAppReq(groupId), userId.toString(), type]);
+
 // Search routes
 export const searchRoute = (query?: {
   limit?: number;

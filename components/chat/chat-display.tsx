@@ -10,9 +10,7 @@ import UserAvatar from "../user/user-avatar";
 
 export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
   const session = useSession();
-  const user = chat.participants.users.filter(
-    (user) => user.id !== session?.id
-  )?.[0];
+  const user = chat.participants.filter((user) => user.id !== session?.id)?.[0];
   return (
     <Link
       href={`/chats/${chat?.id}`}
@@ -37,13 +35,13 @@ export default function ChatDisplay({ chat }: { chat: ChatRoom }) {
                 ? chat.title || "Group chat #" + chat.id
                 : user?.fullName}
             </TypographyLarge>
-            {chat.unreadMessages.total > 0 ? (
+            {chat.totalUnreadMessages > 0 ? (
               <Chip
                 className="text-[0.625rem] w-fit h-fit p-1"
                 color="danger"
                 size="sm"
               >
-                {chat.unreadMessages.total}
+                {chat.totalUnreadMessages ?? 0}
               </Chip>
             ) : null}
           </div>

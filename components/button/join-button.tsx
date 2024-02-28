@@ -12,7 +12,7 @@ export default function JoinButton(props: ButtonProps) {
   const { groupId } = useParams();
   const gId = Number(groupId);
 
-  const { handleGroupJoin, isJoinedGroup } = useGroupJoin(gId);
+  const { handleGroupJoin, isJoinedGroup, applyType } = useGroupJoin(gId);
 
   return (
     <Button
@@ -23,7 +23,13 @@ export default function JoinButton(props: ButtonProps) {
       color={isJoinedGroup ? "danger" : "default"}
       {...rest}
     >
-      {isJoinedGroup ? <RiLogoutBoxLine size={20} /> : "Join"}
+      {isJoinedGroup ? (
+        <RiLogoutBoxLine size={20} />
+      ) : applyType === "private" ? (
+        "Apply"
+      ) : (
+        "Join"
+      )}
     </Button>
   );
 }

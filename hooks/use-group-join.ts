@@ -1,8 +1,13 @@
 "use client";
 
+import { useRequestGroupMembership } from "@/lib/api/application-request/mutation";
 import { useJoinGroupChat, useLeaveGroupChat } from "@/lib/api/chats/mutation";
-import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
+import {
+  useGetChatRoomById,
+  useGetChatRoomParticipant,
+} from "@/lib/api/chats/query";
 import { useGetUserById } from "@/lib/api/users/query";
+import { useMembershipRequestActions } from "@/stores/membership-request-store";
 import { useSession } from "@/stores/auth-store";
 import { useConfirm } from "@/stores/confirm-store";
 
@@ -12,8 +17,11 @@ export const useGroupJoin = (groupId: number) => {
     groupId,
     session?.id ?? -1
   );
+  const { chatRoom, isLoading: isLoadCht } = useGetChatRoomById(groupId);
+  const applyType = chatRoom?.data?.applyType;
   const confirm = useConfirm();
   const { joinGroupChatAsync } = useJoinGroupChat();
+  const { onOpen } = useMembershipRequestActions();
   const { leaveGroupChatAsync } = useLeaveGroupChat();
   const { userData, isLoading: isLoadUserData } = useGetUserById(
     session?.id ?? -1
@@ -38,11 +46,14 @@ export const useGroupJoin = (groupId: number) => {
       return null;
     }
     if (userData?.data)
-      return await joinGroupChatAsync({
-        params: {
-          groupId: groupId,
-        },
-      });
+      if (applyType === "private") {
+        return onOpen();
+      }
+    return await joinGroupChatAsync({
+      params: {
+        groupId: groupId,
+      },
+    });
   };
 
   return {
@@ -51,6 +62,7 @@ export const useGroupJoin = (groupId: number) => {
     isAdmin,
     isCreator,
     isUser,
-    isLoading: isLoading || isLoadUserData,
+    applyType,
+    isLoading: isLoading || isLoadUserData || isLoadCht,
   };
 };

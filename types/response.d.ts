@@ -12,8 +12,8 @@ export type ApiPagingObjectResponse<T> = {
     previous: null | string;
     next: null | string;
     current: string;
-    result_count: number;
-    total_records: number;
+    resultCount: number;
+    totalRecords: number;
     limit: number;
     offset: number;
   };
@@ -21,7 +21,7 @@ export type ApiPagingObjectResponse<T> = {
 
 export type IsLikedResponse = {
   isLiked: boolean;
-  total_likes: number;
+  totalLikes: number;
 };
 
 // export type PagingObject<T> = {

@@ -23,9 +23,7 @@ export default function CreateRoomModal() {
           body: {
             participantId: item.id,
           },
-        })
-          .then((res) => res)
-          .catch((err) => Promise.reject(err)),
+        }),
         {
           error: {
             render({ data }) {

@@ -14,9 +14,11 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { FiEdit } from "react-icons/fi";
 import InputFile from "@/components/input/file";
-import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
-import { useUpdateGroupChat } from "@/lib/api/chats/mutation";
+import {
+  useAddGroupParticipants,
+  useUpdateGroupChat,
+} from "@/lib/api/chats/mutation";
 import {
   useEditGroupActions,
   useEditGroupIsOpen,
@@ -29,11 +31,12 @@ import { useGetChatRoomById } from "@/lib/api/chats/query";
 import { useParams } from "next/navigation";
 import { TypographyLarge } from "@/components/ui/typography";
 import UserGroupLists from "@/components/user/user-group-lists";
-import { ParticipantsField } from "@/types";
 import { MdGroup } from "react-icons/md";
 import { useConfirm } from "@/stores/confirm-store";
-import { DISCARD_CHANGE_CONFIRM_PROPS, saveChangesProps } from "@/lib/consts";
+import { saveChangesProps } from "@/lib/consts";
 import CancelButton from "@/components/button/reset-button";
+import ApplicationType from "@/components/input/application-type";
+import GroupVisibility from "@/components/input/group-visibility";
 
 const editGroupSchema = z.object({
   participants: z.any().array().optional(),
@@ -43,6 +46,8 @@ const editGroupSchema = z.object({
     .optional(),
   description: z.string().optional(),
   image: zImage.optional(),
+  applyType: z.enum(["private", "public"]).optional(),
+  groupVisibility: z.enum(["private", "public"]).optional(),
 });
 
 type EditGroupSchema = z.infer<typeof editGroupSchema>;
@@ -50,8 +55,10 @@ type EditGroupSchema = z.infer<typeof editGroupSchema>;
 export default function EditGroupModal() {
   const confirm = useConfirm();
   const { groupId } = useParams();
-  const { chatRoom } = useGetChatRoomById(Number(groupId));
+  const gId = Number(groupId);
+  const { chatRoom } = useGetChatRoomById(gId);
   const { updateGroupChatAsync } = useUpdateGroupChat();
+  const { addParticipantsAsync } = useAddGroupParticipants();
   const {
     formState: { isSubmitSuccessful, errors, isSubmitting },
     handleSubmit,
@@ -66,9 +73,13 @@ export default function EditGroupModal() {
       image: null,
       participants: [],
       title: "",
+      applyType: "public",
+      groupVisibility: "public",
     },
     values: {
       participants: [],
+      applyType: chatRoom?.data?.applyType,
+      groupVisibility: chatRoom?.data?.groupVisibility,
       description: chatRoom?.data?.description ?? "",
       title: chatRoom?.data?.title ?? "",
     },
@@ -120,20 +131,16 @@ export default function EditGroupModal() {
       updateGroupChatAsync({
         body: {
           image: data?.image,
-          participants: (data?.participants ?? []).map((p) => ({
-            id: p.id,
-            role: p.role,
-          })) as ParticipantsField[],
           title: data?.title,
           description: data?.description,
+          applyType: data?.applyType,
+          groupVisibility: data?.groupVisibility,
         },
         formData: true,
         params: {
-          groupId: Number(groupId),
+          groupId: gId,
         },
-      })
-        .then((res) => res)
-        .catch((err) => Promise.reject(err)),
+      }),
       {
         success: "Group chat successfully updated.",
         pending: "Updating group chat...",
@@ -144,6 +151,21 @@ export default function EditGroupModal() {
         },
       }
     );
+    if (data?.participants) {
+      try {
+        await addParticipantsAsync({
+          body: { ids: data.participants.map((t) => t.id) },
+          params: { groupId: gId },
+        });
+      } catch (err: any) {
+        const errors = err?.errors ?? [];
+        if (errors.length > 0) {
+          errors.forEach((e: any) => {
+            toast.error(e.message);
+          });
+        }
+      }
+    }
   };
 
   const file = watch("image");
@@ -231,6 +253,8 @@ export default function EditGroupModal() {
           control={control}
           name="description"
         />
+        <GroupVisibility control={control} name="groupVisibility" />
+        <ApplicationType control={control} name="applyType" />
       </form>
     </ModalLayoutV2>
   );

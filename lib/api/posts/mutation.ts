@@ -142,8 +142,8 @@ const deletePostOptimistic = (oldData: InfinitePost, postId: number) =>
             draft.pages[pi].data = draft.pages[pi].data.filter(
               (item) => item.id !== postId
             );
-            draft.pages[pi].pagination.total_records -= 1;
-            draft.pages[pi].pagination.result_count -= 1;
+            draft.pages[pi].pagination.totalRecords -= 1;
+            draft.pages[pi].pagination.resultCount -= 1;
           }
         });
       });
@@ -207,14 +207,14 @@ const updateLikePost = <OD extends InfinitePost>(
         if (p?.data && !isSearchAllType) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
-              draft.pages[pi].data[poi].total_likes += 1;
+              draft.pages[pi].data[poi].totalLikes += 1;
             }
           });
         } else if (isSearchAllType) {
           if ((p as any)?.data?.posts?.data instanceof Array) {
             (p as any)?.data?.posts?.data?.forEach((d: any, di: number) => {
               if (d.id === postId) {
-                (draft as any).pages[pi].data.posts.data[di].total_likes += 1;
+                (draft as any).pages[pi].data.posts.data[di].totalLikes += 1;
               }
             });
           }
@@ -234,9 +234,9 @@ const updateUnlikePost = <OD extends InfinitePost>(
         if (p?.data && !isSearchAllType) {
           p.data.forEach((post, poi) => {
             if (post.id === postId) {
-              const totalLikes = draft.pages[pi].data[poi].total_likes;
+              const totalLikes = draft.pages[pi].data[poi].totalLikes;
               if (totalLikes > 0) {
-                draft.pages[pi].data[poi].total_likes -= 1;
+                draft.pages[pi].data[poi].totalLikes -= 1;
               }
             }
           });
@@ -246,9 +246,9 @@ const updateUnlikePost = <OD extends InfinitePost>(
               if (d.id === postId) {
                 if (
                   ((draft as any)?.pages?.[pi]?.data?.posts?.data?.[di]
-                    ?.total_likes ?? 0) > 0
+                    ?.totalLikes ?? 0) > 0
                 )
-                  (draft as any).pages[pi].data.posts.data[di].total_likes -= 1;
+                  (draft as any).pages[pi].data.posts.data[di].totalLikes -= 1;
               }
             });
           }
@@ -311,7 +311,7 @@ export const useLikePost = () => {
         //   updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
         //     produce(oldData, (draft) => {
         //       if (draft?.data) {
-        //         draft.data.total_likes += 1;
+        //         draft.data.totalLikes += 1;
         //       }
         //     }),
         // },
@@ -323,7 +323,7 @@ export const useLikePost = () => {
             produce(oldData, (draft) => {
               if (draft.data) {
                 draft.data.isLiked = true;
-                draft.data.total_likes += 1;
+                draft.data.totalLikes += 1;
               }
             }),
         },
@@ -388,8 +388,8 @@ export const useUnlikePost = () => {
         //   updater: <OD extends ApiResponseT<Post>>(oldData: OD): OD =>
         //     produce(oldData, (draft) => {
         //       if (draft?.data) {
-        //         if (draft.data.total_likes > 0) {
-        //           draft.data.total_likes -= 1;
+        //         if (draft.data.totalLikes > 0) {
+        //           draft.data.totalLikes -= 1;
         //         }
         //       }
         //     }),
@@ -402,8 +402,8 @@ export const useUnlikePost = () => {
             produce(oldData, (draft) => {
               if (draft.data) {
                 draft.data.isLiked = false;
-                if ((draft.data.total_likes ?? 0) > 0)
-                  draft.data.total_likes -= 1;
+                if ((draft.data.totalLikes ?? 0) > 0)
+                  draft.data.totalLikes -= 1;
               }
             }),
         },
@@ -474,7 +474,7 @@ export const useDeletepostImages = () => {
       return request
         .delete(postImagesByPostId(v.postId.toString()), v?.config)
         .then((res) => res.data as ApiResponseT<null>)
-        .catch((err) => Promise.reject(err?.response?.data));
+        .catch((err) => Promise.reject(err?.response));
     },
     onSuccess: (d, v) => {
       queryClient.invalidateQueries({ queryKey: keys.postById(v.postId) });

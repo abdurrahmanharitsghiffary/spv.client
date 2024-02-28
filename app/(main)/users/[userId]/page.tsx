@@ -79,7 +79,7 @@ export default function UserPage({ params }: { params: { userId: string } }) {
 
               <ProfileInfo
                 userId={Number(params.userId)}
-                postCount={posts?.pagination?.total_records ?? 0}
+                postCount={posts?.pagination?.totalRecords ?? 0}
                 followedCount={userData?.data?.count?.following ?? 0}
                 followersCount={userData?.data?.count?.followedBy ?? 0}
               />

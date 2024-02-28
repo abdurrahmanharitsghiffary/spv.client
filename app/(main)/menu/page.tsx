@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ThemeSwitchBase } from "@/components/theme-switch";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useTheme } from "next-themes";
-import { MdSecurity } from "react-icons/md";
+import { MdOutlineAssignment, MdSecurity } from "react-icons/md";
 import { useLogout } from "@/lib/api/auth";
 import { useConfirm } from "@/stores/confirm-store";
 import SendVerifyButton from "@/components/button/send-verify-button";
@@ -122,7 +122,6 @@ export default function MenuPage() {
         return router.push("/users/blocked");
       }
       default:
-        alert(key);
         break;
     }
   };
@@ -171,6 +170,12 @@ export default function MenuPage() {
           },
         ],
       },
+    },
+    {
+      icon: <MdOutlineAssignment />,
+      key: "membership-requests",
+      label: "Group membership requests",
+      url: "/membership-requests",
     },
     {
       key: "setting-section",
@@ -279,6 +284,7 @@ export default function MenuPage() {
                 {/* @ts-ignore */}
                 {(item: ListboxItem) => (
                   <ListboxItem
+                    href={item.url}
                     textValue={item.label}
                     key={item.key ?? ""}
                     color={item.key.includes("delete") ? "danger" : "default"}
@@ -295,6 +301,8 @@ export default function MenuPage() {
             <ListboxItem
               // @ts-ignore
               textValue={item.label}
+              // @ts-ignore
+              href={item?.url}
               key={item.key ?? ""}
               color={item.key.includes("delete") ? "danger" : "default"}
               className={item.key.includes("delete") ? "text-danger" : ""}

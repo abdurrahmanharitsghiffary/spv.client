@@ -133,7 +133,17 @@ type URDEL = {
   data: number[];
 };
 
-export type UpdateRoom = URP | URD | URDEL;
+export type ParticipantsData = {
+  roomId: number;
+  data: ChatRoomParticipant[];
+};
+
+export type DeleteParticipantsData = {
+  roomId: number;
+  data: number[];
+};
+
+export type UpdateRoom = URD;
 
 export type TypingUser = {
   chatId: number;

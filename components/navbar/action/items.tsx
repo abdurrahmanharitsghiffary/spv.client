@@ -15,7 +15,8 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   {
     keys: [
-      "/group/:groupId",
+      "/groups/:groupId/membership-requests",
+      "/groups/:groupId",
       "/comments/:commentId",
       "/posts/saved",
       "/posts/:postId",

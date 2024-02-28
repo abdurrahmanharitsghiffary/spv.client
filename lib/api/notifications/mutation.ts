@@ -62,8 +62,8 @@ export const useClearNotification = () => {
                           );
                     if (timeStampOptions === undefined) {
                       draft.pages[pi].data = [];
-                      draft.pages[pi].pagination.result_count = 0;
-                      draft.pages[pi].pagination.total_records = 0;
+                      draft.pages[pi].pagination.resultCount = 0;
+                      draft.pages[pi].pagination.totalRecords = 0;
                     }
                     if (
                       timeStampOptions &&
@@ -72,8 +72,8 @@ export const useClearNotification = () => {
                       draft.pages[pi].data = draft.pages[pi].data.filter(
                         (d) => d.id !== n.id
                       );
-                      draft.pages[pi].pagination.result_count -= 1;
-                      draft.pages[pi].pagination.total_records -= 1;
+                      draft.pages[pi].pagination.resultCount -= 1;
+                      draft.pages[pi].pagination.totalRecords -= 1;
                     }
                   });
                 });

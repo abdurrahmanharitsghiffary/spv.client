@@ -2,7 +2,11 @@ import { CountType, SearchOptions } from "@/types";
 
 export const keys = {
   counts: (type?: CountType[]) => ["counts", type] as const,
+  gmr: (type: "all" | "rejected" | "approved" | "pending") =>
+    ["membership-requests", "group", type] as const,
   posts: ["posts"] as const,
+  meMr: (type: "all" | "rejected" | "approved" | "pending") =>
+    [...keys.me, "membership-requests", type] as const,
   users: ["users"] as const,
   myInfo: ["myInfo"] as const,
   post: ["post"] as const,

@@ -61,8 +61,8 @@ export default function ChatsPage() {
 
           if (draft.pages?.[0]) {
             draft.pages[0].data.unshift(joinedRoom);
-            draft.pages[0].pagination.total_records += 1;
-            draft.pages[0].pagination.result_count += 1;
+            draft.pages[0].pagination.totalRecords += 1;
+            draft.pages[0].pagination.resultCount += 1;
             draft.pages[0].pagination.limit += 1;
           }
         }
@@ -82,7 +82,7 @@ export default function ChatsPage() {
               if (cht.id === createdMessage.roomId) {
                 draft.pages[pi].data[ci].messages.unshift(createdMessage);
                 if (isNotAuthored)
-                  draft.pages[pi].data[ci].unreadMessages.total += 1;
+                  draft.pages[pi].data[ci].totalUnreadMessages += 1;
               }
             });
           });
@@ -101,7 +101,7 @@ export default function ChatsPage() {
           draft.pages.forEach((p, pi) => {
             p.data.forEach((msg, mi) => {
               if (msg.id === data.roomId) {
-                draft.pages[pi].data[mi].unreadMessages.total -= 1;
+                draft.pages[pi].data[mi].totalUnreadMessages -= 1;
               }
             });
           });
@@ -121,8 +121,8 @@ export default function ChatsPage() {
               p.data.forEach((cht) => {
                 if (cht.id === roomId) {
                   draft.pages[pi].data = p.data.filter((d) => d.id !== roomId);
-                  draft.pages[pi].pagination.result_count -= 1;
-                  draft.pages[pi].pagination.total_records -= 1;
+                  draft.pages[pi].pagination.resultCount -= 1;
+                  draft.pages[pi].pagination.totalRecords -= 1;
                 }
               });
             });
@@ -138,10 +138,10 @@ export default function ChatsPage() {
               p.data.forEach((cht, i) => {
                 if (cht.id === roomId) {
                   if (p.data[i].participants) {
-                    draft.pages[pi].data[i].participants.users = p.data[
+                    draft.pages[pi].data[i].participants = p.data[
                       i
-                    ].participants.users.filter((user) => user.id !== userId);
-                    draft.pages[pi].data[i].participants.total -= 1;
+                    ].participants.filter((user) => user.id !== userId);
+                    draft.pages[pi].data[i].totalParticipants -= 1;
                   }
                 }
               });
@@ -154,12 +154,9 @@ export default function ChatsPage() {
 
   const onUpdateRoom = (updatedRoom: UpdateRoom) => {
     console.log(updatedRoom, "Updating Room");
-    if (updatedRoom.updating === "details") {
-      queryClient.setQueriesData<InfiniteRoomPaging>(
-        keys.meChats(),
-        (oldData) => Immer.updatePagingData(oldData, updatedRoom.data, "id")
-      );
-    }
+    queryClient.setQueriesData<InfiniteRoomPaging>(keys.meChats(), (oldData) =>
+      Immer.updatePagingData(oldData, updatedRoom.data, "id")
+    );
   };
 
   const onDeletingRoom = (roomId: number) => {
@@ -192,7 +189,7 @@ export default function ChatsPage() {
     };
   }, [socket]);
 
-  const totalRooms = chatRooms?.pagination?.total_records ?? 0;
+  const totalRooms = chatRooms?.pagination?.totalRecords ?? 0;
 
   return (
     <div

@@ -38,7 +38,7 @@ export default function CommentLikesModal() {
     isFetching,
   });
 
-  const totalLikes = resp?.pagination?.total_records ?? 0;
+  const totalLikes = resp?.pagination?.totalRecords ?? 0;
   const users = resp?.data ?? [];
 
   return (

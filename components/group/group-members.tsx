@@ -27,13 +27,9 @@ export default function GroupMembers({ groupId }: { groupId: number }) {
 
   return (
     <div className="flex flex-col">
-      {isLoading ? (
-        <Skeleton className="h-[12px] rounded-full mx-4 w-[90px] mb-2" />
-      ) : (
-        <TypographyH4 className="px-4 !text-base !font-normal pb-2">
-          Members ({participants?.pagination?.total_records ?? 0})
-        </TypographyH4>
-      )}
+      <TypographyH4 className="px-4 !text-base !font-normal pb-2">
+        Members ({participants?.pagination?.totalRecords ?? 0})
+      </TypographyH4>
       {isLoading ? (
         <UserListboxLoading />
       ) : (

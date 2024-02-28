@@ -1,11 +1,10 @@
 "use client";
 import { UserGroup } from "@/types/user";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Avatar } from "@nextui-org/avatar";
 import React, { useCallback } from "react";
 import IconButton from "../button/icon-button";
-import { FiTrash } from "react-icons/fi";
 import { listboxUserProps } from "./listbox-user-props";
+import { BiTrash } from "react-icons/bi";
 
 type Props = {
   users: UserGroup[];
@@ -22,7 +21,12 @@ export default function UserGroupLists({ users, onCloseClick }: Props) {
   );
 
   return (
-    <Listbox items={users} className="px-0" emptyContent="No users selected.">
+    <Listbox
+      items={users}
+      className="px-0"
+      classNames={{ emptyContent: "text-small" }}
+      emptyContent="No users selected."
+    >
       {(user) => (
         <ListboxItem
           textValue={user?.fullName!}
@@ -36,7 +40,7 @@ export default function UserGroupLists({ users, onCloseClick }: Props) {
                 variant="flat"
                 onClick={() => handleCloseClick(user)}
               >
-                <FiTrash size={16} />
+                <BiTrash size={16} />
               </IconButton>
             </div>
           }

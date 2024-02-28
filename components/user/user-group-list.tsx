@@ -2,11 +2,12 @@
 
 import { Button } from "@nextui-org/button";
 import UserCard from "./user-card";
-import { FiCheck, FiTrash } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
 import IconButton from "../button/icon-button";
 import clsx from "clsx";
 import { UserSimplified } from "@/types/user";
 import { FieldValues, UseFormSetValue } from "react-hook-form";
+import { BiTrash } from "react-icons/bi";
 
 export default function UserGroupList<TFieldValues extends FieldValues>({
   user,
@@ -67,7 +68,7 @@ export default function UserGroupList<TFieldValues extends FieldValues>({
         variant="flat"
         onClick={handleCloseClick}
       >
-        <FiTrash size={16} />
+        <BiTrash size={16} />
       </IconButton>
     </li>
   );

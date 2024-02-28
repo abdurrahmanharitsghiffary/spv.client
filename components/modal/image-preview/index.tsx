@@ -13,7 +13,6 @@ function ImagePreview() {
     handleClose();
     setIsError(false);
   };
-  console.log(isOpen, "Is Open");
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
   //     setWindowHeight(window.innerHeight ?? 0);

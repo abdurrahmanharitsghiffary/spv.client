@@ -18,7 +18,6 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { FiPlus } from "react-icons/fi";
 import InputFile from "@/components/input/file";
-import { BsCardImage } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useCreateGroupChat } from "@/lib/api/chats/mutation";
 import { TypographyLarge } from "@/components/ui/typography";
@@ -28,6 +27,9 @@ import {
 } from "@/components/input/input-with-control";
 import UserGroupLists from "@/components/user/user-group-lists";
 import { MdGroup } from "react-icons/md";
+import { zApplyType, zGroupVisibility } from "@/lib/zod-schema";
+import GroupVisibility from "@/components/input/group-visibility";
+import ApplicationType from "@/components/input/application-type";
 
 const createGroupSchema = z.object({
   participants: z
@@ -40,6 +42,8 @@ const createGroupSchema = z.object({
     .optional(),
   description: z.string().optional(),
   image: zImage.optional(),
+  applyType: zApplyType.optional(),
+  groupVisibility: zGroupVisibility.optional(),
 });
 
 type CreateGroupSchema = z.infer<typeof createGroupSchema>;
@@ -98,15 +102,15 @@ export default function CreateGroupModal() {
     await toast.promise(
       createGroupChatAsync({
         body: {
+          applyType: data?.applyType,
+          groupVisibility: data.groupVisibility,
           image: data?.image,
           participants: participants,
           title: data?.title,
           description: data?.description,
         },
         formData: true,
-      })
-        .then((res) => res)
-        .catch((err) => Promise.reject(err)),
+      }),
       {
         success: "Group chat successfully created.",
         pending: "Creating group chat...",
@@ -211,6 +215,8 @@ export default function CreateGroupModal() {
           control={control}
           name="description"
         />
+        <GroupVisibility control={control} name="groupVisibility" />
+        <ApplicationType control={control} name="applyType" />
       </form>
     </ModalLayoutV2>
   );

@@ -16,6 +16,7 @@ import { useConfirm } from "@/stores/confirm-store";
 import {
   useAddGroupParticipants,
   useRemoveParticipants,
+  useUpdateParticipants,
 } from "@/lib/api/chats/mutation";
 import MemberRole from "@/components/group/member-role";
 
@@ -32,8 +33,8 @@ export default function ParticipantMenu() {
   const { participant: selectedParticipant, isLoading } =
     useGetChatRoomParticipant(gId, participantId);
   const confirm = useConfirm();
+  const { updateParticipantsAsync } = useUpdateParticipants();
   const { removeParticipantsAsync } = useRemoveParticipants();
-  const { addParticipantsAsync } = useAddGroupParticipants();
   const currentUserRole = participant?.data?.role ?? "user";
   const selectedParticipantRole: ParticipantRole =
     selectedParticipant?.data?.role ?? "user";
@@ -57,7 +58,7 @@ export default function ParticipantMenu() {
             ids: [participantId],
           },
           params: {
-            roomId: gId,
+            groupId: gId,
           },
         });
         return;
@@ -68,12 +69,12 @@ export default function ParticipantMenu() {
           title: "Promote",
           body: "Promote this user to admin?",
         });
-        await addParticipantsAsync({
+        await updateParticipantsAsync({
           body: {
             participants: [{ id: selectedParticipant.data.id, role: "admin" }],
           },
           params: {
-            roomId: gId,
+            groupId: gId,
           },
         });
         return;
@@ -86,12 +87,12 @@ export default function ParticipantMenu() {
           confirmLabel: "Dismiss",
           confirmColor: "danger",
         });
-        await addParticipantsAsync({
+        await updateParticipantsAsync({
           body: {
             participants: [{ id: selectedParticipant.data.id, role: "user" }],
           },
           params: {
-            roomId: gId,
+            groupId: gId,
           },
         });
         return;

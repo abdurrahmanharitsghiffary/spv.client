@@ -29,7 +29,7 @@ function Comment({
     className ?? ""
   }`;
 
-  const commentIds = comment?.replies?.ids ?? [];
+  const commentIds = comment?.replies ?? [];
 
   const handleReplyClick = (value: React.SetStateAction<boolean>) => {
     setIsShow(value);
@@ -64,7 +64,7 @@ function Comment({
           isShow={isShow}
           level={level}
           onReplyClick={handleReplyClick}
-          totalReply={comment?.replies?.total}
+          totalReply={comment?.totalReplies}
           username={comment?.user?.username}
         />
         {isShow && commentIds?.length > 0 && (
