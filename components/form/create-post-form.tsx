@@ -121,14 +121,37 @@ export default function CreatePostForm({
 
   return (
     <>
+      {!isNotPostPage && (
+        <TypographyH3 className="!text-base text-start py-4 self-start px-4">
+          Post your thought
+        </TypographyH3>
+      )}
+      {isShowPreview && withPreview && (
+        <div className="w-full flex flex-col gap-2">
+          <PostCard
+            shadow="none"
+            radius="none"
+            isPreview
+            className={`rounded-none w-full`}
+            post={post as unknown as Post}
+          />
+        </div>
+      )}
+      {withPreview && (
+        <Checkbox
+          size="sm"
+          isSelected={isShowPreview}
+          onValueChange={setIsShowPreview}
+          className="self-start !pt-5 px-6"
+        >
+          Show preview
+        </Checkbox>
+      )}
       <form
-        className={clsx("w-full flex flex-col gap-2 p-4 pt-8", className)}
+        className={clsx("w-full flex flex-col gap-2 p-4", className)}
         onSubmit={handleSubmit(onSubmit)}
         encType="multipart/form-data"
       >
-        {!isNotPostPage && (
-          <TypographyH3 className="!text-lg">Post your thought</TypographyH3>
-        )}
         <InputWithControl
           disableAnimation
           maxLength={40}
@@ -213,27 +236,6 @@ export default function CreatePostForm({
           </Button>
         </div>
       </form>
-      {withPreview && (
-        <Checkbox
-          isSelected={isShowPreview}
-          onValueChange={setIsShowPreview}
-          className="self-start !pb-5 px-6"
-        >
-          Show preview
-        </Checkbox>
-      )}
-      {isShowPreview && withPreview && (
-        <div className="w-full flex flex-col gap-2">
-          <TypographyH4 className="px-4 !text-base">Preview</TypographyH4>
-          <PostCard
-            shadow="none"
-            radius="none"
-            isPreview
-            className={`rounded-none w-full`}
-            post={post as unknown as Post}
-          />
-        </div>
-      )}
     </>
   );
 }

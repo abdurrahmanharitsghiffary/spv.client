@@ -26,14 +26,14 @@ export const items: {
     active: <FiSearch stroke="#0070F0" size={20} />,
   },
   {
-    label: "Posts",
+    label: "Create",
     url: "/posts",
     icon: <FiPlusSquare size={20} />,
     active: <FiPlusSquare stroke="#0070F0" size={20} />,
   },
   {
-    label: "Notification",
-    url: "/notification",
+    label: "Notifications",
+    url: "/notifications",
     icon: <NotificationIcon />,
     active: <NotificationIcon isActive />,
   },

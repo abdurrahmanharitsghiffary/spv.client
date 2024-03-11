@@ -20,13 +20,10 @@ type ChatRoomParticipant = UserSimplified & {
   joinedAt: Date;
 };
 
-type ChatRoom = {
+type ChatRoomSimplified = {
   id: number;
   picture: Image;
-  participants: ChatRoomParticipant[];
   totalParticipants: number;
-  messages: Chat[];
-  totalUnreadMessages: number;
   description?: string | null;
   title?: string | null;
   isGroupChat: boolean;
@@ -36,7 +33,13 @@ type ChatRoom = {
   updatedAt: Date;
 };
 
+type ChatRoom = {
+  participants: ChatRoomParticipant[];
+  messages: Chat[];
+  totalUnreadMessages: number;
+} & ChatRoomSimplified;
+
 type GroupApplyType = "public" | "private";
 type GroupVisibility = "public" | "private";
 
-export type ParticipantRole = "admin" | "user" | "creator";
+export type ParticipantRole = "admin" | "user" | "creator" | "co_creator";

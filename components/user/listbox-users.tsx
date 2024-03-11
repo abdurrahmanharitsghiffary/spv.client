@@ -9,16 +9,18 @@ export default function ListboxUsers({
   users,
   emptyContent,
   itemClassName,
+  className,
 }: {
   users: UserSimplified[];
   emptyContent?: React.ReactNode;
   itemClassName?: string;
+  className?: string;
 }) {
   return (
     <Listbox
       aria-label="users"
       items={users}
-      className="p-2"
+      className={clsx("p-2", className)}
       classNames={{ list: "gap-4", emptyContent: "text-sm" }}
       emptyContent={emptyContent}
     >

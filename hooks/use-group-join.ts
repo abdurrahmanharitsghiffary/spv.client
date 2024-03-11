@@ -1,6 +1,5 @@
 "use client";
 
-import { useRequestGroupMembership } from "@/lib/api/application-request/mutation";
 import { useJoinGroupChat, useLeaveGroupChat } from "@/lib/api/chats/mutation";
 import {
   useGetChatRoomById,
@@ -47,7 +46,7 @@ export const useGroupJoin = (groupId: number) => {
     }
     if (userData?.data)
       if (applyType === "private") {
-        return onOpen();
+        return onOpen(groupId);
       }
     return await joinGroupChatAsync({
       params: {

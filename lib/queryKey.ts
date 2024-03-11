@@ -5,6 +5,7 @@ export const keys = {
   gmr: (type: "all" | "rejected" | "approved" | "pending") =>
     ["membership-requests", "group", type] as const,
   posts: ["posts"] as const,
+  meMrById: (rId: number) => [...keys.me, "membership-request", rId],
   meMr: (type: "all" | "rejected" | "approved" | "pending") =>
     [...keys.me, "membership-requests", type] as const,
   users: ["users"] as const,

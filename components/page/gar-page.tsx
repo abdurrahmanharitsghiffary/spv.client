@@ -13,7 +13,6 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { keys } from "@/lib/queryKey";
 import { AppRequest as ApRq } from "@/types/app-request";
 import { ApiPagingObjectResponse } from "@/types/response";
-import { produce } from "immer";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Immer } from "@/lib/api/utils";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
@@ -56,6 +55,7 @@ export default function GarPage() {
 
   const onRejectedGar = useCallback(
     async (data: DT) => {
+      console.log("HAHAYYUKKSS");
       if (data.roomId !== gId) return null;
       queryClient.setQueriesData<IARQ>(keys.gmr("pending"), (oldData) =>
         Immer.deletePagingData(oldData, data.requestId, "id")

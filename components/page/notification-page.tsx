@@ -84,13 +84,12 @@ export default function NotificationPage() {
       produce((draft) => {
         if (draft?.pages) {
           draft.pages = draft.pages.filter((p) => p !== undefined);
-          console.log(draft.pages, "Draft Pages");
+          console.log(draft.pages, "Daft Pages");
           draft.pages[0].data.unshift(data);
 
           draft.pages[0].pagination.totalRecords += 1;
           draft.pages[0].pagination.limit += 1;
           draft.pages[0].pagination.resultCount += 1;
-          console.log(draft.pages, "Draft Pages new");
         }
       })
     );

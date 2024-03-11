@@ -158,14 +158,14 @@ export default function GroupPage({ groupId }: { groupId: number }) {
         <div className="flex gap-2 justify-between w-full py-2">
           <Button
             color="primary"
-            className="flex-1"
+            className="flex-1 font-semibold"
             as={Link}
             href={`/chats/${groupId}`}
           >
             Message
           </Button>
           <ApplicationRequestButton groupId={Number(groupId)} />
-          <JoinButton />
+          <JoinButton groupId={Number(groupId)} />
           <GroupMenuTrigger variant="solid" radius="md" />
         </div>
         <TextWithLimit text={chatRoom?.data.description ?? ""} />

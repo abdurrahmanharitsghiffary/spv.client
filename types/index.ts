@@ -1,7 +1,7 @@
 import { SVGProps } from "react";
 import { Post } from "./post";
 import { UserAccountPublic } from "./user";
-import { ChatRoom, ChatRoomParticipant } from "./chat";
+import { ChatRoom, ChatRoomParticipant, ChatRoomSimplified } from "./chat";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -33,7 +33,9 @@ export type NotificationType =
   | "liking_comment"
   | "comment"
   | "follow"
-  | "replying_comment";
+  | "replying_comment"
+  | "rejected_group_application"
+  | "accepted_group_application";
 
 export type LoginData = {
   email: string;
@@ -96,7 +98,7 @@ export type OffsetPaging = { limit?: number; offset?: number } | undefined;
 
 export type SearchOptions = OffsetPaging & {
   q?: string;
-  type: "user" | "post" | "all";
+  type: "user" | "post" | "all" | "group";
   filter?: "followed" | "not_followed";
 };
 
@@ -110,6 +112,7 @@ export type PaginationData<T> = { data: T; total: number };
 export type SearchAllData = {
   posts: PaginationData<Post[]>;
   users: PaginationData<UserAccountPublic[]>;
+  groups: PaginationData<ChatRoomSimplified[]>;
 };
 
 export type Gender = "male" | "female" | "not_say" | null;

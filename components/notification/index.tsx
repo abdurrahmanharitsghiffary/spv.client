@@ -26,6 +26,12 @@ const getContent = (type: NotificationType) => {
     case "replying_comment": {
       return "replied your comment on a post...";
     }
+    case "accepted_group_application": {
+      return "Your membership request has been approved.";
+    }
+    case "rejected_group_application": {
+      return "Your membership request has been rejected.";
+    }
     default: {
       return "";
     }
@@ -43,6 +49,11 @@ const getLink = (notification: Notification) => {
     return `/posts/${notification.postId}`;
   } else if (notification.type === "follow") {
     return `/users/${notification.senderId}`;
+  } else if (
+    notification.type === "rejected_group_application" ||
+    notification.type === "accepted_group_application"
+  ) {
+    return `/groups/${notification.groupId}`;
   }
   return "/";
 };

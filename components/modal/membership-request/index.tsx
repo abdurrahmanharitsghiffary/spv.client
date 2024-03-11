@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import ModalLayoutV2 from "../layoutV2";
 import {
+  useGetSelectedGroupId,
   useMembershipRequestActions,
   useMembershipRequestIsOpen,
 } from "@/stores/membership-request-store";
@@ -14,19 +15,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { useConfirm } from "@/stores/confirm-store";
 import { toast } from "react-toastify";
-import { useParams } from "next/navigation";
+import { TypographyLarge } from "@/components/ui/typography";
 
 const applicationRequestSchema = z.object({ comment: z.string().optional() });
 type ApplicationRequestSchema = z.infer<typeof applicationRequestSchema>;
 
 export default function MembershipRequestModal() {
-  const { groupId } = useParams();
-  const gId = Number(groupId);
+  const gId = useGetSelectedGroupId();
   const { onClose } = useMembershipRequestActions();
   const { requestGroupMembershipAsync } = useRequestGroupMembership();
   const isOpen = useMembershipRequestIsOpen();
   const confirm = useConfirm();
   const onSubmit: SubmitHandler<ApplicationRequestSchema> = async (data) => {
+    if (gId === null) return;
     await toast.promise(
       requestGroupMembershipAsync({
         body: { comment: data?.comment },
@@ -38,8 +39,8 @@ export default function MembershipRequestModal() {
             return (data as any)?.message ?? "Something went wrong!";
           },
         },
-        pending: "Sending your application request...",
-        success: "Application request sent successfully.",
+        pending: "Sending your membership request...",
+        success: "Membership request has been sent successfully.",
       }
     );
   };
@@ -51,6 +52,7 @@ export default function MembershipRequestModal() {
     formState: { isSubmitSuccessful },
   } = useForm<ApplicationRequestSchema>({
     resolver: zodResolver(applicationRequestSchema),
+    defaultValues: { comment: undefined },
   });
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function MembershipRequestModal() {
   const handleCancel = async () => {
     await confirm({
       title: "Discard",
-      body: "Are you sure discard the application request?",
+      body: "Are you sure discard the membership request?",
       confirmLabel: "Discard",
       confirmColor: "danger",
     });
@@ -87,9 +89,12 @@ export default function MembershipRequestModal() {
     >
       <form
         id="application_request_form"
-        className="pt-4"
+        className="flex flex-col gap-4"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <TypographyLarge className="!text-base">
+          Request to join
+        </TypographyLarge>
         <TextareaWithControl
           control={control}
           name="comment"

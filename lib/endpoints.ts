@@ -168,7 +168,7 @@ export const searchRoute = (query?: {
   limit?: number;
   offset?: number;
   q?: string;
-  type: "user" | "post" | "all";
+  type: "user" | "post" | "all" | "group";
 }) => withQuerys(urlBase("/search"), entries(query));
 
 // Refresh token route

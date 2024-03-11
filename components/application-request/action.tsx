@@ -38,7 +38,7 @@ export default function AppRequestAction({
     try {
       await confirm({
         title: "Reject",
-        body: "Reject this application request?",
+        body: "Reject this membership request?",
         confirmColor: "danger",
         confirmLabel: "Reject",
       });
@@ -54,7 +54,7 @@ export default function AppRequestAction({
     try {
       await confirm({
         title: "Approve",
-        body: "Approve this application request?",
+        body: "Approve this membership request?",
         confirmLabel: "Approve",
       });
       await approveGMRAsync({

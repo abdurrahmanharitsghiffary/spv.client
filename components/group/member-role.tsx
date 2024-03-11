@@ -13,7 +13,7 @@ export default function MemberRole({
   return (
     <span
       className={clsx(
-        "text-tiny rounded-sm py-[1px] px-2 text-center capitalize",
+        "text-tiny rounded-sm py-[1px] align-middle px-2 text-center capitalize",
         role === "admin" && "text-success-foreground bg-success/80",
         role === "creator" && "bg-secondary/80 text-secondary-foreground",
         className

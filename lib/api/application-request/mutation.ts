@@ -2,7 +2,6 @@
 
 import { baseGroupRoutes, baseMeRoutes } from "@/lib/endpoints";
 import { useMutate } from "../hooks";
-import { keys } from "@/lib/queryKey";
 
 export const useRequestGroupMembership = () => {
   const {
@@ -53,10 +52,6 @@ export const useDeleteGroupMembershipRequest = () => {
   } = useMutate<undefined, { requestId: number }>({
     baseUrl: baseMeRoutes + "/membership-requests/:requestId",
     method: "delete",
-    invalidateTags: (v) => [
-      ["me", "membership-requests"],
-      ["membership-requests", "group"],
-    ],
   });
 
   return { deleteGMR, deleteGMRAsync, ...rest };

@@ -54,7 +54,7 @@ export default function MessageDetailsModal() {
               isRecipient={isRecipient}
               isDisableMenu
             />
-            <TypographyH3 className="!text-base !font-normal px-2">
+            <TypographyH3 className="!text-base px-2">
               Read by ({readedBy?.length})
             </TypographyH3>
             <ListboxUsersRead users={readedBy} />

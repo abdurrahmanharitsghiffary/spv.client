@@ -17,6 +17,10 @@ import { useEditGroupActions } from "@/stores/edit-group-store";
 import { useDeleteGroupChat } from "@/lib/api/chats/mutation";
 import { useConfirm } from "@/stores/confirm-store";
 import { BiTrash } from "react-icons/bi";
+import { AiOutlineShareAlt } from "react-icons/ai";
+import copyToClipboard from "@/lib/copy-to-clipboard";
+import { url } from "@/lib/consts";
+import { sortMenuItems } from "@/lib/sort-menu";
 
 export default function GroupMenu() {
   const isOpen = useGroupMenuIsOpen();
@@ -38,39 +42,54 @@ export default function GroupMenu() {
   const isAdminOrCreator = [isAdmin, isCreator].some((v) => v === true);
 
   const base = [
+    {
+      key: "join-or-leave" + (isJoinedGroup ? "-delete" : ""),
+      label: isJoinedGroup ? "Leave group" : "Join group",
+      icon: isJoinedGroup ? <RiLogoutBoxLine /> : <MdOutlineGroup />,
+    },
+    {
+      key: "share-link",
+      label: "Share group link",
+      icon: <AiOutlineShareAlt />,
+    },
     { key: "group-report-delete", label: "Report group", icon: <GoReport /> },
   ];
 
   if (isAdminOrCreator) {
-    base.push(
-      { key: "edit-group", label: "Edit group", icon: <FiEdit /> },
-      {
-        key: "delete-group",
-        label: "Delete group",
-        icon: <BiTrash />,
-      }
-    );
+    base.push({ key: "edit-group", label: "Edit group", icon: <FiEdit /> });
   }
 
-  base.push({
-    key: "join-or-leave" + (isJoinedGroup ? "-delete" : ""),
-    label: isJoinedGroup ? "Leave group" : "Join group",
-    icon: isJoinedGroup ? <RiLogoutBoxLine /> : <MdOutlineGroup />,
-  });
+  if (isCreator) {
+    base.push({
+      key: "delete-group",
+      label: "Delete group",
+      icon: <BiTrash />,
+    });
+  }
+
+  sortMenuItems(base);
 
   const handleMenuActions = async (key: React.Key) => {
     switch (key) {
       case "group-report-delete": {
-        return notifyToast("Cooming soon!");
+        notifyToast("Cooming soon!");
+        return;
+      }
+      case "share-link": {
+        await copyToClipboard(url(`/groups/${gId}`));
+        return;
       }
       case "join-or-leave": {
         await handleGroupJoin();
+        return;
       }
       case "join-or-leave-delete": {
         await handleGroupJoin();
+        return;
       }
       case "edit-group": {
-        return onOpen();
+        onOpen();
+        return;
       }
       case "delete-group": {
         await confirm({
@@ -80,6 +99,7 @@ export default function GroupMenu() {
           body: "Are you sure delete this group?",
         });
         await deleteGroupChatAsync({ params: { groupId: gId } });
+        return;
       }
     }
   };

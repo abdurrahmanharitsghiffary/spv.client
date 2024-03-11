@@ -10,8 +10,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Post } from "@/types/post";
 import { UserAccountPublic } from "@/types/user";
 import Search from "@/components/search";
+import GroupsTab from "./groups-tab";
+import { ChatRoomSimplified } from "@/types/chat";
 
-type SearchType = "post" | "user" | "all";
+type SearchType = "post" | "user" | "all" | "group";
 
 export default function SearchTabs() {
   const pathname = usePathname();
@@ -56,27 +58,50 @@ export default function SearchTabs() {
       <UserTabLoading />
     );
 
-  const tabContent =
-    type === "all" ? (
-      <>
-        <PostsTab
-          posts={(data as unknown as SearchAllData).posts?.data ?? []}
-        />
-        <UsersTab
-          users={(data as unknown as SearchAllData)?.users?.data ?? []}
-        />
-      </>
-    ) : type === "post" ? (
-      <PostsTab posts={data as Post[]} />
-    ) : (
-      <UsersTab users={data as UserAccountPublic[]} />
-    );
+  const tabContent = (() => {
+    switch (type) {
+      case "all": {
+        return (
+          <>
+            <TabLayout>
+              <h2 className="font-semibold px-4">Posts</h2>
+              <PostsTab
+                posts={(data as unknown as SearchAllData).posts?.data ?? []}
+              />
+            </TabLayout>
+            <TabLayout>
+              <h2 className="font-semibold px-4">Users</h2>
+              <UsersTab
+                users={(data as unknown as SearchAllData)?.users?.data ?? []}
+              />
+            </TabLayout>
+            <TabLayout>
+              <h2 className="font-semibold px-4">Groups</h2>
+              <GroupsTab
+                className="p-2"
+                groups={(data as unknown as SearchAllData)?.groups?.data ?? []}
+              />
+            </TabLayout>
+          </>
+        );
+      }
+      case "group": {
+        return <GroupsTab groups={data as unknown as ChatRoomSimplified[]} />;
+      }
+      case "post": {
+        return <PostsTab posts={data as Post[]} />;
+      }
+      case "user": {
+        return <UsersTab users={data as UserAccountPublic[]} />;
+      }
+      default: {
+        return null;
+      }
+    }
+  })();
 
   return (
     <>
-      {/* <div className="fixed top-[13px] md:static right-3 z-[41] left-3">
-        <Search />
-      </div> */}
       <Suspense>
         <Search className="my-2 max-w-[280px] px-2 hidden md:block" />
       </Suspense>
@@ -88,6 +113,7 @@ export default function SearchTabs() {
         classNames={{
           tabContent: "px-1",
           tab: "w-[54px]",
+          tabList: "font-semibold",
           cursor: "w-full data-selected",
         }}
         variant="underlined"
@@ -96,8 +122,23 @@ export default function SearchTabs() {
         <Tab key="all" title="All"></Tab>
         <Tab key="user" title="Users"></Tab>
         <Tab key="post" title="Posts"></Tab>
+        <Tab key="group" title="Groups"></Tab>
       </Tabs>
-      <TabLayout>{isLoading ? loader : isSuccess && tabContent}</TabLayout>
+      <TL type={type}>{isLoading ? loader : isSuccess && tabContent}</TL>
     </>
+  );
+}
+
+function TL({
+  type,
+  children,
+}: {
+  children?: React.ReactNode;
+  type: SearchType;
+}) {
+  return type === "all" ? (
+    <div className="flex pt-3 pb-4 md:pt-0 flex-col gap-4">{children}</div>
+  ) : (
+    <TabLayout className="md:pb-4 ">{children}</TabLayout>
   );
 }

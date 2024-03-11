@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Navbar as NavbarTemplate } from "@nextui-org/navbar";
+import { NavbarBrand, Navbar as NavbarTemplate } from "@nextui-org/navbar";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
 import clsx from "clsx";
@@ -49,11 +49,11 @@ export default function Navbar() {
       isMenuOpen={showMenu}
       onMenuOpenChange={setShowMenu}
     >
-      {/* <NavbarBrand
+      <NavbarBrand
         className={clsx("hidden md:flex px-4 gap-1", chatId && "!hidden")}
       >
-        <span className="text-lg font-semibold">AstroVerse</span>
-      </NavbarBrand> */}
+        <span className="text-lg font-semibold">MyBrand</span>
+      </NavbarBrand>
       <NavActions pathname={pathname} router={router} />
       <NavEndContent pathname={pathname} router={router} />
       {/* <NavbarContent className="hidden sm:flex">

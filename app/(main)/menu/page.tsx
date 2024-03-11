@@ -19,11 +19,13 @@ import { useShowEditProfile } from "@/hooks/use-edit-profile";
 import { useShowChangePasswordModal } from "@/hooks/use-change-password-modal";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useShowDeleteAccountModal } from "@/hooks/use-delete-account";
-import { IoLanguage } from "react-icons/io5";
+import { IoBugOutline, IoLanguage } from "react-icons/io5";
 import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { toast } from "react-toastify";
 import { urlBase } from "@/lib/endpoints";
 import { useSetSession } from "@/stores/auth-store";
+import { FaBug } from "react-icons/fa";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 type ListboxItem = {
   label: string;
@@ -47,6 +49,7 @@ export default function MenuPage() {
   const request = useAxiosInterceptor();
   const showProfileEdit = useShowEditProfile();
   const { logoutAsync } = useLogout();
+  const { onOpen: openReportBugModal } = useReportModalActions();
   const confirm = useConfirm();
   const showDeleteModal = useShowDeleteAccountModal();
 
@@ -63,6 +66,10 @@ export default function MenuPage() {
         });
         await logoutAsync();
         return null;
+      }
+      case "report-bug": {
+        openReportBugModal();
+        return;
       }
       case "my-chats": {
         return router.push("/chats");
@@ -165,7 +172,7 @@ export default function MenuPage() {
           {
             key: "saved-posts",
             label: "Saved posts",
-            url: "/bookmark",
+            url: "/posts/saved",
             icon: <BsBookmark />,
           },
         ],
@@ -176,6 +183,11 @@ export default function MenuPage() {
       key: "membership-requests",
       label: "Group membership requests",
       url: "/membership-requests",
+    },
+    {
+      icon: <IoBugOutline />,
+      key: "report-bug",
+      label: "Report bug",
     },
     {
       key: "setting-section",

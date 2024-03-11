@@ -171,8 +171,54 @@ export default function ChatsPage() {
     fetchNextPage,
   });
 
+  const onDeleteMessage = async (data: { chatId: number; roomId: number }) => {
+    queryClient.setQueriesData<InfiniteRoomPaging>(
+      keys.meChats(),
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((p, pi) => {
+            if (p?.data) {
+              p.data.forEach((d, di) => {
+                if (d.id === data.roomId) {
+                  draft.pages[pi].data[di].messages = d.messages.filter(
+                    (m) => m.id !== data.chatId
+                  );
+                }
+              });
+            }
+          });
+        }
+      })
+    );
+  };
+
+  const onUpdateMessagae = async (updatedMessage: Chat) => {
+    queryClient.setQueriesData<InfiniteRoomPaging>(
+      keys.meChats(),
+      produce((draft) => {
+        if (draft?.pages) {
+          draft.pages.forEach((p, pi) => {
+            if (p.data) {
+              p.data.forEach((d, di) => {
+                if (updatedMessage.roomId === d.id) {
+                  d.messages.forEach((m, mi) => {
+                    if (m.id === updatedMessage.id) {
+                      draft.pages[pi].data[di].messages[mi] = updatedMessage;
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      })
+    );
+  };
+
   useEffect(() => {
     if (!socket) return;
+    socket.on(Socket_Event.DELETE_MESSAGE, onDeleteMessage);
+    socket.on(Socket_Event.UPDATE_MESSAGE, onUpdateMessagae);
     socket.on(Socket_Event.DELETE_ROOM, onDeletingRoom);
     socket.on(Socket_Event.JOIN_ROOM, onJoinChatRoom);
     socket.on(Socket_Event.LEAVE_ROOM, onLeaveRoom);
@@ -180,6 +226,8 @@ export default function ChatsPage() {
     socket.on(Socket_Event.RECEIVE_MESSAGE, onReceiveMessage);
     socket.on(Socket_Event.READED_MESSAGE, onReadedMessage);
     return () => {
+      socket.off(Socket_Event.DELETE_MESSAGE, onDeleteMessage);
+      socket.off(Socket_Event.UPDATE_MESSAGE, onUpdateMessagae);
       socket.off(Socket_Event.DELETE_ROOM, onDeletingRoom);
       socket.off(Socket_Event.JOIN_ROOM, onJoinChatRoom);
       socket.off(Socket_Event.LEAVE_ROOM, onLeaveRoom);
@@ -205,6 +253,7 @@ export default function ChatsPage() {
         fullWidth
         variant="underlined"
         className="pb-2"
+        classNames={{ tabList: "font-semibold" }}
         disableAnimation
       >
         <Tab key="all" title="All"></Tab>

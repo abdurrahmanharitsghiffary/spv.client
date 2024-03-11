@@ -15,6 +15,7 @@ import PostLikesModal from "@/components/modal/post-likes-modal";
 import Navbar from "@/components/navbar";
 import EditProfileProvider from "@/context/edit-profile-context";
 import React from "react";
+import ReportBugModal from "@/components/modal/report-bug-modal";
 
 export default function MainLayout({
   children,
@@ -31,6 +32,7 @@ export default function MainLayout({
         <Layout>{children}</Layout>
       </main>
       <Giphy />
+      <ReportBugModal />
       <ModalGif />
       <UserMenu />
       <MembershipRequestModal />

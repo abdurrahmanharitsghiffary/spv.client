@@ -106,6 +106,7 @@ const ModalLayout = forwardRef(
 
     return (
       <Modal
+        radius="sm"
         motionProps={motionProps}
         shouldBlockScroll
         ref={ref}

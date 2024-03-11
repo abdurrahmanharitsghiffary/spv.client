@@ -32,7 +32,7 @@ export default function FollowingPage() {
   const total = resp?.pagination?.totalRecords ?? 0;
   const users = resp?.data ?? [];
   return (
-    <div className="flex flex-col gap-2 w-full max-w-sm pt-6">
+    <div className="flex flex-col gap-2 w-full max-w-md pt-6">
       <TypographyH3 className="px-3 !text-base">
         {total} {total < 2 ? " followed user" : " followed users"}
       </TypographyH3>

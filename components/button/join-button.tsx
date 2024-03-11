@@ -7,29 +7,28 @@ import React from "react";
 import clsx from "clsx";
 import { useGroupJoin } from "@/hooks/use-group-join";
 
-export default function JoinButton(props: ButtonProps) {
+export default function JoinButton(props: ButtonProps & { groupId: number }) {
   const { onClick, isIconOnly, color, ...rest } = props;
-  const { groupId } = useParams();
+  const { groupId } = props;
   const gId = Number(groupId);
 
-  const { handleGroupJoin, isJoinedGroup, applyType } = useGroupJoin(gId);
+  const { handleGroupJoin, isJoinedGroup } = useGroupJoin(gId);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handleGroupJoin();
+  };
 
   return (
     <Button
-      onClick={handleGroupJoin}
+      onClick={handleClick}
       isIconOnly={isJoinedGroup}
-      className={clsx("w-fit", !isJoinedGroup && "flex-1")}
+      className={clsx("w-fit font-semibold", !isJoinedGroup && "flex-1")}
       fullWidth={false}
       color={isJoinedGroup ? "danger" : "default"}
       {...rest}
     >
-      {isJoinedGroup ? (
-        <RiLogoutBoxLine size={20} />
-      ) : applyType === "private" ? (
-        "Apply"
-      ) : (
-        "Join"
-      )}
+      {isJoinedGroup ? <RiLogoutBoxLine size={20} /> : "Join"}
     </Button>
   );
 }

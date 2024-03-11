@@ -1,7 +1,7 @@
 "use client";
 
 import { keys } from "@/lib/queryKey";
-import { useInfinite } from "../hooks";
+import { useInfinite, useQ } from "../hooks";
 import { OffsetPaging } from "@/types";
 import { groupAppReq, urlBase } from "@/lib/endpoints";
 import { MembershipRequest } from "@/types/app-request";
@@ -43,6 +43,15 @@ export const useGetMyMembershipRequest = (
     query: { ...q, type },
     queryKey: [...keys.meMr(type), q],
     url: urlBase("/me/membership-requests"),
+  });
+
+  return { resp, ...rest };
+};
+
+export const useGetMembershipRequestById = (requestId: number) => {
+  const { data: resp, ...rest } = useQ<MembershipRequest>({
+    url: urlBase(`/me/membership-requests/${requestId}`),
+    queryKey: keys.meMrById(requestId),
   });
 
   return { resp, ...rest };

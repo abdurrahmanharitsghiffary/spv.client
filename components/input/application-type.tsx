@@ -50,7 +50,7 @@ export default function ApplicationType<T extends FieldValues>(
       <SelectItem
         startContent={<IoLockClosed />}
         key="private"
-        description="Users must sent application request to the group, only approved users can join the group."
+        description="Users must sent membership request to join the group, only approved users can join the group."
       >
         Private
       </SelectItem>
