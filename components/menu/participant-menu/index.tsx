@@ -14,11 +14,50 @@ import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
 import { ParticipantRole } from "@/types/chat";
 import { useConfirm } from "@/stores/confirm-store";
 import {
-  useAddGroupParticipants,
   useRemoveParticipants,
   useUpdateParticipants,
 } from "@/lib/api/chats/mutation";
 import MemberRole from "@/components/group/member-role";
+
+const roles = {
+  creator: 0,
+  co_creator: 1,
+  admin: 2,
+  user: 3,
+} as const;
+
+const ra = Object.entries(roles).map(
+  ([key, value]) => key
+) as ParticipantRole[];
+
+const getPromoteItems = (
+  currentUserRole: ParticipantRole,
+  selectedUserRole: ParticipantRole
+) => {
+  if (roles[currentUserRole] > roles[selectedUserRole]) return [];
+
+  return ra
+    .slice(0, roles[selectedUserRole])
+    .filter((r) => r !== "creator")
+    .map((r) => ({
+      key: "grant",
+      label: `Promote to ${r.replaceAll("_", "-")}`,
+      icon: <BiUserPlus />,
+    }));
+};
+
+const getDemoteItems = (
+  currentUserRole: ParticipantRole,
+  selectedUserRole: ParticipantRole
+) => {
+  if (roles[currentUserRole] >= roles[selectedUserRole]) return [];
+
+  return ra.slice(roles[selectedUserRole] + 1).map((r) => ({
+    key: "dismiss-delete",
+    label: `Demote to ${r}`,
+    icon: <BiUserPlus />,
+  }));
+};
 
 export default function ParticipantMenu() {
   const participantId = useParticipantMenuId();
@@ -104,36 +143,45 @@ export default function ParticipantMenu() {
     { key: "profile", label: "See profile", icon: <BiUser /> },
   ];
 
-  const adminItems = [...menuItems];
+  const adminItems = [
+    ...menuItems,
+    ...getPromoteItems(currentUserRole, selectedParticipantRole),
+    ...getDemoteItems(currentUserRole, selectedParticipantRole),
+  ];
 
-  const isAdminUpdatingAdmin =
-    selectedParticipantRole === "admin" && currentUserRole === "admin";
-
-  if (selectedParticipantRole === "user")
+  if (
+    participant?.data?.id !== selectedParticipant?.data?.id &&
+    roles[currentUserRole] < roles[selectedParticipantRole]
+  )
     adminItems.push({
-      key: "grant",
-      label: "Promote to admin",
-      icon: <BiUserPlus />,
+      key: "z-delete",
+      label: "Remove from group",
+      icon: <BiTrash />,
     });
 
-  if (selectedParticipantRole === "admin")
-    adminItems.push({
-      key: "dismiss-delete",
-      label: "Dissmiss as admin",
-      icon: <BiUserMinus />,
-    });
+  // const isAdminUpdatingAdmin =
+  //   selectedParticipantRole === "admin" && currentUserRole === "admin";
 
-  adminItems.push({
-    key: "z-delete",
-    label: "Remove from group",
-    icon: <BiTrash />,
-  });
+  // if (selectedParticipantRole === "user")
+  //   adminItems.push({
+  //     key: "grant",
+  //     label: "Promote to admin",
+  //     icon: <BiUserPlus />,
+  //   });
+
+  // if (selectedParticipantRole === "admin")
+  //   adminItems.push({
+  //     key: "dismiss-delete",
+  //     label: "Dissmiss as admin",
+  //     icon: <BiUserMinus />,
+  //   });
 
   const selectedItems =
-    currentUserRole === "user" ||
-    isAdminUpdatingAdmin ||
-    selectedParticipantRole === "creator"
-      ? menuItems
+    currentUserRole === "user"
+      ? // ||
+        // isAdminUpdatingAdmin ||
+        // selectedParticipantRole === "creator"
+        menuItems
       : adminItems;
 
   return (
