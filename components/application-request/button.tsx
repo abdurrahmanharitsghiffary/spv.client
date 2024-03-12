@@ -14,6 +14,7 @@ import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { keys } from "@/lib/queryKey";
 import { ApiPagingObjectResponse } from "@/types/response";
 import { produce } from "immer";
+import { useIsMounted } from "@/hooks/use-is-mounted";
 
 export default function ApplicationRequestButton({
   groupId,
@@ -26,6 +27,8 @@ export default function ApplicationRequestButton({
   );
   const { chatRoom } = useGetChatRoomById(groupId);
   const queryClient = useQueryClient();
+
+  const isMounted = useIsMounted();
 
   useSocketOn(
     Socket_Event.DELETE_GAR,
@@ -84,7 +87,8 @@ export default function ApplicationRequestButton({
   if (
     !isSuccess ||
     (error as any)?.statusCode === 403 ||
-    chatRoom?.data?.applyType === "public"
+    chatRoom?.data?.applyType === "public" ||
+    !isMounted
   )
     return null;
 

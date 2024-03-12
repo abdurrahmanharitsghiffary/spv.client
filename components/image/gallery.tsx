@@ -28,10 +28,14 @@ const getTemplateArea = (items: any[]) => {
 export default function Gallery({
   images = [],
   className,
+  style,
+  ...rest
 }: {
   images: { src: string }[];
-  className?: string;
-}) {
+} & React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>) {
   const showGallery = useShowImageGallery();
   const isSSR = useIsSSR();
   if (images.length === 0) return null;
@@ -46,7 +50,9 @@ export default function Gallery({
         gridAutoColumns: "1fr",
         gridAutoRows: "1fr",
         gap: 4,
+        ...style,
       }}
+      {...rest}
     >
       {images.map((image, i) => {
         if (i > 5) return "";

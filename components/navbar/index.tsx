@@ -49,11 +49,11 @@ export default function Navbar() {
       isMenuOpen={showMenu}
       onMenuOpenChange={setShowMenu}
     >
-      <NavbarBrand
+      {/* <NavbarBrand
         className={clsx("hidden md:flex px-4 gap-1", chatId && "!hidden")}
       >
         <span className="text-lg font-semibold">MyBrand</span>
-      </NavbarBrand>
+      </NavbarBrand> */}
       <NavActions pathname={pathname} router={router} />
       <NavEndContent pathname={pathname} router={router} />
       {/* <NavbarContent className="hidden sm:flex">

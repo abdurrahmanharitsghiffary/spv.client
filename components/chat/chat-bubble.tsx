@@ -46,6 +46,20 @@ const ChatBubble = forwardRef<
     }
   }, [isHolded, chat?.id, isDisableMenu]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      resetHold();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", onScroll);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
     <div
       ref={ref}
@@ -97,7 +111,12 @@ const ChatBubble = forwardRef<
           )}
           <TextWithLimit text={chat?.message ?? ""} className="noselect" />
           {images && images.length > 0 ? (
-            <Gallery className="max-w-[270px]" images={images as any} />
+            <Gallery
+              onPointerUp={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="max-w-[270px]"
+              images={images as any}
+            />
           ) : null}
         </div>
         <Timestamp
