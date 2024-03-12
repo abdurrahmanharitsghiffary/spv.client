@@ -34,11 +34,11 @@ const getPromoteItems = (
   currentUserRole: ParticipantRole,
   selectedUserRole: ParticipantRole
 ) => {
-  if (roles[currentUserRole] > roles[selectedUserRole]) return [];
+  if (roles[currentUserRole] >= roles[selectedUserRole]) return [];
 
   return ra
-    .slice(0, roles[selectedUserRole])
-    .filter((r) => r !== "creator")
+    .slice(roles[currentUserRole], roles[selectedUserRole])
+    .filter((r) => r !== "creator" && r !== "user")
     .map((r) => ({
       key: "grant",
       label: `Promote to ${r.replaceAll("_", "-")}`,
