@@ -179,16 +179,20 @@ export default function MenuPage() {
       },
     },
     {
-      icon: <MdOutlineAssignment />,
-      key: "membership-requests",
-      label: "Group membership requests",
-      url: "/membership-requests",
+      key: "group-section",
+      section: {
+        title: "Groups",
+        items: [
+          {
+            icon: <MdOutlineAssignment />,
+            key: "membership-requests",
+            label: "My membership requests",
+            url: "/membership-requests",
+          },
+        ],
+      },
     },
-    {
-      icon: <IoBugOutline />,
-      key: "report-bug",
-      label: "Report bug",
-    },
+
     {
       key: "setting-section",
       section: {
@@ -211,7 +215,11 @@ export default function MenuPage() {
         ],
       },
     },
-
+    {
+      icon: <IoBugOutline />,
+      key: "report-bug",
+      label: "Report bug",
+    },
     {
       key: "logout",
       label: "Logout",
