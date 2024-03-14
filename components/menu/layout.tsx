@@ -101,6 +101,7 @@ export default function MenuLayout({
 
   return (
     <>
+      {isOpen && <div className="bg-overlay/40 fixed inset-0 z-[200]"></div>}
       <AnimatePresence>
         {isOpen && (
           <motion.div

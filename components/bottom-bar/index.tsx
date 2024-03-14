@@ -10,7 +10,7 @@ import { useIsSSR } from "@react-aria/ssr";
 import { useIsLg, useIsMd } from "@/hooks/use-media-query";
 import clsx from "clsx";
 import IconButton from "../button/icon-button";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronRight } from "react-icons/fi";
 import { useIsMounted } from "@/hooks/use-is-mounted";
 
 export default function BottomBar() {
@@ -36,13 +36,13 @@ export default function BottomBar() {
     <Card
       isBlurred
       className={clsx(
-        isOpen ? "md:w-fit" : "md:w-[50px]",
+        isOpen ? "md:w-fit" : "md:w-[53px]",
         "fixed shadow-none rounded-none left-0 right-0 bottom-0 z-[39] md:top-[64px] md:bottom-0 transition-all md:left-0 md:border-r-1 md:border-divider md:right-auto"
       )}
     >
       <Divider className="md:hidden" />
       <CardBody className="p-0 h-12 md:overflow-hidden">
-        <ul className="flex justify-around w-full h-full items-center md:flex-col md:justify-start md:items-start">
+        <ul className="flex justify-around w-full h-full items-center md:flex-col md:justify-start md:items-start md:gap-2">
           {items.map((item) => (
             <li
               key={item.url}
@@ -52,13 +52,13 @@ export default function BottomBar() {
               )}
             >
               <Link
-                className="flex justify-center flex-col md:flex-row md:gap-4 gap-1 items-center text-center h-full w-full md:text-lg md:p-4 md:justify-start"
+                className="flex text-[1.25rem] justify-center flex-col md:flex-row md:gap-4 gap-1 items-center text-center h-full w-full md:p-4 md:justify-start"
                 href={item.url}
               >
                 {pathname === item.url ? item.active : item.icon}
                 <span
                   className={clsx(
-                    "!font-semibold text-sm hidden md:inline",
+                    "text-base hidden md:inline",
                     item.url === pathname && "text-primary"
                   )}
                 >
@@ -78,11 +78,17 @@ export default function BottomBar() {
           ))}
           <li
             className={clsx(
-              isOpen ? "ml-auto mr-1" : "mx-auto",
-              "hidden md:flex justify-self-end self-end mt-auto mb-1"
+              isOpen ? "ml-auto mr-2" : "mx-auto",
+              "hidden md:flex justify-self-end self-end mt-auto mb-2"
             )}
           >
-            <IconButton onClick={handleToggle}>
+            <IconButton
+              onClick={handleToggle}
+              variant="flat"
+              color="primary"
+              radius="md"
+              size="sm"
+            >
               <FiChevronRight
                 className={clsx(
                   isOpen ? "-rotate-180" : "rotate-0",

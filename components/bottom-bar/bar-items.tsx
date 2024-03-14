@@ -16,20 +16,20 @@ export const items: {
   {
     label: "Home",
     url: "/",
-    icon: <FiHome size={20} />,
-    active: <FiHome stroke="#0070F0" size={20} />,
+    icon: <FiHome />,
+    active: <FiHome stroke="#0070F0" />,
   },
   {
     label: "Search",
     url: "/search",
-    icon: <FiSearch size={20} />,
-    active: <FiSearch stroke="#0070F0" size={20} />,
+    icon: <FiSearch />,
+    active: <FiSearch stroke="#0070F0" />,
   },
   {
     label: "Create",
     url: "/posts",
-    icon: <FiPlusSquare size={20} />,
-    active: <FiPlusSquare stroke="#0070F0" size={20} />,
+    icon: <FiPlusSquare />,
+    active: <FiPlusSquare stroke="#0070F0" />,
   },
   {
     label: "Notifications",
@@ -40,7 +40,7 @@ export const items: {
   {
     label: "Menu",
     url: "/menu",
-    icon: <FiMoreHorizontal size={20} />,
-    active: <FiMoreHorizontal stroke="#0070F0" size={20} />,
+    icon: <FiMoreHorizontal />,
+    active: <FiMoreHorizontal stroke="#0070F0" />,
   },
 ];
