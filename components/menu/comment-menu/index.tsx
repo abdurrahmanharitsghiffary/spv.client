@@ -97,7 +97,7 @@ export default function CommentMenu() {
       return;
     }
     if (isAuthored) {
-      if (key === "delete-comment" && commentId) {
+      if (key === "delete-comment" && commentId && !comment) {
         return await deleteCommentAsync(
           { params: { commentId: Number(commentId) } },
           {

@@ -17,8 +17,18 @@ import { useSession } from "@/stores/auth-store";
 import { Post } from "@/types/post";
 import { Divider } from "@nextui-org/divider";
 import { Spinner } from "@nextui-org/spinner";
+import { Metadata } from "next";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+
+export function generateMetadata({ params }: any): Metadata {
+  return {
+    description: "User page",
+    title: `User - ${params?.userId}`,
+    keywords:
+      "Users, User, Profile, User page, user details, user informations",
+  };
+}
 
 export default function UserPage({ params }: { params: { userId: string } }) {
   const router = useRouter();

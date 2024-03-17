@@ -52,6 +52,7 @@ export const useDeleteGroupMembershipRequest = () => {
   } = useMutate<undefined, { requestId: number }>({
     baseUrl: baseMeRoutes + "/membership-requests/:requestId",
     method: "delete",
+    invalidateTags: (v) => [["membership-requests"]],
   });
 
   return { deleteGMR, deleteGMRAsync, ...rest };

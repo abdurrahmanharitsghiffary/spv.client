@@ -1,5 +1,11 @@
 import Layout from "@/components/layout/layout";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Reset password",
+  description: "Reset password page.",
+};
 
 export default function ResetPasswordLayout({
   children,

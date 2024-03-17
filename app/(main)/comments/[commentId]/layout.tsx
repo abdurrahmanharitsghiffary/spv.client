@@ -2,6 +2,19 @@ import CommentEditForm from "@/components/form/comment-form/edit-form";
 import CommentForm from "@/components/form/comment-form";
 import { Card, CardBody } from "@nextui-org/card";
 import React from "react";
+import { Metadata } from "next";
+
+export function generateMetadata({
+  params,
+}: {
+  params: { commentId: string };
+}): Metadata {
+  return {
+    title: `Comment - ${params.commentId}`,
+    category: "Comment",
+    keywords: "comment, post comment",
+  };
+}
 
 export default function CommentIdLayout({
   children,

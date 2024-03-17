@@ -1,5 +1,11 @@
 import Layout from "@/components/layout/layout";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Verify account",
+  description: "Verify account page.",
+};
 
 export default function VerifyAccountLayout({
   children,

@@ -15,6 +15,12 @@ import PostCardSkeleton from "@/components/post/skeleton";
 import useFetchNextPageObserver from "@/hooks/use-fetch-next-page";
 import { Spinner } from "@nextui-org/spinner";
 import TextWithLimit from "@/components/text-with-limit";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description: "My profile page",
+};
 
 export default function ProfilePage() {
   const { resp, isLoading, isSuccess } = useGetMyAccountInfo();
