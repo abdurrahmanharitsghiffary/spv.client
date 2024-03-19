@@ -62,9 +62,9 @@ export default function ChatListbox({ chats }: { chats: ChatRoom[] }) {
             endContent={
               <div className="max-w-[35%] flex flex-col gap-2 justify-center items-end">
                 {chat?.isGroupChat && (
-                  <span className="text-tiny rounded-sm py-[1px] bg-secondary/80 text-secondary-foreground px-2 text-center">
+                  <Chip color="secondary" variant="flat" size="sm">
                     Group
-                  </span>
+                  </Chip>
                 )}
                 <Time
                   date={chat?.messages?.[0]?.createdAt ?? chat?.createdAt}

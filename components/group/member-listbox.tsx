@@ -3,8 +3,8 @@ import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import React from "react";
 import { listboxUserProps } from "../user/listbox-user-props";
 import ParticipantMenuTrigger from "../menu/participant-menu/trigger";
-import MemberRole from "./member-role";
 import clsx from "clsx";
+import ParticipantRole from "../participant-role";
 
 export default function MemberListbox({
   members,
@@ -42,7 +42,7 @@ export default function MemberListbox({
             endContent={<ParticipantMenuTrigger participantId={member?.id} />}
           >
             <span className="flex-1 truncate">{member?.fullName}</span>
-            <MemberRole className="flex-shrink-0" role={member?.role} />
+            <ParticipantRole role={member?.role} />
           </ListboxItem>
         );
       }}

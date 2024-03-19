@@ -7,17 +7,17 @@ import {
   useParticipantMenuId,
   useParticipantMenuIsOpen,
 } from "@/stores/participant-menu-store";
-import { BiTrash, BiUser, BiUserMinus, BiUserPlus } from "react-icons/bi";
+import { BiTrash, BiUser, BiUserPlus } from "react-icons/bi";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "@/stores/auth-store";
 import { useGetChatRoomParticipant } from "@/lib/api/chats/query";
-import { ParticipantRole } from "@/types/chat";
+import { ParticipantRole as ParticipantRoleT } from "@/types/chat";
 import { useConfirm } from "@/stores/confirm-store";
 import {
   useRemoveParticipants,
   useUpdateParticipants,
 } from "@/lib/api/chats/mutation";
-import MemberRole from "@/components/group/member-role";
+import ParticipantRole from "@/components/participant-role";
 
 const roles = {
   creator: 0,
@@ -28,11 +28,11 @@ const roles = {
 
 const ra = Object.entries(roles).map(
   ([key, value]) => key
-) as ParticipantRole[];
+) as ParticipantRoleT[];
 
 const getPromoteItems = (
-  currentUserRole: ParticipantRole,
-  selectedUserRole: ParticipantRole
+  currentUserRole: ParticipantRoleT,
+  selectedUserRole: ParticipantRoleT
 ) => {
   if (roles[currentUserRole] >= roles[selectedUserRole]) return [];
 
@@ -47,8 +47,8 @@ const getPromoteItems = (
 };
 
 const getDemoteItems = (
-  currentUserRole: ParticipantRole,
-  selectedUserRole: ParticipantRole
+  currentUserRole: ParticipantRoleT,
+  selectedUserRole: ParticipantRoleT
 ) => {
   if (roles[currentUserRole] >= roles[selectedUserRole]) return [];
 
@@ -75,7 +75,7 @@ export default function ParticipantMenu() {
   const { updateParticipantsAsync } = useUpdateParticipants();
   const { removeParticipantsAsync } = useRemoveParticipants();
   const currentUserRole = participant?.data?.role ?? "user";
-  const selectedParticipantRole: ParticipantRole =
+  const selectedParticipantRole: ParticipantRoleT =
     selectedParticipant?.data?.role ?? "user";
 
   const handleMenuActions = async (key: React.Key) => {
@@ -194,10 +194,7 @@ export default function ParticipantMenu() {
           <span className="flex-1 pr-2 truncate">
             {selectedParticipant?.data?.fullName ?? ""}
           </span>
-          <MemberRole
-            className="flex-shrink-0"
-            role={selectedParticipant?.data?.role ?? "user"}
-          />
+          <ParticipantRole role={selectedParticipant?.data?.role ?? "user"} />
         </div>
       }
       description={selectedParticipant?.data?.username}

@@ -1,10 +1,9 @@
 import Link from "next/link";
 import UserAvatar from "../user/user-avatar";
 import { TypographyLarge, TypographyMuted } from "../ui/typography";
-import Time from "../time";
 import { ChatRoomParticipant } from "@/types/chat";
-import clsx from "clsx";
 import ParticipantMenuTrigger from "../menu/participant-menu/trigger";
+import ParticipantRole from "../participant-role";
 
 export default function ChatParticipant({
   participant,
@@ -35,19 +34,7 @@ export default function ChatParticipant({
           </TypographyMuted>
         </Link>
         <div className="flex flex-col gap-1 justify-center items-end">
-          {participant?.role !== "user" && (
-            <span
-              className={clsx(
-                "text-tiny rounded-sm py-[1px] px-2 text-center capitalize",
-                participant?.role === "admin" &&
-                  "text-success-foreground bg-success/80",
-                participant?.role === "creator" &&
-                  "bg-secondary/80 text-secondary-foreground"
-              )}
-            >
-              {participant?.role}
-            </span>
-          )}
+          <ParticipantRole role={participant?.role} />
           <ParticipantMenuTrigger participantId={participant?.id} />
         </div>
       </div>
