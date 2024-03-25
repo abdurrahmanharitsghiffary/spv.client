@@ -21,6 +21,7 @@ import { AiOutlineShareAlt } from "react-icons/ai";
 import copyToClipboard from "@/lib/copy-to-clipboard";
 import { url } from "@/lib/consts";
 import { sortMenuItems } from "@/lib/sort-menu";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 export default function GroupMenu() {
   const isOpen = useGroupMenuIsOpen();
@@ -38,6 +39,7 @@ export default function GroupMenu() {
     isUser,
     isLoading,
   } = useGroupJoin(gId);
+  const { onOpen: openReportModal } = useReportModalActions();
 
   const isAdminOrCreator = [isAdmin, isCreator].some((v) => v === true);
 
@@ -72,7 +74,7 @@ export default function GroupMenu() {
   const handleMenuActions = async (key: React.Key) => {
     switch (key) {
       case "group-report-delete": {
-        notifyToast("Cooming soon!");
+        openReportModal("group", gId);
         return;
       }
       case "share-link": {

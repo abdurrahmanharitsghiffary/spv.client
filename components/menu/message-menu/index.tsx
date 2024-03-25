@@ -18,6 +18,7 @@ import { useSession } from "@/stores/auth-store";
 import { useMessageInfoDisclosure } from "@/context/message-info-context";
 import { notifyToast } from "@/lib/toast";
 import { GoReport } from "react-icons/go";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 export default function MessageMenu() {
   const isOpen = useMessageMenuIsOpen();
@@ -25,9 +26,11 @@ export default function MessageMenu() {
   const messageId = useMessageMenuId();
   const { deleteMessageAsync } = useDeleteMessage();
   const { message, isLoading, isSuccess } = useGetMessage(messageId);
+  const authorId = message?.data?.author?.id;
   const confirm = useConfirm();
   const { onOpen } = useMessageEditDisclosure();
   const { onOpen: onDetailClick } = useMessageInfoDisclosure();
+  const { onOpen: openReportModal } = useReportModalActions();
   const session = useSession();
 
   const baseItems: MenuItems[] = [
@@ -35,18 +38,27 @@ export default function MessageMenu() {
     { key: "copy", label: "Copy message", icon: <AiOutlineCopy /> },
   ];
 
-  if (session?.id === message?.data?.author?.id) {
+  if (session?.id === authorId) {
     baseItems.push(
       { key: "edit", label: "Edit message", icon: <AiOutlineEdit /> },
-      { key: "report-delete", label: "Report Message", icon: <GoReport /> },
       { key: "delete", label: "Delete message", icon: <BiTrash /> }
     );
+  } else if (session?.id !== authorId) {
+    baseItems.push({
+      key: "report-delete",
+      label: "Report message",
+      icon: <GoReport />,
+    });
   }
 
   const handleMenuActions = async (key: React.Key) => {
     switch (key) {
       case "copy": {
         return await copyToClipboard(message?.data?.message ?? "");
+      }
+      case "report-delete": {
+        openReportModal("message", messageId);
+        return;
       }
       case "delete": {
         await confirm({

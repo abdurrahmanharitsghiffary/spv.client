@@ -206,6 +206,7 @@ export default function CreatePostForm({
               {images?.length} Image{(images ?? []).length > 1 && "s"} choosen
             </TypographyMuted>
             <Checkbox
+              size="sm"
               isSelected={isChipTruncated}
               onValueChange={setIsChipTruncated}
             >

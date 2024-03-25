@@ -9,6 +9,7 @@ export interface NavItem {
   ) => { key: string; element: React.ReactNode }[];
   style?: React.CSSProperties | undefined;
   className?: string;
+  isMd?: boolean;
   isShowEndContent?: boolean;
 }
 
@@ -34,6 +35,7 @@ export const navItems: NavItem[] = [
     items: (router) => [
       { key: "chat-header", element: <ChatHeader router={router} /> },
     ],
+    isMd: true,
     isShowEndContent: false,
   },
   // {

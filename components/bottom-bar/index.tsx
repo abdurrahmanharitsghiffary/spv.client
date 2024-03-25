@@ -52,13 +52,22 @@ export default function BottomBar() {
               )}
             >
               <Link
-                className="flex text-[1.25rem] justify-center flex-col md:flex-row md:gap-4 gap-1 items-center text-center h-full w-full md:p-4 md:justify-start"
+                className={clsx(
+                  "flex text-[1.25rem] justify-center flex-col md:flex-row md:gap-4 gap-1 items-center text-center h-full w-full md:p-4 md:justify-start"
+                )}
                 href={item.url}
               >
-                {pathname === item.url ? item.active : item.icon}
                 <span
                   className={clsx(
-                    "text-base hidden md:inline",
+                    "text-[1.25rem]",
+                    pathname === item.url && "text-primary"
+                  )}
+                >
+                  {item.icon}
+                </span>
+                <span
+                  className={clsx(
+                    "text-sm hidden md:inline",
                     item.url === pathname && "text-primary"
                   )}
                 >
@@ -78,6 +87,9 @@ export default function BottomBar() {
           ))}
           <li
             className={clsx(
+              pathname.includes("/comments/") || pathname.includes("/posts/")
+                ? "mb-16"
+                : "",
               isOpen ? "ml-auto mr-2" : "mx-auto",
               "hidden md:flex justify-self-end self-end mt-auto mb-2"
             )}

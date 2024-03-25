@@ -17,6 +17,7 @@ import { useParams, useRouter } from "next/navigation";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useConfirm } from "@/stores/confirm-store";
 import { useBlockUser } from "@/lib/api/users/mutation";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 export default function UserMenu() {
   const confirm = useConfirm();
@@ -30,7 +31,7 @@ export default function UserMenu() {
     Number(params.userId ?? -1)
   );
   const { blockUserAsync } = useBlockUser();
-
+  const { onOpen } = useReportModalActions();
   const handleMenuActions = async (key: React.Key) => {
     if (key === "follow") {
       if (isFollowed?.data) {
@@ -51,6 +52,8 @@ export default function UserMenu() {
         confirmColor: "danger",
       });
       await blockUserAsync({ body: { userId: Number(params.userId ?? -1) } });
+    } else if (key === "report-delete") {
+      onOpen("user", Number(params.userId));
     }
   };
 

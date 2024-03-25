@@ -25,6 +25,7 @@ export default function UserListboxLoading({
     <Listbox aria-label="loading..." className="gap-6" {...listProps}>
       {items.map((i) => (
         <ListboxItem
+          textValue={i.toString()}
           {...listboxUserProps}
           key={i}
           startContent={

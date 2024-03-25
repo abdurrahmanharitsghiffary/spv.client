@@ -27,6 +27,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useConfirm } from "@/stores/confirm-store";
 import { MdOutlineInfo } from "react-icons/md";
 import { useCommentLikeModalActions } from "@/stores/comment-likes-modal-store";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 export default function CommentMenu() {
   const { commentId } = useParams();
@@ -45,6 +46,7 @@ export default function CommentMenu() {
   const { likeCommentAsync } = useLikeComment();
   const { unlikeCommentAsync } = useUnlikeComment();
   const { deleteCommentAsync } = useDeleteComment();
+  const { onOpen: openReportModal } = useReportModalActions();
   const isAuthored = (comment?.authorId ?? -1) === (session?.id ?? -2);
 
   const baseItems = [
@@ -91,7 +93,7 @@ export default function CommentMenu() {
         return await unlikeCommentAsync({ params: { commentId: comment?.id } });
       return await likeCommentAsync({ params: { commentId: comment?.id } });
     } else if (key === "delete-report-comment" && !isAuthored) {
-      return notifyToast("Cooming soon!");
+      return openReportModal("comment", comment?.id ?? Number(commentId));
     } else if (key === "details") {
       onOpen(comment?.id ?? Number(commentId));
       return;

@@ -13,12 +13,15 @@ import {
   DropdownTrigger,
 } from "@nextui-org/dropdown";
 import { RiLogoutBoxLine } from "react-icons/ri";
-import { FiUser } from "react-icons/fi";
+import { FiMoon, FiSun, FiUser } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "@/stores/confirm-store";
 import { useLogout } from "@/lib/api/auth";
+import { useTheme } from "next-themes";
+import { ThemeSwitchBase } from "../theme-switch";
 
 export default function UserAvatar() {
+  const { resolvedTheme } = useTheme();
   const session = useSession();
   const { resp } = useGetMyAccountInfo();
   const data = resp?.data;
@@ -67,6 +70,13 @@ export default function UserAvatar() {
       <DropdownMenu onAction={handleDropdownActions}>
         <DropdownItem key="profile" startContent={<FiUser />}>
           Profile
+        </DropdownItem>
+        <DropdownItem
+          key="dark_mode"
+          startContent={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
+          endContent={<ThemeSwitchBase />}
+        >
+          Dark mode
         </DropdownItem>
         <DropdownItem
           key="logout"

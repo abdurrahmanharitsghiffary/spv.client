@@ -24,7 +24,7 @@ import useAxiosInterceptor from "@/hooks/use-axios-interceptor";
 import { toast } from "react-toastify";
 import { urlBase } from "@/lib/endpoints";
 import { useSetSession } from "@/stores/auth-store";
-import { useReportModalActions } from "@/stores/report-modal-store";
+import { useReportModalActions } from "@/stores/report-bug-modal-store";
 
 type ListboxItem = {
   label: string;

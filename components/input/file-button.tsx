@@ -48,6 +48,7 @@ const FileButton = forwardRef(
       color: _1,
       radius: _2,
       isIconOnly: _3,
+      children,
       ...rest
     } = btnProps;
     const {
@@ -65,8 +66,9 @@ const FileButton = forwardRef(
         isIconOnly={isIconOnly ?? true}
         color={color}
         variant={variant}
+        startContent={children ? <GoPaperclip size={18} /> : undefined}
       >
-        <GoPaperclip size={18} />
+        {children ? <GoPaperclip size={18} /> : children}
         <InputFile
           {...restInput}
           ref={ref}

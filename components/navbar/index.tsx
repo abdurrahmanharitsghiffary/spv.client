@@ -49,11 +49,19 @@ export default function Navbar() {
       isMenuOpen={showMenu}
       onMenuOpenChange={setShowMenu}
     >
-      {/* <NavbarBrand
-        className={clsx("hidden md:flex px-4 gap-1", chatId && "!hidden")}
+      <NavbarBrand
+        className={clsx("hidden md:flex px-4 gap-4", chatId && "!hidden")}
       >
-        <span className="text-lg font-semibold">MyBrand</span>
-      </NavbarBrand> */}
+        <iframe
+          src="https://giphy.com/embed/yfghyBDIZvWchz6A2I"
+          width="80"
+          height="50"
+          frameBorder="0"
+          className="giphy-embed rounded-large"
+          allowFullScreen
+        ></iframe>
+        <span className="font-bold text-xl font-sans">Chipip</span>
+      </NavbarBrand>
       <NavActions pathname={pathname} router={router} />
       <NavEndContent pathname={pathname} router={router} />
       {/* <NavbarContent className="hidden sm:flex">

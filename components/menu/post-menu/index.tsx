@@ -20,7 +20,6 @@ import { DropdownProps } from "@/components/dropdown";
 import { useGetPostIsLiked, useGetPostIsSaved } from "@/lib/api/posts/query";
 import { useSession } from "@/stores/auth-store";
 import { notifyToast } from "@/lib/toast";
-import { postById } from "@/lib/endpoints";
 import {
   useDeletePost,
   useDeleteSavedPost,
@@ -33,6 +32,7 @@ import { useConfirm } from "@/stores/confirm-store";
 import { MdOutlineInfo } from "react-icons/md";
 import { usePostLikeModalActions } from "@/stores/post-likes-modal-store";
 import { url } from "@/lib/consts";
+import { useReportModalActions } from "@/stores/report-modal-store";
 
 export default function PostMenu() {
   const isOpen = usePostMenuIsOpen();
@@ -54,6 +54,7 @@ export default function PostMenu() {
   const { deletePostAsync } = useDeletePost();
   const showEditForm = useShowEditPost();
   const confirm = useConfirm();
+  const { onOpen: openReportModal } = useReportModalActions();
 
   const isAuthored = session?.id === selectedPost?.authorId;
 
@@ -132,8 +133,11 @@ export default function PostMenu() {
         }
         return savePostAsync({ body: { postId: selectedPost?.id } });
       }
-      case "report-delete":
-        return notifyToast("Cooming soon!");
+      case "report-delete": {
+        if (selectedPost?.id) openReportModal("post", selectedPost?.id);
+        // return notifyToast("Cooming soon!");
+        break;
+      }
       case "delete": {
         if (!isAuthored || !selectedPost) return null;
         await confirm({
@@ -143,10 +147,12 @@ export default function PostMenu() {
           confirmLabel: "Delete",
         });
         await deletePostAsync({ params: { postId: selectedPost?.id } });
+        break;
       }
       case "edit": {
         if (!isAuthored || !selectedPost) return null;
         showEditForm(selectedPost?.id);
+        break;
       }
       default:
         return null;

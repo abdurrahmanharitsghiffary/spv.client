@@ -16,6 +16,7 @@ import Navbar from "@/components/navbar";
 import EditProfileProvider from "@/context/edit-profile-context";
 import React from "react";
 import ReportBugModal from "@/components/modal/report-bug-modal";
+import ReportModal from "@/components/modal/report-modal";
 
 export default function MainLayout({
   children,
@@ -44,6 +45,7 @@ export default function MainLayout({
       <CommentLikesModal />
       <PostLikesModal />
       <EditPostModal />
+      <ReportModal />
       <EditProfileModal />
     </EditProfileProvider>
   );

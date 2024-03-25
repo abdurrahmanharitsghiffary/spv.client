@@ -4,6 +4,7 @@ import { getNavItem } from "./utils";
 import { navItems } from "./items";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import clsx from "clsx";
+import { useIsMd } from "@/hooks/use-media-query";
 
 export default function DesktopAction({
   pathname,
@@ -12,12 +13,15 @@ export default function DesktopAction({
   router: AppRouterInstance;
   pathname: string;
 }) {
+  const isMd = useIsMd();
   const item = getNavItem(navItems, pathname);
   const items = item?.items(router);
 
   if (items === null || (items ?? []).length < 1) return null;
 
   const isSingleItem = (items ?? []).length === 1;
+
+  if (isMd && !item?.isMd) return null;
 
   return (
     <NavbarContent

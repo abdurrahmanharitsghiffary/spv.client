@@ -7,6 +7,7 @@ import { useIsSSR } from "@react-aria/ssr";
 import clsx from "clsx";
 
 import { FiSun, FiMoon } from "react-icons/fi";
+import { useIsMounted } from "@/hooks/use-is-mounted";
 
 export interface ThemeSwitchProps {
   className?: string;
@@ -14,17 +15,15 @@ export interface ThemeSwitchProps {
 }
 
 export function ThemeSwitchBase() {
-  const { theme, setTheme } = useTheme();
+  const isMounted = useIsMounted();
+  const { resolvedTheme, setTheme } = useTheme();
 
-  const onChange = () => {
-    theme === "light" ? setTheme("dark") : setTheme("light");
-  };
+  if (!isMounted) return <Switch />;
 
   return (
     <Switch
-      value={theme}
-      isSelected={theme === "dark"}
-      onValueChange={onChange}
+      isSelected={resolvedTheme === "dark" ? true : false}
+      onValueChange={(e) => setTheme(e ? "dark" : "light")}
     />
   );
 }

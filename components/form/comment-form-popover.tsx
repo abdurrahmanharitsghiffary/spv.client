@@ -63,10 +63,15 @@ export default function CommentFormPopover({
               }
             }}
           >
-            <ListboxItem key="image" startContent={<BsCardImage size={14} />}>
+            <ListboxItem
+              key="image"
+              textValue="uploadimage"
+              startContent={<BsCardImage size={14} />}
+            >
               Upload image
             </ListboxItem>
             <ListboxItem
+              textValue="uploadgif"
               key="gif-menu"
               startContent={<AiOutlineGif size={14} />}
             >

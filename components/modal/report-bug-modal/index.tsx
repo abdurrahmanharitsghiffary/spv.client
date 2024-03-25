@@ -1,24 +1,22 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import ModalLayoutV2 from "../layoutV2";
 import {
   useReportModalActions,
   useReportModalIsOpen,
-} from "@/stores/report-modal-store";
+} from "@/stores/report-bug-modal-store";
 import { TextareaWithControl } from "@/components/input/input-with-control";
 import { z } from "zod";
 import { zImages } from "@/lib/zod-schema/image";
-import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TypographyMuted } from "@/components/ui/typography";
-import CreatePostImageChip from "@/components/form/create-post-image-chip";
 import { Button } from "@nextui-org/button";
-import { BsCardImage } from "react-icons/bs";
-import InputFile from "@/components/input/file";
 import CancelButton from "@/components/button/reset-button";
 import { useReportBug } from "@/lib/api/bug/mutation";
 import { toast } from "react-toastify";
+import FileButtonWithControl from "@/components/input/file-button-with-control";
 
 const reportBugValidation = z.object({
   problem: z.string({ required_error: "Must not be empty." }),
@@ -36,7 +34,6 @@ export default function ReportBugModal() {
     handleSubmit,
     control,
     reset,
-    setValue,
     formState: {
       isSubmitSuccessful,
       errors: { images: imagesErrors },
@@ -44,8 +41,6 @@ export default function ReportBugModal() {
   } = useForm<ReportBugValidation>({
     resolver: zodResolver(reportBugValidation),
   });
-
-  const { images } = useWatch({ control });
 
   const onSubmit: SubmitHandler<ReportBugValidation> = async (data) => {
     await toast.promise(
@@ -64,20 +59,6 @@ export default function ReportBugModal() {
       }
     );
   };
-
-  const handleCloseClick = useCallback(
-    (image: File) => {
-      if (!images) return null;
-      const files = (images as File[]).filter(
-        (img) =>
-          !`${img.name}${img.size}${image.type}`.includes(
-            `${image.name}${image.size}${image.type}`
-          )
-      );
-      setValue("images", [...files]);
-    },
-    [images]
-  );
 
   useEffect(() => {
     if (isSubmitSuccessful) {
@@ -101,7 +82,7 @@ export default function ReportBugModal() {
       }
     >
       <form
-        className="flex flex-col gap-4 p-4 md:p-0"
+        className="flex flex-col gap-4 p-4 md:p-0 px-6"
         id="report-bug-form"
         onSubmit={handleSubmit(onSubmit)}
       >
@@ -118,38 +99,7 @@ export default function ReportBugModal() {
             {imagesErrors?.message.toString()}
           </TypographyMuted>
         )}
-        <CreatePostImageChip
-          images={images}
-          onCloseClick={handleCloseClick}
-          className="!flex-wrap"
-        />
-        <Button
-          color="secondary"
-          startContent={<BsCardImage />}
-          className="w-fit"
-        >
-          Add attachments
-          <Controller
-            control={control}
-            name="images"
-            render={({ field: { onChange } }) => (
-              <InputFile
-                className="opacity-0 z-[10] absolute inset-0"
-                id="edit_post_images"
-                onChange={(e) => {
-                  console.log(e.target.files, "FileList");
-                  const files: File[] = [];
-                  Array.from(e.target?.files ?? []).forEach((img) => {
-                    files.push(img);
-                  });
-                  console.log(files, "Files");
-                  onChange(files);
-                }}
-                multiple={true}
-              />
-            )}
-          />
-        </Button>
+        <FileButtonWithControl control={control} name="images" />
       </form>
     </ModalLayoutV2>
   );

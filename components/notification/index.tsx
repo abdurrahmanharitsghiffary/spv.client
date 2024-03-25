@@ -75,6 +75,7 @@ export default function NotificationLists({
         const href = getLink(notification);
         return (
           <ListboxItem
+            textValue={notification.sender.fullName + " " + text}
             className={clsx("bg-content1")}
             key={notification.id}
             classNames={{

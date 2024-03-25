@@ -198,3 +198,5 @@ export type CountType =
   | "chat_rooms"
   | "participated_groups"
   | "comments";
+
+export type ReportType = "user" | "group" | "post" | "comment" | "message";
