@@ -101,7 +101,7 @@ export default function ReportModal() {
     >
       <form
         id="report_form"
-        className="flex flex-col gap-4 p-4 px-6 md:p-0"
+        className="flex flex-col gap-4 p-4 md:p-0 px-2"
         onSubmit={handleSubmit(onSubmit)}
       >
         <h2 className="text-base font-semibold">Report {type}</h2>

@@ -83,8 +83,8 @@ export default function GroupPage({ groupId }: { groupId: number }) {
         if (draft?.pages) {
           draft.pages.forEach((p) => {
             if (p.data) {
-              p.data = p.data.filter((d) =>
-                data.data.some((id) => id === d.id)
+              p.data = p.data.filter(
+                (d) => !data.data.some((id) => id === d.id)
               );
             }
           });

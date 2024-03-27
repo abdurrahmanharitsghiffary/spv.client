@@ -5,6 +5,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import NavActions from "./action";
 import clsx from "clsx";
 import NavEndContent from "./end-content";
+import WebsiteLogo from "../w-logo";
 
 const navItem: string[] = [];
 // ["Home", "Login", "SignUp"];
@@ -52,15 +53,7 @@ export default function Navbar() {
       <NavbarBrand
         className={clsx("hidden md:flex px-4 gap-4", chatId && "!hidden")}
       >
-        <iframe
-          src="https://giphy.com/embed/yfghyBDIZvWchz6A2I"
-          width="80"
-          height="50"
-          frameBorder="0"
-          className="giphy-embed rounded-large"
-          allowFullScreen
-        ></iframe>
-        <span className="font-bold text-xl font-sans">Chipip</span>
+        <WebsiteLogo />
       </NavbarBrand>
       <NavActions pathname={pathname} router={router} />
       <NavEndContent pathname={pathname} router={router} />

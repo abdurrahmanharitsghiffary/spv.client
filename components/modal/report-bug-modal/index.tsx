@@ -99,7 +99,9 @@ export default function ReportBugModal() {
             {imagesErrors?.message.toString()}
           </TypographyMuted>
         )}
-        <FileButtonWithControl control={control} name="images" />
+        <FileButtonWithControl control={control} name="images">
+          Add images
+        </FileButtonWithControl>
       </form>
     </ModalLayoutV2>
   );

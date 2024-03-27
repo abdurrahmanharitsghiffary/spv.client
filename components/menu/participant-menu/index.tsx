@@ -40,7 +40,7 @@ const getPromoteItems = (
     .slice(roles[currentUserRole], roles[selectedUserRole])
     .filter((r) => r !== "creator" && r !== "user")
     .map((r) => ({
-      key: "grant",
+      key: `grant:${r}`,
       label: `Promote to ${r.replaceAll("_", "-")}`,
       icon: <BiUserPlus />,
     }));
@@ -53,7 +53,7 @@ const getDemoteItems = (
   if (roles[currentUserRole] >= roles[selectedUserRole]) return [];
 
   return ra.slice(roles[selectedUserRole] + 1).map((r) => ({
-    key: "dismiss-delete",
+    key: `dismiss-delete:${r}`,
     label: `Demote to ${r}`,
     icon: <BiUserPlus />,
   }));
@@ -79,6 +79,48 @@ export default function ParticipantMenu() {
     selectedParticipant?.data?.role ?? "user";
 
   const handleMenuActions = async (key: React.Key) => {
+    if (key.toString().includes("grant")) {
+      const designatedRole = key.toString().split(":")[1] as any;
+      if (!selectedParticipant) return;
+      await confirm({
+        title: "Promote",
+        body: `Promote this user to ${designatedRole}?`,
+      });
+      await updateParticipantsAsync({
+        body: {
+          participants: [
+            { id: selectedParticipant.data.id, role: designatedRole },
+          ],
+        },
+        params: {
+          groupId: gId,
+        },
+      });
+      return;
+    }
+
+    if (key.toString().includes("dismiss")) {
+      const designatedRole = key.toString().split(":")[1] as any;
+      if (!selectedParticipant) return;
+      await confirm({
+        body: `Dismiss this user from ${designatedRole}?`,
+        title: "Dismiss",
+        confirmLabel: "Dismiss",
+        confirmColor: "danger",
+      });
+      await updateParticipantsAsync({
+        body: {
+          participants: [
+            { id: selectedParticipant.data.id, role: designatedRole },
+          ],
+        },
+        params: {
+          groupId: gId,
+        },
+      });
+      return;
+    }
+
     switch (key) {
       case "profile": {
         router.push(`/users/${participantId}`);
@@ -95,40 +137,6 @@ export default function ParticipantMenu() {
         await removeParticipantsAsync({
           body: {
             ids: [participantId],
-          },
-          params: {
-            groupId: gId,
-          },
-        });
-        return;
-      }
-      case "grant": {
-        if (!selectedParticipant) return;
-        await confirm({
-          title: "Promote",
-          body: "Promote this user to admin?",
-        });
-        await updateParticipantsAsync({
-          body: {
-            participants: [{ id: selectedParticipant.data.id, role: "admin" }],
-          },
-          params: {
-            groupId: gId,
-          },
-        });
-        return;
-      }
-      case "dismiss-delete": {
-        if (!selectedParticipant) return;
-        await confirm({
-          body: "Dismiss this user from admin?",
-          title: "Dismiss",
-          confirmLabel: "Dismiss",
-          confirmColor: "danger",
-        });
-        await updateParticipantsAsync({
-          body: {
-            participants: [{ id: selectedParticipant.data.id, role: "user" }],
           },
           params: {
             groupId: gId,

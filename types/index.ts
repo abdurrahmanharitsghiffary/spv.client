@@ -117,7 +117,10 @@ export type SearchAllData = {
 
 export type Gender = "male" | "female" | "not_say" | null;
 
-export type ParticipantsField = { role: "user" | "admin"; id: number };
+export type ParticipantsField = {
+  role: "user" | "admin" | "co_creator";
+  id: number;
+};
 
 type URP = {
   updating: "participants";
