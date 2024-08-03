@@ -51,7 +51,7 @@ export default function Navbar() {
       onMenuOpenChange={setShowMenu}
     >
       <NavbarBrand
-        className={clsx("hidden md:flex px-4 gap-4", chatId && "!hidden")}
+        className={clsx("hidden md:flex px-8 gap-4", chatId && "!hidden")}
       >
         <WebsiteLogo />
       </NavbarBrand>
