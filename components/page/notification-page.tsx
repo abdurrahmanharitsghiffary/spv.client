@@ -63,7 +63,7 @@ export default function NotificationPage() {
   } = useGetNotifications({ order_by: type });
   const queryClient = useQueryClient();
   const notifications = useMemo(() => resp?.data ?? [], [resp]);
-
+  console.log(resp, "RESPONSE");
   const { ref } = useFetchNextPageObserver({
     isDisabled: isFetchNextNotAvailable,
     isFetching,
